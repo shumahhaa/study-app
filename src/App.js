@@ -43,14 +43,25 @@ function App() {
       />
 
       <p>モチベーション</p>
-      <input
-        type="range"
-        min="1"
-        max="5"
-        value={motivation}
-        onChange={(e) => setMotivation(Number(e.target.value))}
-      />
-      <span>{motivation}</span>
+      <div>
+        {[1,2,3,4,5].map((level) => (
+          <button
+            key={level}
+            onClick={() => setMotivation(level)}
+            style={{
+              margin:"5px",
+              padding:"10px",
+              backgroundColor: motivation === level ? "green" : "gray",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer"
+            }}
+          >
+            {level}
+          </button>
+        ))}
+      </div>
 
       <button
         onClick={startStudy}
