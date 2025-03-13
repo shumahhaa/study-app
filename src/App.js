@@ -1,4 +1,4 @@
-import { use, useState } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
   const [studyTopic, setStudyTopic] = useState("");
@@ -6,13 +6,26 @@ function App() {
   const [studyStartTime, setStudyStartTime] = useState(null);
   const [studyDuration, setStudyDuration] = useState(null);
   const [motivation, setMotivation] = useState(3);
-  const [recordedMotivation, setRecordedMorivation] = useState(null);
+  const [recordedMotivation, setRecordedMotivation] = useState(null);
   
+  useEffect(() => {
+    let interval;
+    if (isStudying) {
+      interval = setInterval(() => {
+        setStudyDuration((prev) => (Date.now() - studyStartTime) / 1000);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+
+    return () => clearInterval(interval);
+  }, [isStudying, studyStartTime]);
+
   const startStudy = () => {
     setStudyStartTime(Date.now());
     setStudyDuration(null);
     setIsStudying(true);
-    setRecordedMorivation(motivation)
+    setRecordedMotivation(motivation)
   }
 
   const stopStudy = () => {
@@ -73,15 +86,16 @@ function App() {
       {isStudying && (
         <div>
           <p>「{studyTopic}の学習を開始しました！」</p>
+          <p>経過時間: {formatTime(studyDuration)}</p>
           <button onClick={stopStudy}>学習終了</button>
         </div>
       )}
 
-      {studyDuration !== null && (
-        <p>学習時間：{formatTime(studyDuration)}</p>
-      )}
-      {studyDuration !== null && (
-        <p>学習開始時のモチベーション：{recordedMotivation}/5</p>
+      {!isStudying && studyDuration > 0 && (
+        <div>
+          <p>最終学習時間: {formatTime(studyDuration)}</p>
+          <p>学習開始時のモチベーション：{recordedMotivation}/5</p>
+        </div>
       )}
     </div>
     );
