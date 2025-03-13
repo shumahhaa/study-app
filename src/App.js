@@ -20,6 +20,15 @@ function App() {
     }
   }
 
+const formatTime = (seconds) => {
+  const minutes = Math.floor(seconds/60);
+  const remainingSeconds = Math.floor(seconds%60)
+  const hours = Math.floor(minutes/60);
+  const remainnigMinutes = Math.floor(minutes%60)
+  return `${hours}時 ${remainnigMinutes}分 ${remainingSeconds}秒`;
+
+}
+
   return (
     <div>
       <h1>学習管理アプリ</h1>
@@ -46,7 +55,7 @@ function App() {
       )}
 
       {studyDuration !== null && (
-        <p>学習時間：{studyDuration}</p>
+        <p>学習時間：{formatTime(studyDuration)}</p>
       )}
     </div>
     );
