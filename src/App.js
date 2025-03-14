@@ -139,21 +139,44 @@ function App() {
         {studyHistory.length === 0 ? (
           <p>学習履歴がありません。</p>
         ) : (
-          <ul>
-            {studyHistory.map((session) => (
-              <li key={session.id}>
-                <strong>学習内容：</strong> {session.topic} <br />
-                <strong>学習時間：</strong> {formatTime(session.duration)} <br />
-                <strong>モチベーション：</strong> {session.motivation}/5 <br />
-                <strong>開始時間：</strong> {new Date(session.startTime).toLocaleString()}
-                <hr />
-              </li>
-            ))}
-          </ul>
+          <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "10px" }}>
+            <thead>
+              <tr style={{ backgroundColor: "#f0f0f0" }}>
+                <th style={tableHeaderStyle}>学習内容</th>
+                <th style={tableHeaderStyle}>学習時間</th>
+                <th style={tableHeaderStyle}>モチベーション</th>
+                <th style={tableHeaderStyle}>開始時間</th>
+              </tr>
+            </thead>
+            <tbody>
+              {studyHistory.map((session) => (
+                <tr key={session.id} style={{ borderBottom: "1px solid #ddd" }}>
+                  <td style={tableCellStyle}>{session.topic}</td>
+                  <td style={tableCellStyle}>{formatTime(session.duration)}</td>
+                  <td style={tableCellStyle}>{session.motivation}/5</td>
+                  <td style={tableCellStyle}>{new Date(session.startTime).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
     </div>
     );
 }
+
+// テーブルのスタイル
+const tableHeaderStyle = {
+  padding: "10px",
+  borderBottom: "2px solid #ddd",
+  textAlign: "left",
+  fontWeight: "bold",
+};
+
+const tableCellStyle = {
+  padding: "10px",
+  borderBottom: "1px solid #ddd",
+  textAlign: "left",
+};
 
 export default App;
