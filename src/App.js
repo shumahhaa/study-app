@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { db } from "./firebase"; // firebase.js から Firestore を import
-import { collection, addDoc, onSnapshot, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp } from "firebase/firestore";
 
 function App() {
   const [studyTopic, setStudyTopic] = useState("");
@@ -70,6 +70,18 @@ function App() {
   
       return () => unsubscribe(); // クリーンアップ処理（コンポーネントがアンマウントされたら監視を解除）
     }, []);
+
+    const deleteStudySession = async (id) => {
+      const confirmDelete = window.confirm("この学習履歴を削除しますか？");
+      if (confirmDelete) {
+        try {
+          await deleteDoc(doc(db, "studySessions", id));
+          console.log("学習履歴を削除しました");
+        } catch (error) {
+          console.error("削除エラー:", error);
+        }
+      }
+    };
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds/60);
@@ -155,6 +167,21 @@ function App() {
                   <td style={tableCellStyle}>{formatTime(session.duration)}</td>
                   <td style={tableCellStyle}>{session.motivation}/5</td>
                   <td style={tableCellStyle}>{new Date(session.startTime).toLocaleString()}</td>
+                  <td style={tableCellStyle}>
+                    <button 
+                      onClick={() => deleteStudySession(session.id)} 
+                      style={{
+                        padding: "5px 10px",
+                        backgroundColor: "blue",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "5px",
+                        cursor: "pointer"
+                      }}
+                    >
+                      削除
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
