@@ -1,6 +1,6 @@
 import React from "react";
 
-const StudyControls = ({ isStudying, startStudy, stopStudy, studyTopic, studyDuration, recordedStudyTopic, recordedMotivation, formatTime }) => {
+const StudyControls = ({ isStudying, isPaused, pauseStudy, resumeStudy, startStudy, stopStudy, studyTopic, studyDuration, recordedStudyTopic, recordedMotivation, formatTime }) => {
   return (
     <div>
       <button onClick={startStudy} disabled={isStudying || studyTopic.trim() === ""}>
@@ -11,6 +11,12 @@ const StudyControls = ({ isStudying, startStudy, stopStudy, studyTopic, studyDur
         <div>
           <p>「{studyTopic}の学習を開始しました！」</p>
           <p>経過時間: {formatTime(studyDuration)}</p>
+          
+          {isPaused ? (
+            <button onClick={resumeStudy}>▶ 再開</button>
+          ) : (
+            <button onClick={pauseStudy}>⏸ 一時停止</button>
+          )}
           <button onClick={stopStudy}>学習終了</button>
         </div>
       )}
