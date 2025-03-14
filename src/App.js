@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { db } from "./firebase"; // firebase.js から Firestore を import
-import { collection, addDoc, getDocs, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, onSnapshot, serverTimestamp } from "firebase/firestore";
 
 function App() {
   const [studyTopic, setStudyTopic] = useState("");
@@ -55,26 +55,21 @@ function App() {
       }
     };
   
-  const fetchStudyHistory = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "studySessions"));
-      const historyData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      // timestamp の降順に並べ替え
-      historyData.sort((a, b) => b.timestamp - a.timestamp);
-
-      setStudyHistory(historyData);
-    } catch (error) {
-      console.error("学習履歴の取得エラー:", error);
-    }
-  };
+    useEffect(() => {
+      const unsubscribe = onSnapshot(collection(db, "studySessions"), (snapshot) => {
+        const historyData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
   
-  useEffect(() => {
-    fetchStudyHistory();
-  }, []);
+        // timestamp の降順に並べ替え
+        historyData.sort((a, b) => b.timestamp - a.timestamp);
+  
+        setStudyHistory(historyData);
+      });
+  
+      return () => unsubscribe(); // クリーンアップ処理（コンポーネントがアンマウントされたら監視を解除）
+    }, []);
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds/60);
