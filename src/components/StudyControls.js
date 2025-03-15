@@ -1,20 +1,29 @@
 import React from "react";
 
 const StudyControls = ({ isStudying, isPaused, pauseStudy, resumeStudy, startStudy, stopStudy, studyTopic, studyDuration, recordedStudyTopic, recordedMotivation, formatTime }) => {
+  
+  const baseButtonStyle = {
+    color: "white",
+    padding: "10px 20px",
+    margin: "5px",
+    border: "none",
+    cursor: "pointer",
+    fontSize: "16px",
+    transition: "background-color 0.3s ease", // ホバー時のエフェクト
+  };
+  
   return (
     <div>
       <button 
         onClick={startStudy} 
         disabled={isStudying || studyTopic.trim() === ""}
         style={{
+          ...baseButtonStyle,
           backgroundColor: isStudying ? "gray" : "green",
-          color: "white",
-          padding: "10px 20px",
-          margin: "5px",
-          border: "none",
           cursor: isStudying ? "not-allowed" : "pointer",
-          fontSize: "16px",
         }}
+        onMouseOver={(e) => !isStudying && (e.target.style.backgroundColor = "lightgreen")}
+        onMouseOut={(e) => !isStudying && (e.target.style.backgroundColor = "green")}
       >
         学習開始
       </button>
@@ -26,16 +35,13 @@ const StudyControls = ({ isStudying, isPaused, pauseStudy, resumeStudy, startStu
           
           {isPaused ? (
             <button
-              nClick={resumeStudy}
+              onClick={resumeStudy}
               style={{
+                ...baseButtonStyle,
                 backgroundColor: "blue",
-                color: "white",
-                padding: "10px 20px",
-                margin: "5px",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "16px",
               }}
+              onMouseOver={(e) => (e.target.style.backgroundColor = "lightblue")}
+              onMouseOut={(e) => (e.target.style.backgroundColor = "blue")}
             >
               ▶ 再開
             </button>
@@ -43,14 +49,11 @@ const StudyControls = ({ isStudying, isPaused, pauseStudy, resumeStudy, startStu
             <button
               onClick={pauseStudy}
               style={{
+                ...baseButtonStyle,
                 backgroundColor: "orange",
-                color: "white",
-                padding: "10px 20px",
-                margin: "5px",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "16px",
               }}
+              onMouseOver={(e) => (e.target.style.backgroundColor = "gold")}
+              onMouseOut={(e) => (e.target.style.backgroundColor = "orange")}
             >
               ⏸ 一時停止
             </button>
@@ -58,14 +61,11 @@ const StudyControls = ({ isStudying, isPaused, pauseStudy, resumeStudy, startStu
           <button 
             onClick={stopStudy}
             style={{
+              ...baseButtonStyle,
               backgroundColor: "red",
-              color: "white",
-              padding: "10px 20px",
-              margin: "5px",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "16px",
             }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "lightcoral")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "red")}
           >
             学習終了
           </button>
