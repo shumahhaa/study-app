@@ -102,10 +102,19 @@ function App() {
 
   const formatTime = (seconds) => `${Math.floor(seconds / 60)}m ${Math.floor(seconds % 60)}s`;
 
+  const getStatus = () => {
+    if (isStudying && isPaused) return { text: "一時停止中", color: "orange" };
+    if (isStudying) return { text: "学習中", color: "green" };
+    return { text: "未開始", color: "gray" };
+  };
+
   return (
     <div>
       <h1>LearnTime</h1>
       <StudyInput studyTopic={studyTopic} setStudyTopic={setStudyTopic} motivation={motivation} setMotivation={setMotivation} />
+      <div style={{ fontSize: "18px", fontWeight: "bold", color: getStatus().color }}>
+        状態: {getStatus().text}
+      </div>
       <StudyControls {...{ isStudying, isPaused, startStudy, stopStudy, pauseStudy, resumeStudy, studyTopic, studyStartTime, pausedTime, studyDuration, recordedStudyTopic, recordedMotivation, formatTime }} />
       <StudyHistory {...{ studyHistory, deleteStudySession, formatTime }} />
     </div>
