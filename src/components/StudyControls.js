@@ -1,16 +1,18 @@
 import React from "react";
 
-const StudyControls = ({ isStudying, isPaused, pauseStudy, resumeStudy, startStudy, stopStudy, studyTopic, studyDuration, recordedStudyTopic, recordedMotivation, formatTime }) => {
-  
-  const baseButtonStyle = {
-    color: "white",
-    padding: "10px 20px",
-    margin: "5px",
-    border: "none",
-    cursor: "pointer",
-    fontSize: "16px",
-    transition: "background-color 0.3s ease", // ホバー時のエフェクト
-  };
+const StudyControls = ({ 
+  isStudying, 
+  isPaused, 
+  pauseStudy, 
+  resumeStudy, 
+  startStudy, 
+  stopStudy, 
+  studyTopic, 
+  studyDuration, 
+  recordedStudyTopic, 
+  recordedMotivation, 
+  formatTime 
+}) => {
   
   return (
     <div>
@@ -31,7 +33,15 @@ const StudyControls = ({ isStudying, isPaused, pauseStudy, resumeStudy, startStu
       {isStudying && (
         <div>
           <p>「{studyTopic}の学習を開始しました！」</p>
-          <p>経過時間: {formatTime(studyDuration)}</p>
+          <p style={{ 
+            fontSize: "32px", 
+            fontWeight: "bold", 
+            textAlign: "center",
+            color: isPaused ? "orange" : "black",
+            transition: "color 0.3s ease-in-out" // 色の変化を滑らかに
+          }}>
+            経過時間： {formatTime(studyDuration)}
+          </p>
           
           {isPaused ? (
             <button
@@ -81,6 +91,16 @@ const StudyControls = ({ isStudying, isPaused, pauseStudy, resumeStudy, startStu
       )}
     </div>
   );
+};
+
+const baseButtonStyle = {
+  color: "white",
+  padding: "10px 20px",
+  margin: "5px",
+  border: "none",
+  cursor: "pointer",
+  fontSize: "16px",
+  transition: "background-color 0.3s ease", // ホバー時のエフェクト
 };
 
 export default StudyControls;

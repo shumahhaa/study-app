@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { db } from "./firebase";
 import { collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp } from "firebase/firestore";
-import StudyInput from "./components/StudyInput";
-import StudyControls from "./components/StudyControls";
-import StudyHistory from "./components/StudyHistory";
+import HomePage from "./pages/HomePage";
+import HistoryPage from "./pages/HistoryPage";
 
 function App() {
   const [studyTopic, setStudyTopic] = useState("");
@@ -14,9 +14,9 @@ function App() {
   const [motivation, setMotivation] = useState(3);
   const [recordedMotivation, setRecordedMotivation] = useState(null);
   const [studyHistory, setStudyHistory] = useState([]);
-  const [isPaused, setIsPaused] = useState(false); 
-  const [pausedTime, setPausedTime] = useState(0); // ← 一時停止時間
-  const [pauseStartTime, setPauseStartTime] = useState(null); // ← 一時停止開始時間を記録
+  const [isPaused, setIsPaused] = useState(false);
+  const [pausedTime, setPausedTime] = useState(0);
+  const [pauseStartTime, setPauseStartTime] = useState(null);
 
   useEffect(() => {
     let interval;
@@ -36,8 +36,8 @@ function App() {
     setIsStudying(true);
     setRecordedMotivation(motivation);
     setRecordedStudyTopic(studyTopic);
-    setPausedTime(0); // 一時停止時間リセット
-    setPauseStartTime(null); // 一時停止時間リセット
+    setPausedTime(0);
+    setPauseStartTime(null);
     setIsPaused(false);
   };
 
@@ -48,11 +48,11 @@ function App() {
 
   const resumeStudy = () => {
     if (pauseStartTime) {
-      const pausedDuration = Date.now() - pauseStartTime; // 一時停止していた時間
-      setPausedTime(prev => prev + pausedDuration); // 累積する
+      const pausedDuration = Date.now() - pauseStartTime;
+      setPausedTime(prev => prev + pausedDuration);
     }
     setIsPaused(false);
-    setPauseStartTime(null); // リセット
+    setPauseStartTime(null);
   };
 
   const stopStudy = async () => {
@@ -60,7 +60,7 @@ function App() {
   
     let totalPausedTime = pausedTime;
     if (isPaused) {
-      totalPausedTime += Date.now() - pauseStartTime;  // 終了時までの経過時間を追加
+      totalPausedTime += Date.now() - pauseStartTime;
     }
 
     const totalDuration = (Date.now() - studyStartTime - totalPausedTime) / 1000;
@@ -109,15 +109,42 @@ function App() {
   };
 
   return (
-    <div>
-      <h1>LearnTime</h1>
-      <StudyInput studyTopic={studyTopic} setStudyTopic={setStudyTopic} motivation={motivation} setMotivation={setMotivation} />
-      <div style={{ fontSize: "18px", fontWeight: "bold", color: getStatus().color }}>
-        状態: {getStatus().text}
-      </div>
-      <StudyControls {...{ isStudying, isPaused, startStudy, stopStudy, pauseStudy, resumeStudy, studyTopic, studyStartTime, pausedTime, studyDuration, recordedStudyTopic, recordedMotivation, formatTime }} />
-      <StudyHistory {...{ studyHistory, deleteStudySession, formatTime }} />
-    </div>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <HomePage
+              studyTopic={studyTopic}
+              setStudyTopic={setStudyTopic}
+              motivation={motivation}
+              setMotivation={setMotivation}
+              isStudying={isStudying}
+              isPaused={isPaused}
+              pauseStudy={pauseStudy}
+              resumeStudy={resumeStudy}
+              startStudy={startStudy}
+              stopStudy={stopStudy}
+              studyDuration={studyDuration}
+              recordedStudyTopic={recordedStudyTopic}
+              recordedMotivation={recordedMotivation}
+              formatTime={formatTime}
+              getStatus={getStatus}
+            />
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <HistoryPage
+              studyHistory={studyHistory}
+              deleteStudySession={deleteStudySession}
+              formatTime={formatTime}
+            />
+          }
+        />
+      </Routes>
+    </Router>
   );
 }
 
