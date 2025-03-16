@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import { db } from "./firebase";
 import { collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp } from "firebase/firestore";
 import HomePage from "./pages/HomePage";
 import HistoryPage from "./pages/HistoryPage";
+import ResultPage from "./pages/ResultPage";
 
-function App() {
+function AppContent() {
+  const navigate = useNavigate();
   const [studyTopic, setStudyTopic] = useState("");
   const [recordedStudyTopic, setRecordedStudyTopic] = useState(null);
   const [isStudying, setIsStudying] = useState(false);
@@ -69,13 +71,26 @@ function App() {
     setIsPaused(false);
     setPauseStartTime(null);
 
+    const studyData = {
+      topic: studyTopic,
+      motivation: recordedMotivation,
+      duration: totalDuration,
+      startTime: studyStartTime,
+      timestamp: serverTimestamp(),
+    };
+
     try {
-      await addDoc(collection(db, "studySessions"), {
-        topic: studyTopic,
-        motivation: recordedMotivation,
-        duration: totalDuration,
-        startTime: studyStartTime,
-        timestamp: serverTimestamp(),
+      await addDoc(collection(db, "studySessions"), studyData);
+      // 結果ページに遷移
+      navigate('/result', { 
+        state: { 
+          studyData: {
+            topic: studyTopic,
+            motivation: recordedMotivation,
+            duration: totalDuration,
+            startTime: studyStartTime
+          }
+        }
       });
     } catch (error) {
       console.error("エラー:", error);
@@ -109,41 +124,48 @@ function App() {
   };
 
   return (
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <HomePage
+            studyTopic={studyTopic}
+            setStudyTopic={setStudyTopic}
+            motivation={motivation}
+            setMotivation={setMotivation}
+            isStudying={isStudying}
+            isPaused={isPaused}
+            pauseStudy={pauseStudy}
+            resumeStudy={resumeStudy}
+            startStudy={startStudy}
+            stopStudy={stopStudy}
+            studyDuration={studyDuration}
+            recordedStudyTopic={recordedStudyTopic}
+            recordedMotivation={recordedMotivation}
+            formatTime={formatTime}
+            getStatus={getStatus}
+          />
+        }
+      />
+      <Route
+        path="/history"
+        element={
+          <HistoryPage
+            studyHistory={studyHistory}
+            deleteStudySession={deleteStudySession}
+            formatTime={formatTime}
+          />
+        }
+      />
+      <Route path="/result" element={<ResultPage />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
     <Router>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <HomePage
-              studyTopic={studyTopic}
-              setStudyTopic={setStudyTopic}
-              motivation={motivation}
-              setMotivation={setMotivation}
-              isStudying={isStudying}
-              isPaused={isPaused}
-              pauseStudy={pauseStudy}
-              resumeStudy={resumeStudy}
-              startStudy={startStudy}
-              stopStudy={stopStudy}
-              studyDuration={studyDuration}
-              recordedStudyTopic={recordedStudyTopic}
-              recordedMotivation={recordedMotivation}
-              formatTime={formatTime}
-              getStatus={getStatus}
-            />
-          }
-        />
-        <Route
-          path="/history"
-          element={
-            <HistoryPage
-              studyHistory={studyHistory}
-              deleteStudySession={deleteStudySession}
-              formatTime={formatTime}
-            />
-          }
-        />
-      </Routes>
+      <AppContent />
     </Router>
   );
 }
