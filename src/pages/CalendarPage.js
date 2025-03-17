@@ -7,9 +7,6 @@ const CalendarPage = ({ studyHistory, formatTime }) => {
     <Layout>
       <div style={styles.container}>
         <h1 style={styles.title}>学習カレンダー</h1>
-        <p style={styles.description}>
-          カレンダーで学習履歴を確認できます。日付をクリックすると、その日の学習セッションが表示されます。
-        </p>
         <CalendarView studyHistory={studyHistory} formatTime={formatTime} />
       </div>
     </Layout>
@@ -26,7 +23,8 @@ const styles = {
     fontSize: '28px',
     fontWeight: '700',
     color: '#333',
-    marginBottom: '10px',
+    marginBottom: '30px',
+    textAlign: 'center',
   },
   description: {
     fontSize: '16px',

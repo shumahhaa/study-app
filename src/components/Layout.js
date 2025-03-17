@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
-const Layout = ({ children }) => {
+const Layout = ({ children, isStudying }) => {
   const location = useLocation();
   
   // 現在のパスに基づいてアクティブなリンクを判定
@@ -9,12 +9,15 @@ const Layout = ({ children }) => {
     return location.pathname === path;
   };
 
+  // ロゴのリンク先を決定
+  const logoLinkPath = isStudying ? "/active" : "/";
+
   return (
     <div style={styles.container}>
       <header style={styles.header}>
         <div style={styles.headerContent}>
-          <Link to="/" style={styles.logoLink} title="ホームに戻る">
-            <div style={styles.logo}>
+          <Link to={logoLinkPath} style={styles.logoLink} title={isStudying ? "学習管理画面へ" : "ホームに戻る"}>
+            <div className="logo-container" style={styles.logo}>
               <span style={styles.logoIcon}>⏱️</span>
               <span style={styles.logoText}>Learn<span style={styles.logoHighlight}>Time</span></span>
             </div>
@@ -23,28 +26,19 @@ const Layout = ({ children }) => {
           <nav style={styles.nav}>
             <Link 
               to="/analytics" 
-              style={{
-                ...styles.navLink,
-                ...(isActive('/analytics') ? styles.activeLink : {})
-              }}
+              className={`nav-link ${isActive('/analytics') ? 'active-link' : ''}`}
             >
-              分析
+              学習分析
             </Link>
             <Link 
               to="/calendar" 
-              style={{
-                ...styles.navLink,
-                ...(isActive('/calendar') ? styles.activeLink : {})
-              }}
+              className={`nav-link ${isActive('/calendar') ? 'active-link' : ''}`}
             >
               カレンダー
             </Link>
             <Link 
               to="/history" 
-              style={{
-                ...styles.navLink,
-                ...(isActive('/history') ? styles.activeLink : {})
-              }}
+              className={`nav-link ${isActive('/history') ? 'active-link' : ''}`}
             >
               学習履歴
             </Link>
@@ -56,7 +50,7 @@ const Layout = ({ children }) => {
       </main>
       <footer style={styles.footer}>
         <div style={styles.footerContent}>
-          <p style={styles.copyright}>© 2023 LearnTime. All rights reserved.</p>
+          <p style={styles.copyright}>© 2025 LearnTime. All rights reserved.</p>
         </div>
       </footer>
     </div>
@@ -119,24 +113,26 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "4px 8px",
-    backgroundColor: "#2196F3",
-    color: "white",
+    padding: "6px 12px",
+    color: "#555",
     textDecoration: "none",
     borderRadius: "6px",
     fontWeight: "500",
-    transition: "background-color 0.3s, transform 0.2s",
-    minWidth: "100px",
-    height: "40px",
-    textAlign: "center",
-    ":hover": {
-      backgroundColor: "#1976D2",
-      transform: "translateY(-2px)"
-    }
+    fontSize: "14px",
+    transition: "all 0.2s ease",
+    margin: "0 4px",
+    minWidth: "80px",
+    height: "32px",
+    backgroundColor: "#f5f5f5",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+    border: "1px solid #eaeaea",
   },
   activeLink: {
-    backgroundColor: "#1976D2",
-    transform: "translateY(-2px)"
+    backgroundColor: "#2196F3",
+    color: "white",
+    boxShadow: "0 2px 4px rgba(33,150,243,0.2)",
+    border: "1px solid #1e88e5",
+    fontWeight: "600",
   },
   main: {
     flex: 1,

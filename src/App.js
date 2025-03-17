@@ -90,6 +90,16 @@ function App() {
     }
   };
 
+  const abandonStudy = () => {
+    setIsStudying(false);
+    setIsPaused(false);
+    setPauseStartTime(null);
+    setStudyDuration(0);
+    setStudyStartTime(null);
+    setRecordedStudyTopic(null);
+    setRecordedMotivation(null);
+  };
+
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "studySessions"), (snapshot) => {
       const historyData = snapshot.docs.map((doc) => ({
@@ -156,6 +166,7 @@ function App() {
               resumeStudy={resumeStudy}
               startStudy={startStudy}
               stopStudy={stopStudy}
+              abandonStudy={abandonStudy}
               studyDuration={studyDuration}
               recordedStudyTopic={recordedStudyTopic}
               recordedMotivation={recordedMotivation}
@@ -175,7 +186,9 @@ function App() {
               pauseStudy={pauseStudy}
               resumeStudy={resumeStudy}
               stopStudy={stopStudy}
+              abandonStudy={abandonStudy}
               recordedMotivation={recordedMotivation}
+              isStudying={isStudying}
             />
           }
         />

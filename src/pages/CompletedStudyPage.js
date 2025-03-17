@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 
@@ -11,7 +11,6 @@ const CompletedStudyPage = ({
   pausedTime
 }) => {
   const navigate = useNavigate();
-  const [showConfetti, setShowConfetti] = useState(true);
   const endTime = studyStartTime ? studyStartTime + (studyDuration * 1000) + pausedTime : null;
 
   // 学習内容がなければホームページにリダイレクト
@@ -19,13 +18,6 @@ const CompletedStudyPage = ({
     if (!recordedStudyTopic) {
       navigate("/");
     }
-    
-    // 5秒後にコンフェティを非表示
-    const timer = setTimeout(() => {
-      setShowConfetti(false);
-    }, 5000);
-    
-    return () => clearTimeout(timer);
   }, [recordedStudyTopic, navigate]);
 
   // モチベーションに応じた色を取得
@@ -38,19 +30,6 @@ const CompletedStudyPage = ({
       5: "#4CAF50"
     };
     return colors[level] || "#ddd";
-  };
-
-  // 学習時間に応じたメッセージを取得
-  const getCompletionMessage = () => {
-    if (studyDuration < 300) { // 5分未満
-      return "短い時間でも、一歩前進です！";
-    } else if (studyDuration < 1200) { // 20分未満
-      return "素晴らしい集中力でした！";
-    } else if (studyDuration < 3600) { // 1時間未満
-      return "すごい頑張りました！充実した学習時間でしたね！";
-    } else { // 1時間以上
-      return "驚異的な集中力です！長時間の学習、本当にお疲れ様でした！";
-    }
   };
 
   // 学習時間のフォーマット
@@ -102,67 +81,48 @@ const CompletedStudyPage = ({
   return (
     <Layout>
       <div style={styles.container}>
-        {showConfetti && (
-          <div style={styles.confetti}>
-            {Array.from({ length: 50 }).map((_, i) => (
-              <div 
-                key={i}
-                style={{
-                  ...styles.confettiPiece,
-                  left: `${Math.random() * 100}%`,
-                  width: `${Math.random() * 10 + 5}px`,
-                  height: `${Math.random() * 10 + 5}px`,
-                  backgroundColor: ['#f44336', '#2196f3', '#ffeb3b', '#4caf50', '#9c27b0'][Math.floor(Math.random() * 5)],
-                  animation: `fall ${Math.random() * 3 + 2}s linear forwards, sway ${Math.random() * 2 + 3}s ease-in-out infinite alternate`
-                }}
-              />
-            ))}
-          </div>
-        )}
-        
         <div style={styles.completionCard}>
           <div style={styles.completionHeader}>
-            <h1 style={styles.completionTitle}>学習完了！</h1>
-            <p style={styles.completionMessage}>{getCompletionMessage()}</p>
+            <div style={styles.completionIcon}>✓</div>
+            <h1 style={styles.completionTitle}>学習完了</h1>
+            <p style={styles.completionSubtitle}>お疲れ様でした！また一歩成長しました！</p>
           </div>
           
           <div style={styles.summarySection}>
-            <div style={styles.summaryItem}>
-              <span style={styles.summaryLabel}>学習内容</span>
-              <span style={styles.summaryValue}>{recordedStudyTopic}</span>
-            </div>
-            
-            <div style={styles.summaryItem}>
-              <span style={styles.summaryLabel}>学習時間</span>
-              <span style={styles.summaryValue}>{formatDuration(studyDuration)}</span>
-            </div>
-            
-            <div style={styles.summaryItem}>
-              <span style={styles.summaryLabel}>休憩時間</span>
-              <span style={styles.summaryValue}>{formatDuration(pausedTime / 1000)}</span>
-            </div>
-            
-            <div style={styles.summaryItem}>
-              <span style={styles.summaryLabel}>開始時間</span>
-              <span style={styles.summaryValue}>{formatDateTime(studyStartTime)}</span>
-            </div>
-            
-            <div style={styles.summaryItem}>
-              <span style={styles.summaryLabel}>終了時間</span>
-              <span style={styles.summaryValue}>{formatDateTime(endTime)}</span>
-            </div>
-            
-            <div style={styles.summaryItem}>
-              <span style={styles.summaryLabel}>開始時のモチベーション</span>
-              <div 
-                style={{
-                  ...styles.motivationBadge,
-                  backgroundColor: getMotivationColor(recordedMotivation)
-                }}
-              >
-                {recordedMotivation}/5
-              </div>
-            </div>
+            <table style={styles.summaryTable}>
+              <tbody>
+                <tr style={styles.tableRow}>
+                  <td style={styles.tableLabel}>学習内容:</td>
+                  <td style={styles.tableValue}>{recordedStudyTopic}</td>
+                </tr>
+                
+                <tr style={styles.tableRow}>
+                  <td style={styles.tableLabel}>モチベーション:</td>
+                  <td style={styles.tableValue}>
+                    <strong>{recordedMotivation}/5</strong>
+                  </td>
+                </tr>
+                
+                <tr style={styles.tableRow}>
+                  <td style={styles.tableLabel}>学習時間:</td>
+                  <td style={styles.tableValue}>{formatDuration(studyDuration)}</td>
+                </tr>
+                
+                <tr style={styles.tableRow}>
+                  <td style={styles.tableLabel}>休憩時間:</td>
+                  <td style={styles.tableValue}>{formatDuration(pausedTime / 1000)}</td>
+                </tr>
+                
+                <tr style={styles.tableRow}>
+                  <td style={styles.tableLabel}>時間:</td>
+                  <td style={styles.tableValue}>
+                    <span>{formatDateTime(studyStartTime)}</span>
+                    <span style={styles.timelineArrow}>→</span>
+                    <span>{formatDateTime(endTime)}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
           
           <div style={styles.actionsSection}>
@@ -181,127 +141,130 @@ const CompletedStudyPage = ({
 
 const styles = {
   container: {
-    maxWidth: "800px",
+    maxWidth: "700px",
     margin: "0 auto",
-    padding: "20px",
-    position: "relative",
-    overflow: "hidden",
-  },
-  confetti: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    pointerEvents: "none",
-    zIndex: 100,
-  },
-  confettiPiece: {
-    position: "absolute",
-    top: "-10px",
-    borderRadius: "2px",
+    padding: "15px",
   },
   completionCard: {
     backgroundColor: "white",
     borderRadius: "12px",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-    padding: "30px",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
+    padding: "25px",
     marginTop: "20px",
-    position: "relative",
-    zIndex: 10,
+    width: "100%",
   },
   completionHeader: {
     textAlign: "center",
-    marginBottom: "30px",
+    marginBottom: "25px",
+  },
+  completionIcon: {
+    width: "50px",
+    height: "50px",
+    borderRadius: "50%",
+    backgroundColor: "#4CAF50",
+    color: "white",
+    fontSize: "30px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: "0 auto 15px",
+    fontWeight: "bold",
   },
   completionTitle: {
-    fontSize: "36px",
-    color: "#2196F3",
-    margin: 0,
-    marginBottom: "10px",
+    fontSize: "24px",
+    color: "#333",
+    margin: "0 0 5px 0",
   },
-  completionMessage: {
-    fontSize: "18px",
-    color: "#555",
+  completionSubtitle: {
+    fontSize: "16px",
+    color: "#666",
     margin: 0,
   },
   summarySection: {
     backgroundColor: "#f9f9f9",
-    borderRadius: "8px",
+    borderRadius: "10px",
     padding: "20px",
-    marginBottom: "30px",
+    marginBottom: "25px",
+    overflowX: "auto",
   },
-  summaryItem: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "12px 0",
-    borderBottom: "1px solid #eee",
+  summaryTable: {
+    width: "100%",
+    borderCollapse: "separate",
+    borderSpacing: "0 8px",
+    tableLayout: "fixed",
   },
-  summaryLabel: {
-    fontSize: "16px",
+  tableRow: {
+    backgroundColor: "white",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+  },
+  tableLabel: {
+    padding: "12px 15px",
+    fontSize: "14px",
     color: "#666",
     fontWeight: "500",
+    width: "120px",
+    textAlign: "left",
+    borderTopLeftRadius: "8px",
+    borderBottomLeftRadius: "8px",
+    verticalAlign: "top",
   },
-  summaryValue: {
-    fontSize: "18px",
+  tableValue: {
+    padding: "12px 15px",
+    fontSize: "15px",
     color: "#333",
-    fontWeight: "600",
+    fontWeight: "700",
+    textAlign: "left",
+    borderTopRightRadius: "8px",
+    borderBottomRightRadius: "8px",
+    verticalAlign: "top",
+    wordBreak: "break-word",
   },
-  motivationBadge: {
-    display: "inline-block",
-    padding: "6px 12px",
-    color: "white",
-    borderRadius: "20px",
-    fontSize: "14px",
-    fontWeight: "500",
-    textAlign: "center",
-    minWidth: "50px",
+  timelineArrow: {
+    margin: "0 10px",
+    color: "#2196F3",
+    fontWeight: "bold",
+    whiteSpace: "nowrap",
   },
   actionsSection: {
     display: "flex",
     justifyContent: "center",
-    gap: "20px",
+    gap: "15px",
   },
   homeButton: {
-    padding: "12px 24px",
+    padding: "12px 20px",
     backgroundColor: "#2196F3",
     color: "white",
     border: "none",
-    borderRadius: "8px",
-    fontSize: "16px",
+    borderRadius: "6px",
+    fontSize: "15px",
     fontWeight: "600",
     cursor: "pointer",
     textDecoration: "none",
     textAlign: "center",
-    transition: "background-color 0.3s",
+    transition: "all 0.2s ease",
+    boxShadow: "0 2px 4px rgba(33, 150, 243, 0.2)",
+    letterSpacing: "0.5px",
+    minWidth: "140px",
   },
   historyButton: {
-    padding: "12px 24px",
-    backgroundColor: "#03A9F4",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    fontSize: "16px",
+    padding: "12px 20px",
+    backgroundColor: "white",
+    color: "#333",
+    border: "1px solid #ddd",
+    borderRadius: "6px",
+    fontSize: "15px",
     fontWeight: "600",
     cursor: "pointer",
     textDecoration: "none",
     textAlign: "center",
-    transition: "background-color 0.3s",
+    transition: "all 0.2s ease",
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
+    letterSpacing: "0.5px",
+    minWidth: "140px",
   },
-  "@keyframes fall": {
-    "to": {
-      top: "100vh",
-      transform: "rotate(360deg)",
-    }
-  },
-  "@keyframes sway": {
-    "from": {
-      transform: "translateX(-10px)",
-    },
-    "to": {
-      transform: "translateX(10px)",
-    }
+  buttonIcon: {
+    marginRight: "8px",
+    fontSize: "16px",
   }
 };
 

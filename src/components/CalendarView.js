@@ -21,8 +21,13 @@ const CalendarView = ({ studyHistory, formatTime }) => {
     const data = {};
     
     studyHistory.forEach(session => {
+      // タイムゾーンを考慮した日付の取得
       const date = new Date(session.startTime);
-      const dateStr = date.toISOString().split('T')[0];
+      // 現地時間でのYYYY-MM-DD形式に変換
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
       
       if (!data[dateStr]) {
         data[dateStr] = {
@@ -43,7 +48,12 @@ const CalendarView = ({ studyHistory, formatTime }) => {
 
   // 選択された日付のセッションを更新
   const updateSelectedDateSessions = (date, data) => {
-    const dateStr = date.toISOString().split('T')[0];
+    // 選択された日付をローカルタイムゾーンでYYYY-MM-DD形式に変換
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+    
     const sessions = data[dateStr]?.sessions || [];
     setSelectedDateSessions(sessions);
     
@@ -96,7 +106,12 @@ const CalendarView = ({ studyHistory, formatTime }) => {
   const tileContent = ({ date, view }) => {
     if (view !== 'month') return null;
     
-    const dateStr = date.toISOString().split('T')[0];
+    // 選択された日付をローカルタイムゾーンでYYYY-MM-DD形式に変換
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+    
     const dateData = calendarData[dateStr];
     
     if (!dateData) return null;
@@ -123,7 +138,12 @@ const CalendarView = ({ studyHistory, formatTime }) => {
   const tileClassName = ({ date, view }) => {
     if (view !== 'month') return '';
     
-    const dateStr = date.toISOString().split('T')[0];
+    // 選択された日付をローカルタイムゾーンでYYYY-MM-DD形式に変換
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+    
     return calendarData[dateStr] ? 'has-study-session' : '';
   };
 
@@ -165,6 +185,14 @@ const CalendarView = ({ studyHistory, formatTime }) => {
   const renderPieChart = () => {
     if (topicDistribution.length === 0) return null;
     
+    // 0より大きい値を持つデータのみをフィルタリング
+    const validDistribution = topicDistribution.filter(item => item.duration > 0);
+    
+    // 有効なデータがない場合
+    if (validDistribution.length === 0) {
+      return <div style={styles.noDataMessage}>有効なデータがありません</div>;
+    }
+    
     const size = 200;
     const radius = size / 2;
     const centerX = radius;
@@ -174,77 +202,165 @@ const CalendarView = ({ studyHistory, formatTime }) => {
     const paths = [];
     const labels = [];
     
-    topicDistribution.forEach((item, index) => {
-      const angle = (item.percentage / 100) * 360;
-      const endAngle = startAngle + angle;
-      
-      // 円弧のパスを計算
-      const startRad = (startAngle - 90) * (Math.PI / 180);
-      const endRad = (endAngle - 90) * (Math.PI / 180);
-      
-      const x1 = centerX + radius * Math.cos(startRad);
-      const y1 = centerY + radius * Math.sin(startRad);
-      const x2 = centerX + radius * Math.cos(endRad);
-      const y2 = centerY + radius * Math.sin(endRad);
-      
-      const largeArcFlag = angle > 180 ? 1 : 0;
-      
-      const pathData = [
-        `M ${centerX} ${centerY}`,
-        `L ${x1} ${y1}`,
-        `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
-        'Z'
-      ].join(' ');
+    // 単一トピックの場合（100%）の特別処理
+    if (validDistribution.length === 1) {
+      const item = validDistribution[0];
       
       paths.push(
-        <path
-          key={index}
-          d={pathData}
+        <circle
+          key="full-circle"
+          cx={centerX}
+          cy={centerY}
+          r={radius}
           fill={item.color}
           stroke="#fff"
           strokeWidth="1"
         />
       );
       
-      // ラベルの位置を計算（スライスの中央）
-      if (item.percentage >= 5) { // 5%以上のスライスにのみラベルを表示
-        const midAngle = startAngle + (angle / 2);
-        const midRad = (midAngle - 90) * (Math.PI / 180);
-        
-        // ラベルを円の中心から少し離す
-        const labelRadius = radius * 0.7;
-        const labelX = centerX + labelRadius * Math.cos(midRad);
-        const labelY = centerY + labelRadius * Math.sin(midRad);
-        
-        labels.push(
-          <text
-            key={`label-${index}`}
-            x={labelX}
-            y={labelY}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fill="#fff"
-            fontWeight="bold"
-            fontSize="12"
-          >
-            {item.percentage}%
-          </text>
-        );
-      }
+      // 中央にラベルを表示
+      labels.push(
+        <text
+          key="center-label"
+          x={centerX}
+          y={centerY - 10}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill="#fff"
+          fontWeight="bold"
+          fontSize="16"
+        >
+          100%
+        </text>
+      );
       
-      startAngle = endAngle;
-    });
+      // トピック名を表示
+      labels.push(
+        <text
+          key="topic-label"
+          x={centerX}
+          y={centerY + 15}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill="#fff"
+          fontWeight="bold"
+          fontSize="12"
+        >
+          {item.topic}
+        </text>
+      );
+    } else {
+      // 複数トピックの場合は通常の円グラフを描画
+      validDistribution.forEach((item, index) => {
+        const angle = (item.percentage / 100) * 360;
+        const endAngle = startAngle + angle;
+        
+        // 円弧のパスを計算
+        const startRad = (startAngle - 90) * (Math.PI / 180);
+        const endRad = (endAngle - 90) * (Math.PI / 180);
+        
+        const x1 = centerX + radius * Math.cos(startRad);
+        const y1 = centerY + radius * Math.sin(startRad);
+        const x2 = centerX + radius * Math.cos(endRad);
+        const y2 = centerY + radius * Math.sin(endRad);
+        
+        const largeArcFlag = angle > 180 ? 1 : 0;
+        
+        const pathData = [
+          `M ${centerX} ${centerY}`,
+          `L ${x1} ${y1}`,
+          `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
+          'Z'
+        ].join(' ');
+        
+        paths.push(
+          <path
+            key={index}
+            d={pathData}
+            fill={item.color}
+            stroke="#fff"
+            strokeWidth="1"
+          />
+        );
+        
+        // スライスが十分な大きさの場合にのみラベルを表示
+        if (item.percentage >= 8) { // 8%以上のスライスにラベルを表示
+          const midAngle = startAngle + (angle / 2);
+          const midRad = (midAngle - 90) * (Math.PI / 180);
+          
+          // パーセンテージラベルの位置（円の中心から少し離す）
+          const percentLabelRadius = radius * 0.6;
+          const percentLabelX = centerX + percentLabelRadius * Math.cos(midRad);
+          const percentLabelY = centerY + percentLabelRadius * Math.sin(midRad);
+          
+          // トピック名ラベルの位置（パーセンテージラベルの下）
+          const topicLabelRadius = radius * 0.6;
+          const topicLabelX = centerX + topicLabelRadius * Math.cos(midRad);
+          const topicLabelY = centerY + topicLabelRadius * Math.sin(midRad) + 15;
+          
+          // パーセンテージラベル
+          labels.push(
+            <text
+              key={`percent-${index}`}
+              x={percentLabelX}
+              y={percentLabelY}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="#fff"
+              fontWeight="bold"
+              fontSize="12"
+            >
+              {item.percentage}%
+            </text>
+          );
+          
+          // トピック名ラベル（短縮表示）
+          const shortTopicName = item.topic.length > 8 ? item.topic.substring(0, 7) + '...' : item.topic;
+          
+          labels.push(
+            <text
+              key={`topic-${index}`}
+              x={topicLabelX}
+              y={topicLabelY}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="#fff"
+              fontWeight="bold"
+              fontSize="10"
+            >
+              {shortTopicName}
+            </text>
+          );
+        }
+        
+        startAngle = endAngle;
+      });
+    }
     
     return (
       <div style={styles.pieChartContainer}>
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <circle 
+            cx={centerX} 
+            cy={centerY} 
+            r={radius} 
+            fill="#f5f5f5" 
+          />
           {paths}
           {labels}
         </svg>
         <div style={styles.pieChartLegend}>
-          {topicDistribution.map((item, index) => (
-            <div key={index} style={styles.legendItem}>
-              <div style={{ ...styles.legendColor, backgroundColor: item.color }}></div>
+          {validDistribution.map((item, index) => (
+            <div 
+              key={index} 
+              style={styles.legendItem}
+            >
+              <div 
+                style={{ 
+                  ...styles.legendColor, 
+                  backgroundColor: item.color
+                }}
+              ></div>
               <div style={styles.legendText}>
                 <span style={styles.legendTopic}>{item.topic}</span>
                 <span style={styles.legendTime}>{formatTime(item.duration)} ({item.percentage}%)</span>
@@ -288,7 +404,11 @@ const CalendarView = ({ studyHistory, formatTime }) => {
               </div>
               <div style={styles.legendItem}>
                 <div style={{...styles.legendColor, backgroundColor: 'rgba(76, 175, 80, 0.8)'}}></div>
-                <span>3時間以上</span>
+                <span>3〜4時間</span>
+              </div>
+              <div style={styles.legendItem}>
+                <div style={{...styles.legendColor, backgroundColor: 'rgba(76, 175, 80, 1.0)'}}></div>
+                <span>4時間以上</span>
               </div>
             </div>
           </div>
@@ -329,7 +449,7 @@ const CalendarView = ({ studyHistory, formatTime }) => {
               </div>
               
               <div style={styles.summaryCard}>
-                <div style={styles.pieChartHeader}>トピック分布</div>
+                <div style={styles.pieChartHeader}>学習内容の分布</div>
                 {/* 円グラフを表示 */}
                 {renderPieChart()}
               </div>
@@ -340,37 +460,42 @@ const CalendarView = ({ studyHistory, formatTime }) => {
               <div style={styles.sessionsList}>
                 {selectedDateSessions.map(session => (
                   <div key={session.id} style={styles.sessionCard}>
-                    <div style={styles.sessionHeader}>
-                      <h4 style={styles.sessionTopic}>{session.topic}</h4>
-                      <div 
-                        style={{
-                          ...styles.motivationBadge,
-                          backgroundColor: getMotivationColor(session.motivation)
-                        }}
-                      >
-                        モチベーション: {session.motivation}/5
+                    <div style={styles.sessionRow}>
+                      <div style={styles.sessionItem}>
+                        <span style={styles.itemLabel}>学習内容</span>
+                        <span style={styles.itemValue}>{session.topic}</span>
                       </div>
-                    </div>
-                    
-                    <div style={styles.sessionDetails}>
-                      <div style={styles.sessionDetail}>
-                        <span style={styles.detailLabel}>学習時間</span>
-                        <span style={styles.detailValue}>{formatTime(session.duration)}</span>
+                      
+                      <div style={styles.sessionItem}>
+                        <span style={styles.itemLabel}>学習時間</span>
+                        <span style={styles.itemValue}>{formatTime(session.duration)}</span>
                       </div>
-                      <div style={styles.sessionDetail}>
-                        <span style={styles.detailLabel}>開始時間</span>
-                        <span style={styles.detailValue}>{formatDateTime(session.startTime)}</span>
+                      
+                      <div style={styles.sessionItem}>
+                        <span style={styles.itemLabel}>開始時間</span>
+                        <span style={styles.itemValue}>{formatDateTime(session.startTime)}</span>
                       </div>
-                      <div style={styles.sessionDetail}>
-                        <span style={styles.detailLabel}>終了時間</span>
-                        <span style={styles.detailValue}>{formatDateTime(session.endTime)}</span>
+                      
+                      <div style={styles.sessionItem}>
+                        <span style={styles.itemLabel}>終了時間</span>
+                        <span style={styles.itemValue}>{formatDateTime(session.endTime)}</span>
                       </div>
-                      {session.pausedTime > 0 && (
-                        <div style={styles.sessionDetail}>
-                          <span style={styles.detailLabel}>休憩時間</span>
-                          <span style={styles.detailValue}>{formatTime(session.pausedTime)}</span>
+                      
+                      <div style={styles.sessionItem}>
+                        <span style={styles.itemLabel}>休憩時間</span>
+                        <span style={styles.itemValue}>{session.pausedTime > 0 ? formatTime(session.pausedTime) : "0秒"}</span>
+                      </div>
+                      
+                      <div style={styles.motivationContainer}>
+                        <div 
+                          style={{
+                            ...styles.motivationBadge,
+                            backgroundColor: getMotivationColor(session.motivation)
+                          }}
+                        >
+                          モチベーション: {session.motivation}/5
                         </div>
-                      )}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -543,10 +668,10 @@ const styles = {
     gap: '20px',
   },
   pieChartLegend: {
-    display: 'flex',
-    flexDirection: 'column',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
     gap: '10px',
-    maxWidth: '300px',
+    maxWidth: '100%',
     width: '100%',
     marginTop: '10px',
   },
@@ -583,63 +708,56 @@ const styles = {
     gap: '15px',
   },
   sessionCard: {
-    padding: '20px',
+    padding: '15px',
     backgroundColor: 'white',
     borderRadius: '8px',
     boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
     transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-    ':hover': {
-      transform: 'translateY(-2px)',
-      boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-    },
   },
-  sessionHeader: {
+  sessionRow: {
     display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '15px',
     flexWrap: 'wrap',
-    gap: '10px',
+    alignItems: 'center',
+    gap: '15px',
   },
-  sessionTopic: {
-    margin: 0,
-    fontSize: '18px',
-    fontWeight: '600',
+  sessionItem: {
+    display: 'flex',
+    flexDirection: 'column',
+    minWidth: '120px',
+    flex: '1',
+  },
+  itemLabel: {
+    fontSize: '13px',
+    color: '#666',
+    marginBottom: '3px',
+  },
+  itemValue: {
+    fontSize: '15px',
+    fontWeight: '500',
     color: '#333',
+  },
+  motivationContainer: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    minWidth: '150px',
   },
   motivationBadge: {
     display: 'inline-block',
-    padding: '8px 12px',
+    padding: '6px 10px',
     color: 'white',
     borderRadius: '20px',
     fontSize: '14px',
     fontWeight: '500',
     textAlign: 'center',
-    minWidth: '150px',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   },
-  sessionDetails: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '20px',
-    backgroundColor: '#f9f9f9',
-    padding: '15px',
-    borderRadius: '8px',
-  },
-  sessionDetail: {
-    display: 'flex',
-    flexDirection: 'column',
-    minWidth: '120px',
-  },
-  detailLabel: {
-    fontSize: '13px',
+  noDataMessage: {
+    textAlign: 'center',
+    padding: '50px 0',
     color: '#666',
-    marginBottom: '5px',
-  },
-  detailValue: {
-    fontSize: '16px',
-    fontWeight: '500',
-    color: '#333',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '10px',
+    border: '1px dashed #ddd',
   },
 };
 

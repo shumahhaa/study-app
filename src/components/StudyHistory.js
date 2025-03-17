@@ -210,11 +210,11 @@ const StudyHistory = ({ studyHistory, deleteStudySession, formatTime }) => {
             placeholder="学習内容で検索..."
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            style={styles.searchInput}
+            className="search-input"
           />
           <button 
             onClick={() => setAdvancedSearchOpen(!advancedSearchOpen)}
-            style={styles.advancedSearchButton}
+            className={`advanced-search-button ${advancedSearchOpen ? 'active' : ''}`}
           >
             {advancedSearchOpen ? '基本検索に戻る' : '高度な検索'}
           </button>
@@ -227,7 +227,7 @@ const StudyHistory = ({ studyHistory, deleteStudySession, formatTime }) => {
             <h3 style={styles.advancedSearchTitle}>高度な検索</h3>
             <button 
               onClick={resetFilters}
-              style={styles.resetButton}
+              className="reset-button"
             >
               リセット
             </button>
@@ -351,7 +351,7 @@ const StudyHistory = ({ studyHistory, deleteStudySession, formatTime }) => {
           {(filter || Object.values(advancedFilters).some(v => v)) && (
             <button 
               onClick={resetFilters}
-              style={styles.resetFiltersButton}
+              className="reset-filters-button"
             >
               検索条件をリセット
             </button>
@@ -386,7 +386,7 @@ const StudyHistory = ({ studyHistory, deleteStudySession, formatTime }) => {
                 >
                   開始時間 {getSortIcon("startTime")}
                 </th>
-                <th style={styles.tableHeader}>操作</th>
+                <th style={styles.tableHeader}></th>
               </tr>
             </thead>
             <tbody>
@@ -413,10 +413,11 @@ const StudyHistory = ({ studyHistory, deleteStudySession, formatTime }) => {
                   <td style={styles.tableCell}>
                     <button
                       onClick={() => deleteStudySession(session.id)}
-                      style={styles.deleteButton}
-                      title="この学習記録を削除"
+                      className="delete-button"
+                      title="削除"
                     >
-                      削除
+                      <span className="delete-icon">×</span>
+                      <span className="delete-text">削除</span>
                     </button>
                   </td>
                 </tr>
@@ -611,14 +612,35 @@ const styles = {
     color: '#333',
   },
   deleteButton: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "5px",
     padding: "8px 12px",
-    backgroundColor: "#f44336",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
+    backgroundColor: "transparent",
+    color: "#f44336",
+    border: "1px solid #f44336",
+    borderRadius: "20px",
     cursor: "pointer",
-    transition: "background-color 0.3s",
-    fontSize: "14px"
+    transition: "all 0.3s ease",
+    fontSize: "14px",
+    fontWeight: "500",
+    boxShadow: "0 2px 4px rgba(244, 67, 54, 0.1)",
+    outline: "none",
+    minWidth: "80px",
+    ":hover": {
+      backgroundColor: "#f44336",
+      color: "white",
+      transform: "translateY(-2px)",
+      boxShadow: "0 4px 8px rgba(244, 67, 54, 0.2)",
+    }
+  },
+  deleteIcon: {
+    fontSize: "16px",
+    fontWeight: "bold",
+  },
+  deleteText: {
+    marginLeft: "2px",
   },
   stats: {
     display: "flex",

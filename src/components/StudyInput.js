@@ -50,36 +50,28 @@ const StudyInput = ({
             value={studyTopic}
             onChange={(e) => setStudyTopic(e.target.value)}
             placeholder="例: TOEIC、数学、簿記２級..."
-            style={styles.input}
+            className="study-topic-input"
             required
           />
-          {!studyTopic && <p style={styles.helperText}>学習する内容を入力してください</p>}
         </div>
       </div>
       
       <div style={styles.formGroup}>
         <label style={styles.label}>
-          今日のモチベーション
+          モチベーション
         </label>
         <div style={styles.motivationButtons}>
           {[1, 2, 3, 4, 5].map((level) => (
             <button
               key={level}
               type="button"
-              style={{
-                ...styles.motivationButton,
-                backgroundColor: motivation === level ? getMotivationColor(level) : "#f5f5f5",
-                color: motivation === level ? "white" : "#333"
-              }}
+              className={`motivation-button ${motivation === level ? 'active' : ''}`}
+              data-level={level}
               onClick={() => handleMotivationChange(level)}
             >
               {level}
             </button>
           ))}
-        </div>
-        <div style={styles.motivationLabels}>
-          <span>低</span>
-          <span>高</span>
         </div>
       </div>
       
@@ -104,16 +96,16 @@ const styles = {
   container: {
     backgroundColor: "#f9f9f9",
     borderRadius: "8px",
-    padding: "20px",
-    marginBottom: "25px"
+    padding: "18px",
+    marginBottom: "20px"
   },
   heading: {
-    fontSize: "20px",
+    fontSize: "21px",
     color: "#333",
     marginTop: 0,
-    marginBottom: "20px",
+    marginBottom: "25px",
     borderBottom: "1px solid #eaeaea",
-    paddingBottom: "10px"
+    paddingBottom: "8px"
   },
   formGroup: {
     marginBottom: "20px"
@@ -150,15 +142,15 @@ const styles = {
   motivationButtons: {
     display: "flex",
     justifyContent: "space-between",
-    gap: "10px",
+    gap: "8px",
     marginBottom: "5px"
   },
   motivationButton: {
     flex: 1,
-    padding: "12px 0",
+    padding: "10px 0",
     border: "none",
     borderRadius: "6px",
-    fontSize: "18px",
+    fontSize: "16px",
     fontWeight: "600",
     cursor: "pointer",
     transition: "all 0.2s ease",

@@ -11,6 +11,8 @@ const AnalyticsPage = ({ studyHistory, formatTime }) => {
   const [topicDistribution, setTopicDistribution] = useState([]);
   const [selectedPeriod, setSelectedPeriod] = useState("all");
   const [filteredHistory, setFilteredHistory] = useState([]);
+  const [topicMotivation, setTopicMotivation] = useState([]);
+  const [dayMotivation, setDayMotivation] = useState([]);
 
   // 円グラフの色
   const pieChartColors = [
@@ -112,6 +114,70 @@ const AnalyticsPage = ({ studyHistory, formatTime }) => {
     setWeeklyData(weeklyAvg);
   }, [filteredHistory]);
 
+  // 学習内容ごとのモチベーション分析を追加
+  useEffect(() => {
+    if (filteredHistory.length === 0) {
+      setTopicMotivation([]);
+      return;
+    }
+
+    // 学習内容ごとのモチベーションデータを集計
+    const motivationByTopic = {};
+    const sessionCountByTopic = {};
+
+    filteredHistory.forEach(session => {
+      if (!motivationByTopic[session.topic]) {
+        motivationByTopic[session.topic] = 0;
+        sessionCountByTopic[session.topic] = 0;
+      }
+      motivationByTopic[session.topic] += session.motivation;
+      sessionCountByTopic[session.topic]++;
+    });
+
+    // 平均モチベーションを計算し、配列に変換
+    const motivationData = Object.keys(motivationByTopic).map(topic => ({
+      topic,
+      averageMotivation: motivationByTopic[topic] / sessionCountByTopic[topic],
+      sessionCount: sessionCountByTopic[topic],
+      totalTime: topicDistribution.find(t => t.topic === topic)?.time || 0
+    }));
+
+    // モチベーション平均値で降順ソート
+    motivationData.sort((a, b) => b.averageMotivation - a.averageMotivation);
+    setTopicMotivation(motivationData);
+  }, [filteredHistory, topicDistribution]);
+
+  // 曜日ごとのモチベーション分析を追加
+  useEffect(() => {
+    if (filteredHistory.length === 0) {
+      setDayMotivation([]);
+      return;
+    }
+
+    // 曜日ごとのモチベーションデータを集計
+    const weekDays = ["日", "月", "火", "水", "木", "金", "土"];
+    const motivationByDay = Array(7).fill(0);
+    const sessionCountByDay = Array(7).fill(0);
+    const studyTimeByDay = Array(7).fill(0);
+
+    filteredHistory.forEach(session => {
+      const day = new Date(session.startTime).getDay();
+      motivationByDay[day] += session.motivation;
+      sessionCountByDay[day]++;
+      studyTimeByDay[day] += session.duration;
+    });
+
+    // 平均モチベーションを計算し、配列に変換
+    const motivationData = weekDays.map((day, index) => ({
+      day,
+      averageMotivation: sessionCountByDay[index] ? motivationByDay[index] / sessionCountByDay[index] : 0,
+      sessionCount: sessionCountByDay[index],
+      totalTime: studyTimeByDay[index]
+    }));
+
+    setDayMotivation(motivationData);
+  }, [filteredHistory]);
+
   // トピック分布データを円グラフ用に変換
   const getPieChartData = () => {
     return topicDistribution.map(topic => ({
@@ -159,6 +225,115 @@ const AnalyticsPage = ({ studyHistory, formatTime }) => {
     );
   };
 
+  // モチベーション棒グラフを描画する関数
+  const renderMotivationChart = () => {
+    if (!topicMotivation || topicMotivation.length === 0) {
+      return <div style={styles.noDataMessage}>データがありません</div>;
+    }
+
+    const maxMotivation = 5; // モチベーションの最大値は5
+
+    return (
+      <div style={styles.motivationChart}>
+        {topicMotivation.map((item, index) => {
+          const percentage = (item.averageMotivation / maxMotivation) * 100;
+          
+          // モチベーションレベルに応じた色を設定（低→高で赤→緑）
+          let barColor;
+          if (item.averageMotivation <= 1) barColor = "#F44336"; // 赤
+          else if (item.averageMotivation <= 1.5) barColor = "#FF5722"; // 深いオレンジ
+          else if (item.averageMotivation <= 2) barColor = "#FF9800"; // オレンジ
+          else if (item.averageMotivation <= 2.5) barColor = "#FFC107"; // 琥珀色
+          else if (item.averageMotivation <= 3) barColor = "#FFEB3B"; // 黄色
+          else if (item.averageMotivation <= 3.5) barColor = "#CDDC39"; // ライム
+          else if (item.averageMotivation <= 4) barColor = "#8BC34A"; // 薄緑
+          else if (item.averageMotivation <= 4.5) barColor = "#4CAF50"; // 緑
+          else barColor = "#2E7D32"; // 濃い緑
+
+          return (
+            <div key={index} style={styles.motivationBarContainer}>
+              <div style={styles.motivationTopicContainer}>
+                <div style={styles.motivationTopic} title={item.topic}>
+                  {item.topic.length > 20 ? `${item.topic.substring(0, 18)}...` : item.topic}
+                </div>
+                <div style={styles.sessionCount}>
+                  {item.sessionCount}回 / {formatTime(item.totalTime)}
+                </div>
+              </div>
+              <div style={styles.barWrapper}>
+                <div 
+                  style={{
+                    ...styles.bar,
+                    width: `${percentage}%`,
+                    backgroundColor: barColor
+                  }}
+                ></div>
+                <span style={styles.barValue}>
+                  {item.averageMotivation.toFixed(1)}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // 曜日ごとのモチベーション棒グラフを描画する関数
+  const renderDayMotivationChart = () => {
+    if (!dayMotivation || dayMotivation.filter(d => d.sessionCount > 0).length === 0) {
+      return <div style={styles.noDataMessage}>データがありません</div>;
+    }
+
+    const maxMotivation = 5; // モチベーションの最大値は5
+    const daysWithData = dayMotivation.filter(d => d.sessionCount > 0);
+
+    return (
+      <div style={styles.motivationChart}>
+        {daysWithData.map((item, index) => {
+          const percentage = (item.averageMotivation / maxMotivation) * 100;
+          
+          // モチベーションレベルに応じた色を設定（低→高で赤→緑）
+          let barColor;
+          if (item.averageMotivation <= 1) barColor = "#F44336"; // 赤
+          else if (item.averageMotivation <= 1.5) barColor = "#FF5722"; // 深いオレンジ
+          else if (item.averageMotivation <= 2) barColor = "#FF9800"; // オレンジ
+          else if (item.averageMotivation <= 2.5) barColor = "#FFC107"; // 琥珀色
+          else if (item.averageMotivation <= 3) barColor = "#FFEB3B"; // 黄色
+          else if (item.averageMotivation <= 3.5) barColor = "#CDDC39"; // ライム
+          else if (item.averageMotivation <= 4) barColor = "#8BC34A"; // 薄緑
+          else if (item.averageMotivation <= 4.5) barColor = "#4CAF50"; // 緑
+          else barColor = "#2E7D32"; // 濃い緑
+
+          return (
+            <div key={index} style={styles.motivationBarContainer}>
+              <div style={styles.motivationTopicContainer}>
+                <div style={styles.motivationTopic}>
+                  {item.day}曜日
+                </div>
+                <div style={styles.sessionCount}>
+                  {item.sessionCount}回 / {formatTime(item.totalTime)}
+                </div>
+              </div>
+              <div style={styles.barWrapper}>
+                <div 
+                  style={{
+                    ...styles.bar,
+                    width: `${percentage}%`,
+                    backgroundColor: barColor
+                  }}
+                ></div>
+                <span style={styles.barValue}>
+                  {item.averageMotivation.toFixed(1)}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <Layout>
       <div style={styles.container}>
@@ -167,41 +342,25 @@ const AnalyticsPage = ({ studyHistory, formatTime }) => {
           <div style={styles.periodSelector}>
             <button 
               onClick={() => setSelectedPeriod("week")}
-              style={{
-                ...styles.periodButton,
-                backgroundColor: selectedPeriod === "week" ? "#2196F3" : "#e0e0e0",
-                color: selectedPeriod === "week" ? "white" : "#333"
-              }}
+              className={`period-button ${selectedPeriod === "week" ? "period-button-active" : ""}`}
             >
-              週間
+              直近7日間
             </button>
             <button 
               onClick={() => setSelectedPeriod("month")}
-              style={{
-                ...styles.periodButton,
-                backgroundColor: selectedPeriod === "month" ? "#2196F3" : "#e0e0e0",
-                color: selectedPeriod === "month" ? "white" : "#333"
-              }}
+              className={`period-button ${selectedPeriod === "month" ? "period-button-active" : ""}`}
             >
-              月間
+              直近30日間
             </button>
             <button 
               onClick={() => setSelectedPeriod("year")}
-              style={{
-                ...styles.periodButton,
-                backgroundColor: selectedPeriod === "year" ? "#2196F3" : "#e0e0e0",
-                color: selectedPeriod === "year" ? "white" : "#333"
-              }}
+              className={`period-button ${selectedPeriod === "year" ? "period-button-active" : ""}`}
             >
-              年間
+              直近1年間
             </button>
             <button 
               onClick={() => setSelectedPeriod("all")}
-              style={{
-                ...styles.periodButton,
-                backgroundColor: selectedPeriod === "all" ? "#2196F3" : "#e0e0e0",
-                color: selectedPeriod === "all" ? "white" : "#333"
-              }}
+              className={`period-button ${selectedPeriod === "all" ? "period-button-active" : ""}`}
             >
               全期間
             </button>
@@ -260,6 +419,8 @@ const AnalyticsPage = ({ studyHistory, formatTime }) => {
                     <PieChart 
                       data={getPieChartData()} 
                       colors={pieChartColors}
+                      legendColumns={4}
+                      formatTime={formatTime}
                     />
                   ) : (
                     <div style={styles.noDataMessage}>データがありません</div>
@@ -293,61 +454,101 @@ const AnalyticsPage = ({ studyHistory, formatTime }) => {
               </div>
             </div>
             
+            <div style={styles.chartSection}>
+              <div style={styles.chartCard}>
+                <h2 style={styles.chartTitle}>学習内容ごとのモチベーション分析</h2>
+                <div style={styles.chartContent}>
+                  {renderMotivationChart()}
+                </div>
+                <div style={styles.chartFooter}>
+                  <div style={styles.chartHighlight}>
+                    最もモチベーションが高い学習内容: <strong>{topicMotivation[0]?.topic || "なし"}</strong> 
+                    {topicMotivation[0] ? ` (${topicMotivation[0].averageMotivation.toFixed(1)}/5)` : ""}
+                  </div>
+                </div>
+              </div>
+              
+              <div style={styles.chartCard}>
+                <h2 style={styles.chartTitle}>曜日ごとのモチベーション分析</h2>
+                <div style={styles.chartContent}>
+                  {renderDayMotivationChart()}
+                </div>
+                <div style={styles.chartFooter}>
+                  <div style={styles.chartHighlight}>
+                    最もモチベーションが高い曜日: <strong>
+                      {dayMotivation.filter(d => d.sessionCount > 0)
+                        .reduce((max, day) => day.averageMotivation > max.averageMotivation ? day : max, 
+                          { averageMotivation: 0 }).day || "なし"}曜日
+                    </strong>
+                    {dayMotivation.filter(d => d.sessionCount > 0).length > 0 ? 
+                      ` (${dayMotivation.filter(d => d.sessionCount > 0)
+                        .reduce((max, day) => day.averageMotivation > max.averageMotivation ? day : max, 
+                          { averageMotivation: 0 }).averageMotivation.toFixed(1)}/5)` : ""}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
             <div style={styles.insightsSection}>
               <h2 style={styles.insightsTitle}>学習インサイト</h2>
               <div style={styles.insightsList}>
                 {totalStudyTime > 0 && (
                   <div style={styles.insightItem}>
-                    <div style={styles.insightIcon}>💡</div>
+                    <div style={styles.insightIcon}>📊</div>
                     <div style={styles.insightText}>
-                      {selectedPeriod === "week" ? "今週" : 
-                       selectedPeriod === "month" ? "今月" : 
-                       selectedPeriod === "year" ? "今年" : "全期間"}
-                      の合計学習時間は <strong>{formatTime(totalStudyTime)}</strong> です。
+                      {selectedPeriod === "week" ? "直近7日間" : 
+                       selectedPeriod === "month" ? "直近30日間" : 
+                       selectedPeriod === "year" ? "直近1年間" : "全期間"}
+                      の合計学習時間: <strong>{formatTime(totalStudyTime)}</strong>
                     </div>
                   </div>
                 )}
                 
                 {mostStudiedTopic && (
                   <div style={styles.insightItem}>
-                    <div style={styles.insightIcon}>🎯</div>
+                    <div style={styles.insightIcon}>📚</div>
                     <div style={styles.insightText}>
-                      最も学習している内容は <strong>{mostStudiedTopic}</strong> で、
-                      全体の <strong>{Math.round((topicDistribution.find(t => t.topic === mostStudiedTopic)?.time || 0) / totalStudyTime * 100)}%</strong> を占めています。
+                      最も学習した内容: <strong>{mostStudiedTopic}</strong> 
+                      （全体の <strong>{Math.round((topicDistribution.find(t => t.topic === mostStudiedTopic)?.time || 0) / totalStudyTime * 100)}%</strong>）
                     </div>
                   </div>
                 )}
                 
-                {weeklyData.length > 0 && (
+                {weeklyData.length > 0 && weeklyData.some(d => d.totalTime > 0) && (
                   <div style={styles.insightItem}>
                     <div style={styles.insightIcon}>📅</div>
                     <div style={styles.insightText}>
-                      <strong>{weeklyData.reduce((max, day) => day.totalTime > max.totalTime ? day : max, { totalTime: 0 }).day}曜日</strong> に
-                      最も多く学習する傾向があります。
+                      最も学習時間が長い曜日: <strong>
+                        {weeklyData.reduce((max, day) => day.totalTime > max.totalTime ? day : max, { totalTime: 0 }).day}曜日
+                      </strong>
                     </div>
                   </div>
                 )}
                 
-                {averageMotivation > 0 && (
+                {topicMotivation.length > 0 && (
                   <div style={styles.insightItem}>
-                    <div style={styles.insightIcon}>🔋</div>
+                    <div style={styles.insightIcon}>🔍</div>
                     <div style={styles.insightText}>
-                      平均モチベーションは <strong>{averageMotivation.toFixed(1)}/5</strong> です。
-                      {averageMotivation >= 4 ? "とても高いモチベーションで学習できています！" :
-                       averageMotivation >= 3 ? "安定したモチベーションで学習できています。" :
-                       "モチベーションを高める工夫をしてみましょう。"}
+                      モチベーションが最も高い学習内容: <strong>{topicMotivation[0]?.topic}</strong>
+                      （平均 <strong>{topicMotivation[0]?.averageMotivation.toFixed(1)}/5</strong>）
                     </div>
                   </div>
                 )}
                 
-                {filteredHistory.length > 0 && (
+                {dayMotivation.filter(d => d.sessionCount > 0).length > 0 && (
                   <div style={styles.insightItem}>
-                    <div style={styles.insightIcon}>⏱️</div>
+                    <div style={styles.insightIcon}>📆</div>
                     <div style={styles.insightText}>
-                      平均学習時間は <strong>{formatTime(averageStudyTime)}</strong> です。
-                      {averageStudyTime > 3600 ? "長時間の集中力が素晴らしいです！" :
-                       averageStudyTime > 1800 ? "良い集中力で学習できています。" :
-                       "短時間でも継続的な学習が大切です。"}
+                      モチベーションが最も高い曜日: <strong>
+                        {dayMotivation.filter(d => d.sessionCount > 0)
+                          .reduce((max, day) => day.averageMotivation > max.averageMotivation ? day : max, 
+                            { averageMotivation: 0 }).day}曜日
+                      </strong>
+                      （平均 <strong>
+                        {dayMotivation.filter(d => d.sessionCount > 0)
+                          .reduce((max, day) => day.averageMotivation > max.averageMotivation ? day : max, 
+                            { averageMotivation: 0 }).averageMotivation.toFixed(1)}/5
+                      </strong>）
                     </div>
                   </div>
                 )}
@@ -550,6 +751,28 @@ const styles = {
     color: "#333",
     fontSize: "16px",
     lineHeight: "1.5",
+  },
+  motivationChart: {
+    width: '100%',
+    padding: '10px 0',
+  },
+  motivationBarContainer: {
+    marginBottom: '20px',
+  },
+  motivationTopicContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '5px',
+  },
+  motivationTopic: {
+    color: '#333',
+    fontSize: '15px',
+    fontWeight: '500',
+  },
+  sessionCount: {
+    color: '#666',
+    fontSize: '13px',
   },
 };
 
