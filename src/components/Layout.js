@@ -16,14 +16,26 @@ const Layout = ({ children, isStudying }) => {
     <div style={styles.container}>
       <header style={styles.header}>
         <div style={styles.headerContent}>
-          <Link to={logoLinkPath} style={styles.logoLink} title={isStudying ? "学習管理画面へ" : "ホームに戻る"}>
-            <div className="logo-container" style={styles.logo}>
-              <span style={styles.logoIcon}>⏱️</span>
-              <span style={styles.logoText}>Learn<span style={styles.logoHighlight}>Time</span></span>
-            </div>
-          </Link>
+          <div style={styles.logoContainer}>
+            <Link to={logoLinkPath} style={styles.logoLink} title={isStudying ? "学習管理画面へ" : "ホームに戻る"}>
+              <div className="logo-container" style={styles.logo}>
+                <img 
+                  src="/logo.png" 
+                  alt="LearnTime Logo" 
+                  style={styles.logoImage} 
+                />
+                <span style={styles.logoText}>Learn<span style={styles.logoHighlight}>Time</span></span>
+              </div>
+            </Link>
+          </div>
           
           <nav style={styles.nav}>
+            <Link 
+              to="/review-quizzes" 
+              className={`nav-link ${isActive('/review-quizzes') ? 'active-link' : ''}`}
+            >
+              復習問題
+            </Link>
             <Link 
               to="/analytics" 
               className={`nav-link ${isActive('/analytics') ? 'active-link' : ''}`}
@@ -70,7 +82,10 @@ const styles = {
     boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
     position: "sticky",
     top: 0,
-    zIndex: 100
+    zIndex: 100,
+    width: "100%",
+    height: "50px",
+    transition: "none",
   },
   headerContent: {
     display: "flex",
@@ -79,6 +94,11 @@ const styles = {
     maxWidth: "1200px",
     margin: "0 auto",
     width: "100%",
+    padding: "0 20px",
+    height: "100%",
+  },
+  logoContainer: {
+    paddingLeft: "20px",
   },
   logoLink: {
     textDecoration: "none",
@@ -92,12 +112,12 @@ const styles = {
     transition: "transform 0.3s ease",
     cursor: "pointer",
   },
-  logoIcon: {
-    fontSize: "28px",
-    marginRight: "8px"
+  logoImage: {
+    height: "33px",
+    marginRight: "10px",
   },
   logoText: {
-    fontSize: "28px",
+    fontSize: "27px",
     fontWeight: "700",
     color: "#333",
     letterSpacing: "0.5px"

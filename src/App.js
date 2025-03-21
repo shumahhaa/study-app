@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { db } from "./firebase";
-import { collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, query, getDocs } from "firebase/firestore";
 import HomePage from "./pages/HomePage";
 import HistoryPage from "./pages/HistoryPage";
 import ActiveStudyPage from "./pages/ActiveStudyPage";
@@ -9,6 +9,7 @@ import CompletedStudyPage from "./pages/CompletedStudyPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import AdminPage from "./pages/AdminPage";
 import CalendarPage from "./pages/CalendarPage";
+import ReviewQuizzesPage from "./pages/ReviewQuizzesPage";
 
 function App() {
   const [studyTopic, setStudyTopic] = useState("");
@@ -36,6 +37,18 @@ function App() {
   }, [isStudying, isPaused, studyStartTime, pausedTime]);
 
   const startStudy = () => {
+    // 学習開始前に前回の学習セッションのチャット履歴をクリア
+    // （もし存在する場合）
+    if (recordedStudyTopic) {
+      const previousChatKey = `aiChat_${recordedStudyTopic}`;
+      sessionStorage.removeItem(previousChatKey);
+    }
+    
+    // 新しいトピックのチャット履歴も念のためクリア
+    const newChatKey = `aiChat_${studyTopic}`;
+    sessionStorage.removeItem(newChatKey);
+    
+    // 既存のコード
     setStudyStartTime(Date.now());
     setStudyDuration(null);
     setIsStudying(true);
@@ -149,6 +162,38 @@ function App() {
     return { text: "未開始", color: "gray" };
   };
 
+  // リロードや閉じる操作時の警告を設定
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isStudying) {
+        // 標準的なメッセージ（ブラウザによって上書きされる場合があります）
+        const message = "学習中です。ページを離れると学習データが保存されません。本当に離れますか？";
+        e.returnValue = message; // Chrome では必要
+        return message; // 他のブラウザ用
+      }
+    };
+
+    // イベントリスナーを追加
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // クリーンアップ関数
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isStudying]);
+
+  // アプリ初期化時にリロードフラグをリセット
+  useEffect(() => {
+    // アプリが正常に起動した時点でリロードフラグをリセット
+    sessionStorage.removeItem('pageReloaded');
+  }, []);
+
+  // チャット履歴をリセットする関数
+  const resetChatHistory = (topic) => {
+    const chatStorageKey = `aiChat_${topic}`;
+    localStorage.removeItem(chatStorageKey);
+  };
+
   return (
     <Router>
       <Routes>
@@ -189,6 +234,7 @@ function App() {
               abandonStudy={abandonStudy}
               recordedMotivation={recordedMotivation}
               isStudying={isStudying}
+              resetChatHistory={resetChatHistory}
             />
           }
         />
@@ -236,6 +282,10 @@ function App() {
               formatTime={formatTime}
             />
           }
+        />
+        <Route
+          path="/review-quizzes"
+          element={<ReviewQuizzesPage />}
         />
       </Routes>
     </Router>

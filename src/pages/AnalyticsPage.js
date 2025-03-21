@@ -9,7 +9,7 @@ const AnalyticsPage = ({ studyHistory, formatTime }) => {
   const [mostStudiedTopic, setMostStudiedTopic] = useState("");
   const [weeklyData, setWeeklyData] = useState([]);
   const [topicDistribution, setTopicDistribution] = useState([]);
-  const [selectedPeriod, setSelectedPeriod] = useState("all");
+  const [selectedPeriod, setSelectedPeriod] = useState("week");
   const [filteredHistory, setFilteredHistory] = useState([]);
   const [topicMotivation, setTopicMotivation] = useState([]);
   const [dayMotivation, setDayMotivation] = useState([]);

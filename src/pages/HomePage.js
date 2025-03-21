@@ -39,6 +39,7 @@ const HomePage = ({
   return (
     <Layout isStudying={isStudying}>
       <div style={styles.container}>
+        {/* 学習開始セクション */}
         <div style={styles.startStudySection}>
           <div style={styles.startStudyCard}>
             <StudyInput
@@ -60,6 +61,16 @@ const HomePage = ({
           </div>
           
           <div style={styles.featuresSection}>
+            <Link to="/review-quizzes" className="feature-card-link">
+              <div className="feature-card">
+                <div className="feature-icon">📝</div>
+                <h3 className="feature-title">復習問題</h3>
+                <p className="feature-description">
+                  生成された問題で理解を深める
+                </p>
+              </div>
+            </Link>
+            
             <Link to="/analytics" className="feature-card-link">
               <div className="feature-card">
                 <div className="feature-icon">📊</div>
@@ -76,16 +87,6 @@ const HomePage = ({
                 <h3 className="feature-title">カレンダー</h3>
                 <p className="feature-description">
                   日別の学習状況を確認
-                </p>
-              </div>
-            </Link>
-            
-            <Link to="/history" className="feature-card-link">
-              <div className="feature-card">
-                <div className="feature-icon">📋</div>
-                <h3 className="feature-title">履歴</h3>
-                <p className="feature-description">
-                  過去の学習記録を確認
                 </p>
               </div>
             </Link>

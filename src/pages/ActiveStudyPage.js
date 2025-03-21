@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
+import AIChat from "../components/AIChat";
 
 const ActiveStudyPage = ({
   recordedStudyTopic,
@@ -12,11 +13,51 @@ const ActiveStudyPage = ({
   stopStudy,
   abandonStudy,
   recordedMotivation,
-  isStudying
+  isStudying,
+  resetChatHistory
 }) => {
   const navigate = useNavigate();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationType, setConfirmationType] = useState("stop");
+
+  // ページロード時に実行される処理
+  useEffect(() => {
+    // リロードフラグをチェック
+    const isReloaded = sessionStorage.getItem('pageReloaded');
+    
+    if (isReloaded === 'true') {
+      // リロードされた場合、学習を放棄してホームに戻る
+      abandonStudy();
+      navigate('/');
+      // フラグをリセット
+      sessionStorage.removeItem('pageReloaded');
+    } else {
+      // 初回アクセス時はフラグを設定
+      sessionStorage.setItem('pageReloaded', 'true');
+      
+      // 学習開始時に毎回チャット履歴をリセット
+      if (recordedStudyTopic) {
+        resetChatHistory(recordedStudyTopic);
+      }
+    }
+    
+    // beforeunloadイベントのリスナーを設定
+    const handleBeforeUnload = (e) => {
+      if (isStudying) {
+        const message = "学習中です。ページを離れると学習データが保存されません。";
+        e.returnValue = message;
+        return message;
+      }
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      // コンポーネントがアンマウントされる時（正常な遷移時）はフラグを削除
+      sessionStorage.removeItem('pageReloaded');
+    };
+  }, [abandonStudy, navigate, isStudying, recordedStudyTopic, resetChatHistory]);
 
   const handleStopStudy = () => {
     setConfirmationType("stop");
@@ -30,9 +71,13 @@ const ActiveStudyPage = ({
 
   const confirmAction = async () => {
     if (confirmationType === "stop") {
+      // 学習終了時にチャット履歴をリセット
+      resetChatHistory(recordedStudyTopic);
       await stopStudy();
       navigate("/completed");
     } else {
+      // 学習放棄時にチャット履歴をリセット
+      resetChatHistory(recordedStudyTopic);
       abandonStudy();
       navigate("/");
     }
@@ -151,16 +196,15 @@ const ActiveStudyPage = ({
           </div>
         </div>
         
-        {/* 右側：AIチャット用スペース */}
+        {/* 右側：AIチャット */}
         <div style={styles.rightPanel}>
-          <div style={styles.chatPlaceholder}>
-            <div style={styles.chatPlaceholderIcon}>🤖</div>
-            <h3 style={styles.chatPlaceholderTitle}>AIチャットアシスタント</h3>
-            <p style={styles.chatPlaceholderText}>
-              この領域にAIチャット機能が実装される予定です。
-              学習中の質問や相談ができるようになります。
-            </p>
-          </div>
+          <AIChat 
+            studyTopic={recordedStudyTopic}
+            customStyles={{
+              boxShadow: 'none',
+              borderRadius: '0',
+            }}
+          />
         </div>
         
         {showConfirmation && (
@@ -200,31 +244,36 @@ const ActiveStudyPage = ({
 
 const styles = {
   container: {
-    display: "flex",
-    height: "calc(100vh - 120px)",
+    display: "flex", 
     padding: "20px",
-    gap: "20px",
+    paddingLeft: "60px",
+    paddingRight: "60px",
   },
   // 左側パネル（学習管理）
   leftPanel: {
-    width: "300px",
-    flexShrink: 0,
-    display: "flex",
-    flexDirection: "column",
+    width: "280px",
+    position: "fixed",
+    top: "100px", 
+    left: "60px",
+    height: "auto",
+    maxHeight: "calc(100vh - 180px)",
+    overflowY: "auto",
   },
   studyInfoCard: {
     backgroundColor: "white",
     borderRadius: "16px",
     boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
-    padding: "25px",
+    padding: "20px",
     height: "100%",
     display: "flex",
     flexDirection: "column",
+    maxHeight: "calc(100vh - 200px)",
+    overflowY: "auto",
   },
   statusIndicator: {
     display: "flex",
     alignItems: "center",
-    marginBottom: "25px",
+    marginBottom: "16px",
   },
   statusDot: {
     width: "10px",
@@ -240,26 +289,27 @@ const styles = {
     letterSpacing: "0.5px",
   },
   topicSection: {
-    marginBottom: "30px",
+    marginBottom: "20px",
   },
   topicTitle: {
-    fontSize: "22px",
+    fontSize: "20px",
     fontWeight: "700",
     color: "#333",
-    margin: "0 0 15px 0",
+    margin: "0 0 12px 0",
     lineHeight: "1.3",
   },
   motivationTag: {
     display: "inline-block",
     padding: "6px 12px",
-    borderRadius: "20px",
+    borderRadius: "18px",
     fontSize: "12px",
     fontWeight: "600",
   },
   timerContainer: {
     textAlign: "center",
-    marginBottom: "auto",
-    padding: "20px 0",
+    marginTop: "10px",
+    marginBottom: "25px",
+    padding: "0",
     display: "flex",
     justifyContent: "center",
   },
@@ -282,59 +332,26 @@ const styles = {
     color: "#333",
     fontFamily: "'Roboto Mono', monospace",
     letterSpacing: "1px",
-    marginBottom: "5px",
+    marginBottom: "6px",
   },
   timerLabel: {
-    fontSize: "14px",
+    fontSize: "16px",
     color: "#888",
     fontWeight: "500",
   },
   controlsContainer: {
     display: "flex",
     flexDirection: "column",
-    gap: "12px",
-    marginTop: "20px",
+    gap: "10px",
+    marginTop: "auto",
+    marginBottom: "15px",
   },
   
   // 右側パネル（AIチャット用）
   rightPanel: {
     flex: 1,
-    backgroundColor: "white",
-    borderRadius: "16px",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
-    overflow: "hidden",
-    display: "flex",
-    flexDirection: "column",
-  },
-  chatPlaceholder: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: "30px",
-    backgroundColor: "#f9f9f9",
-    borderRadius: "16px",
-    border: "2px dashed #e0e0e0",
-    margin: "20px",
-  },
-  chatPlaceholderIcon: {
-    fontSize: "48px",
-    marginBottom: "20px",
-    opacity: 0.5,
-  },
-  chatPlaceholderTitle: {
-    fontSize: "20px",
-    fontWeight: "600",
-    color: "#666",
-    margin: "0 0 10px 0",
-  },
-  chatPlaceholderText: {
-    fontSize: "15px",
-    color: "#888",
-    textAlign: "center",
-    maxWidth: "400px",
-    lineHeight: "1.5",
+    marginLeft: "300px",
+    minHeight: "calc(100vh - 180px)",
   },
   
   // モーダルダイアログ
@@ -367,7 +384,7 @@ const styles = {
     fontWeight: "600",
   },
   dialogText: {
-    fontSize: "18px",
+    fontSize: "15px",
     color: "#555",
     textAlign: "center",
     marginBottom: "30px",

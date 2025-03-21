@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
+import { generateQuizFromChatHistory, saveQuizToFirebase } from "../utils/quizGenerator";
 
 const CompletedStudyPage = ({
   recordedStudyTopic,
@@ -12,6 +13,11 @@ const CompletedStudyPage = ({
 }) => {
   const navigate = useNavigate();
   const endTime = studyStartTime ? studyStartTime + (studyDuration * 1000) + pausedTime : null;
+  
+  // 問題生成関連の状態
+  const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
+  const [quizGenerated, setQuizGenerated] = useState(false);
+  const [quizError, setQuizError] = useState(null);
 
   // 学習内容がなければホームページにリダイレクト
   useEffect(() => {
@@ -78,6 +84,33 @@ const CompletedStudyPage = ({
     return `${year}年${month}月${day}日(${weekday}) ${hour}:${minute}`;
   };
 
+  // 復習問題を生成する処理
+  const handleGenerateQuiz = async () => {
+    try {
+      setIsGeneratingQuiz(true);
+      setQuizError(null);
+      
+      // チャット履歴から問題を生成
+      const quizData = await generateQuizFromChatHistory(recordedStudyTopic);
+      
+      // 生成した問題をFirebaseに保存
+      await saveQuizToFirebase(quizData, recordedStudyTopic, studyDuration);
+      
+      // 問題生成完了
+      setQuizGenerated(true);
+      
+      // 学習が完了したので、チャット履歴をクリア
+      const chatStorageKey = `aiChat_${recordedStudyTopic}`;
+      sessionStorage.removeItem(chatStorageKey);
+      
+    } catch (error) {
+      console.error('復習問題の生成中にエラーが発生しました:', error);
+      setQuizError(error.message || '復習問題の生成に失敗しました');
+    } finally {
+      setIsGeneratingQuiz(false);
+    }
+  };
+
   return (
     <Layout>
       <div style={styles.container}>
@@ -125,14 +158,49 @@ const CompletedStudyPage = ({
             </table>
           </div>
           
+          {/* ボタン配置を変更 */}
           <div style={styles.actionsSection}>
-            <Link to="/" style={styles.homeButton}>
-              ホームに戻る
-            </Link>
-            <Link to="/history" style={styles.historyButton}>
-              学習履歴を見る
-            </Link>
+            {quizGenerated ? (
+              <>
+                <Link to="/review-quizzes" style={styles.quizButton}>
+                  復習問題を確認する
+                </Link>
+                <Link to="/" style={styles.homeButton}>
+                  ホームに戻る
+                </Link>
+              </>
+            ) : (
+              <>
+                <button 
+                  onClick={handleGenerateQuiz} 
+                  disabled={isGeneratingQuiz}
+                  style={{
+                    ...styles.quizButton,
+                    ...(isGeneratingQuiz ? styles.disabledButton : {})
+                  }}
+                >
+                  {isGeneratingQuiz ? (
+                    <>
+                      <span style={styles.loadingIndicator}></span> 
+                      復習問題を作成中...
+                    </>
+                  ) : (
+                    'チャットから復習問題を作成'
+                  )}
+                </button>
+                <Link to="/" style={styles.homeButton}>
+                  ホームに戻る
+                </Link>
+              </>
+            )}
           </div>
+          
+          {/* エラーメッセージ表示 */}
+          {quizError && (
+            <div style={styles.errorMessage}>
+              <span style={styles.errorIcon}>⚠️</span> {quizError}
+            </div>
+          )}
         </div>
       </div>
     </Layout>
@@ -229,6 +297,55 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     gap: "15px",
+    marginTop: "25px",  // マージンを追加
+  },
+  quizButton: {
+    backgroundColor: '#4CAF50',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    padding: '12px 24px',
+    fontSize: '15px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'all 0.2s ease',
+    boxShadow: '0 2px 4px rgba(76, 175, 80, 0.2)',
+    textDecoration: 'none',
+    minWidth: '200px',  // 幅を調整
+    textAlign: 'center',
+  },
+  disabledButton: {
+    backgroundColor: '#a5d6a7',
+    cursor: 'not-allowed',
+    boxShadow: 'none',
+  },
+  loadingIndicator: {
+    display: 'inline-block',
+    width: '18px',
+    height: '18px',
+    border: '3px solid rgba(255,255,255,0.3)',
+    borderRadius: '50%',
+    borderTopColor: 'white',
+    animation: 'spin 1s ease-in-out infinite',
+    marginRight: '10px',
+  },
+  errorMessage: {
+    backgroundColor: '#ffebee',
+    color: '#d32f2f',
+    padding: '12px 16px',
+    borderRadius: '6px',
+    marginTop: '15px',  // マージンを上部に変更
+    width: '100%',
+    textAlign: 'left',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  errorIcon: {
+    marginRight: '10px',
+    fontSize: '18px',
   },
   homeButton: {
     padding: "12px 20px",
@@ -244,28 +361,25 @@ const styles = {
     transition: "all 0.2s ease",
     boxShadow: "0 2px 4px rgba(33, 150, 243, 0.2)",
     letterSpacing: "0.5px",
-    minWidth: "140px",
-  },
-  historyButton: {
-    padding: "12px 20px",
-    backgroundColor: "white",
-    color: "#333",
-    border: "1px solid #ddd",
-    borderRadius: "6px",
-    fontSize: "15px",
-    fontWeight: "600",
-    cursor: "pointer",
-    textDecoration: "none",
-    textAlign: "center",
-    transition: "all 0.2s ease",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
-    letterSpacing: "0.5px",
-    minWidth: "140px",
+    minWidth: '200px',  // 幅を調整
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonIcon: {
     marginRight: "8px",
     fontSize: "16px",
   }
 };
+
+// アニメーションを追加
+const globalStyle = document.createElement('style');
+globalStyle.innerHTML = `
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+document.head.appendChild(globalStyle);
 
 export default CompletedStudyPage; 
