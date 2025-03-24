@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../firebase';
-import { collection, getDocs, query, orderBy, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import Layout from '../components/Layout';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { fetchReviewQuizzes, updateReviewQuiz, deleteReviewQuiz } from '../utils/api';
 
 const ReviewQuizzesPage = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -16,22 +15,10 @@ const ReviewQuizzesPage = () => {
   const [confirmDelete, setConfirmDelete] = useState(null); // 削除確認用の状態
 
   useEffect(() => {
-    const fetchQuizzes = async () => {
+    const fetchQuizData = async () => {
       try {
-        const q = query(collection(db, 'reviewQuizzes'), orderBy('nextReviewDate', 'asc'));
-        const querySnapshot = await getDocs(q);
-        
-        const fetchedQuizzes = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          createdAt: doc.data().createdAt?.toDate() || new Date(),
-          nextReviewDate: doc.data().nextReviewDate?.toDate() || new Date(),
-          reviewSchedule: doc.data().reviewSchedule?.map(schedule => ({
-            ...schedule,
-            dueDate: schedule.dueDate?.toDate() || new Date()
-          })) || []
-        }));
-        
+        // バックエンドAPIを使用して復習問題を取得
+        const fetchedQuizzes = await fetchReviewQuizzes();
         setQuizzes(fetchedQuizzes);
         setLoading(false);
       } catch (error) {
@@ -41,7 +28,7 @@ const ReviewQuizzesPage = () => {
       }
     };
     
-    fetchQuizzes();
+    fetchQuizData();
   }, []);
   
   const toggleAnswer = (index) => {
@@ -89,12 +76,9 @@ const ReviewQuizzesPage = () => {
         reviewStatus = 'completed';
       }
       
-      // Firestoreを更新
-      await updateDoc(doc(db, 'reviewQuizzes', quizId), {
-        reviewSchedule: updatedSchedule.map(schedule => ({
-          ...schedule,
-          dueDate: schedule.dueDate
-        })),
+      // バックエンドAPIを使用して更新
+      await updateReviewQuiz(quizId, {
+        reviewSchedule: updatedSchedule,
         currentReviewIndex: nextReviewIndex,
         nextReviewDate: nextReviewDate,
         reviewStatus: reviewStatus,
@@ -112,38 +96,103 @@ const ReviewQuizzesPage = () => {
           lastReviewedAt: new Date()
         } : q
       ));
-      
-      // 警告を表示せずに一覧ページに戻る
-      setSelectedQuiz(null);
-      
     } catch (error) {
-      console.error('復習状態の更新に失敗しました:', error);
-      alert('エラーが発生しました。もう一度お試しください。');
+      console.error('復習更新エラー:', error);
+      setError('復習記録の更新に失敗しました。再度お試しください。');
+    }
+  };
+
+  // 日付型に変換するヘルパー関数を追加
+  const toDateObject = (dateValue) => {
+    if (!dateValue) return null;
+    
+    // すでにDateオブジェクトの場合はそのまま返す
+    if (dateValue instanceof Date) return dateValue;
+    
+    // Firestoreのtimestampオブジェクトの場合
+    if (typeof dateValue === 'object' && dateValue.toDate) {
+      return dateValue.toDate();
+    }
+    
+    // バックエンドから返された通常のJSONオブジェクトの場合
+    if (dateValue && typeof dateValue === 'object' && dateValue._seconds !== undefined) {
+      return new Date(dateValue._seconds * 1000);
+    }
+    
+    // ISO文字列の場合
+    try {
+      return new Date(dateValue);
+    } catch (e) {
+      console.error("日付変換エラー:", e, dateValue);
+      return new Date(); // エラーの場合は現在の日付を返す
+    }
+  };
+
+  // 日付を安全にフォーマットする関数
+  const formatDateSafe = (dateValue, formatType = "short") => {
+    try {
+      const date = toDateObject(dateValue);
+      if (!date) return "不明な日付";
+      
+      if (formatType === "full") {
+        return date.toLocaleDateString('ja-JP', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      } else {
+        return date.toLocaleDateString('ja-JP', { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric' 
+        });
+      }
+    } catch (e) {
+      console.error("日付フォーマットエラー:", e, dateValue);
+      return "不明な日付";
     }
   };
 
   // 日付をフォーマットする関数
-  const formatDate = (date) => {
-    if (!date) return '不明';
+  const formatDate = (dateValue) => {
+    if (!dateValue) return '不明';
     
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    if (date < today) {
-      return '期限切れ';
-    } else if (date.getDate() === today.getDate() && 
-              date.getMonth() === today.getMonth() && 
-              date.getFullYear() === today.getFullYear()) {
-      return '今日';
-    } else if (date.getDate() === tomorrow.getDate() && 
-              date.getMonth() === tomorrow.getMonth() && 
-              date.getFullYear() === tomorrow.getFullYear()) {
-      return '明日';
-    } else {
-      return `${date.getMonth() + 1}月${date.getDate()}日`;
+    try {
+      const date = toDateObject(dateValue);
+      if (!date) return '不明';
+      
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      if (date < today) {
+        return '期限切れ';
+      } else if (isSameDay(date, today)) {
+        return '今日';
+      } else if (isSameDay(date, tomorrow)) {
+        return '明日';
+      } else {
+        return `${date.getMonth() + 1}月${date.getDate()}日`;
+      }
+    } catch (e) {
+      console.error("日付フォーマットエラー:", e, dateValue);
+      return "不明";
     }
+  };
+
+  // 同じ日かどうかを判定する関数
+  const isSameDay = (date1, date2) => {
+    if (!date1 || !date2) return false;
+    
+    date1 = toDateObject(date1);
+    date2 = toDateObject(date2);
+    
+    return date1.getDate() === date2.getDate() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getFullYear() === date2.getFullYear();
   };
 
   // 問題を復習ステータスでフィルタリングする
@@ -161,7 +210,7 @@ const ReviewQuizzesPage = () => {
     
     if (filterMode === 'due_today') {
       filtered = filtered.filter(quiz => {
-        const nextReview = quiz.nextReviewDate;
+        const nextReview = toDateObject(quiz.nextReviewDate);
         return nextReview && nextReview <= new Date() && 
                quiz.reviewStatus !== 'completed';
       });
@@ -172,42 +221,43 @@ const ReviewQuizzesPage = () => {
     return filtered;
   };
 
-  // 復習ステータスに基づいてクイズカードのスタイルを取得
+  // カードのスタイルを取得する関数
   const getQuizCardStyle = (quiz) => {
-    const baseStyle = styles.quizCard;
+    if (!quiz) return styles.quizCard;
     
-    if (!quiz.nextReviewDate) return baseStyle;
+    // 完了済みの場合
+    if (quiz.reviewStatus === 'completed') {
+      return { ...styles.quizCard, ...styles.completedQuizCard };
+    }
     
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    if (quiz.reviewStatus === 'completed') {
-      return { ...baseStyle, borderLeft: '4px solid #4CAF50' };
-    } else if (quiz.nextReviewDate < today) {
-      return { ...baseStyle, borderLeft: '4px solid #f44336' }; // 期限切れ
-    } else if (isSameDay(quiz.nextReviewDate, today)) {
-      return { ...baseStyle, borderLeft: '4px solid #2196F3' }; // 今日
-    } else {
-      return { ...baseStyle, borderLeft: '4px solid #9e9e9e' }; // 将来
+    const nextReviewDate = toDateObject(quiz.nextReviewDate);
+    
+    // 次の復習日が過去の場合（期限切れ）
+    if (nextReviewDate && nextReviewDate < today) {
+      return { ...styles.quizCard, ...styles.overdueQuizCard };
     }
+    
+    // 今日が復習日の場合
+    if (nextReviewDate && isSameDay(nextReviewDate, today)) {
+      return { ...styles.quizCard, ...styles.todayQuizCard };
+    }
+    
+    // それ以外（未来の復習予定）
+    return styles.quizCard;
   };
 
-  // 復習問題が今日の復習対象かどうかをチェックする関数
+  // 今日が復習日かどうかを判定する関数
   const isDueToday = (quiz) => {
     if (!quiz || !quiz.nextReviewDate) return false;
     
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    // 次の復習日が今日以前で、まだ完了していない場合
-    return quiz.nextReviewDate <= today && quiz.reviewStatus !== 'completed';
-  };
-
-  // 同じ日かどうかをチェック
-  const isSameDay = (date1, date2) => {
-    return date1.getDate() === date2.getDate() &&
-           date1.getMonth() === date2.getMonth() &&
-           date1.getFullYear() === date2.getFullYear();
+    const nextReviewDate = toDateObject(quiz.nextReviewDate);
+    return nextReviewDate && nextReviewDate <= today;
   };
 
   // 数式を検出して変換する関数
@@ -288,42 +338,27 @@ const ReviewQuizzesPage = () => {
     return `${currentInterval}の復習`;
   };
 
-  // 復習問題を削除する関数
-  const handleDeleteQuiz = async (event, quizId) => {
-    // イベントの伝播を停止して、カード自体がクリックされるのを防ぐ
-    event.stopPropagation();
-    
-    // 削除確認ダイアログを表示
+  // 問題削除時の確認ダイアログを表示
+  const promptDeleteQuiz = (quizId) => {
     setConfirmDelete(quizId);
   };
 
-  // 削除を確定して実行する関数
+  // 問題削除の実行
   const confirmDeleteQuiz = async () => {
     if (!confirmDelete) return;
     
     try {
-      // Firestoreから削除
-      await deleteDoc(doc(db, 'reviewQuizzes', confirmDelete));
+      // バックエンドAPIを使用して削除
+      await deleteReviewQuiz(confirmDelete);
       
       // ローカルステートを更新
-      setQuizzes(prev => prev.filter(quiz => quiz.id !== confirmDelete));
-      
-      // 確認ダイアログを閉じる
+      setQuizzes(prev => prev.filter(q => q.id !== confirmDelete));
+      setSelectedQuiz(null);
       setConfirmDelete(null);
-      
-      // 削除成功の警告は表示しない
     } catch (error) {
-      console.error('復習問題の削除中にエラーが発生しました:', error);
-      alert('エラーが発生しました。もう一度お試しください。');
-      
-      // 確認ダイアログを閉じる
-      setConfirmDelete(null);
+      console.error('問題削除エラー:', error);
+      setError('問題の削除に失敗しました。再度お試しください。');
     }
-  };
-
-  // 削除をキャンセルする関数
-  const cancelDeleteQuiz = () => {
-    setConfirmDelete(null);
   };
 
   if (loading) {
@@ -359,9 +394,41 @@ const ReviewQuizzesPage = () => {
             <h2 style={styles.quizTitle}>{selectedQuiz.studyTopic}</h2>
             <div style={styles.quizMeta}>
               <p style={styles.quizDate}>
-                作成日: {selectedQuiz.createdAt.toLocaleDateString('ja-JP')}
+                作成日: {formatDateSafe(selectedQuiz.createdAt)}
               </p>
+              {selectedQuiz.lastReviewedAt && (
+                <p style={styles.quizDate}>
+                  最終復習日: {formatDateSafe(selectedQuiz.lastReviewedAt)}
+                </p>
+              )}
             </div>
+            
+            {/* レビュースケジュール表示 */}
+            {selectedQuiz.reviewSchedule && selectedQuiz.reviewSchedule.length > 0 && (
+              <div style={styles.reviewSchedule}>
+                <h3 style={styles.reviewScheduleTitle}>レビュースケジュール</h3>
+                <div style={styles.reviewScheduleItems}>
+                  {selectedQuiz.reviewSchedule.map((schedule, idx) => (
+                    <div 
+                      key={idx} 
+                      style={{
+                        ...styles.scheduleItem,
+                        ...(idx < selectedQuiz.currentReviewIndex ? styles.completedSchedule : {}),
+                        ...(idx === selectedQuiz.currentReviewIndex ? styles.currentSchedule : {})
+                      }}
+                    >
+                      <div style={styles.scheduleIndex}>#{idx + 1}</div>
+                      <div style={styles.scheduleDueDate}>
+                        {formatDateSafe(schedule.dueDate)}
+                      </div>
+                      <div style={styles.scheduleStatus}>
+                        {schedule.completed ? "✓ 完了" : idx === selectedQuiz.currentReviewIndex ? "⏰ 次回" : "予定"}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           
           <div style={styles.questionsList}>
@@ -441,7 +508,7 @@ const ReviewQuizzesPage = () => {
               </p>
               <div style={styles.dialogButtons}>
                 <button
-                  onClick={cancelDeleteQuiz}
+                  onClick={() => setConfirmDelete(null)}
                   style={styles.cancelButton}
                 >
                   キャンセル
@@ -525,7 +592,7 @@ const ReviewQuizzesPage = () => {
                   <h3 style={styles.quizTopicTitle}>{quiz.studyTopic}</h3>
                   <button
                     style={styles.deleteButton}
-                    onClick={(e) => handleDeleteQuiz(e, quiz.id)}
+                    onClick={(e) => promptDeleteQuiz(quiz.id)}
                     title="この復習問題を削除"
                   >
                     <span style={styles.deleteIcon}>×</span>
@@ -538,8 +605,7 @@ const ReviewQuizzesPage = () => {
                   <span style={styles.nextReviewLabel}>次の復習:</span>
                   <span style={{
                     ...styles.nextReviewDate,
-                    ...(quiz.nextReviewDate && quiz.nextReviewDate < new Date() 
-                      ? styles.overdueReview : {})
+                    ...(isDueToday(quiz) ? styles.overdueReview : {})
                   }}>
                     {quiz.reviewStatus === 'completed' 
                       ? '全ステップ完了' 
@@ -926,6 +992,46 @@ const styles = {
     transition: "all 0.2s ease",
     boxShadow: "0 4px 10px rgba(244, 67, 54, 0.3)",
     flex: "1",
+  },
+  reviewSchedule: {
+    marginTop: '20px',
+    padding: '20px',
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+  },
+  reviewScheduleTitle: {
+    fontSize: '1.6rem',
+    marginBottom: '1rem',
+    color: '#2c3e50',
+  },
+  reviewScheduleItems: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+  },
+  scheduleItem: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  scheduleIndex: {
+    fontSize: '0.9rem',
+    color: '#666',
+  },
+  scheduleDueDate: {
+    fontSize: '0.9rem',
+    color: '#2c3e50',
+  },
+  scheduleStatus: {
+    fontSize: '0.9rem',
+    color: '#666',
+  },
+  completedSchedule: {
+    backgroundColor: '#f5f5f5',
+  },
+  currentSchedule: {
+    backgroundColor: '#e8f5e9',
   },
 };
 

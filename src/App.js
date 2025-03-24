@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { db } from "./firebase";
-import { collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, query, getDocs } from "firebase/firestore";
+import { saveStudySession } from "./utils/api";
 import HomePage from "./pages/HomePage";
 import HistoryPage from "./pages/HistoryPage";
 import ActiveStudyPage from "./pages/ActiveStudyPage";
@@ -89,14 +88,13 @@ function App() {
     setPauseStartTime(null);
 
     try {
-      await addDoc(collection(db, "studySessions"), {
+      await saveStudySession({
         topic: studyTopic,
         motivation: recordedMotivation,
         duration: totalDuration,
         startTime: studyStartTime,
         endTime: endTime,
         pausedTime: totalPausedTime / 1000,
-        timestamp: serverTimestamp(),
       });
     } catch (error) {
       console.error("エラー:", error);
@@ -114,21 +112,21 @@ function App() {
   };
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "studySessions"), (snapshot) => {
-      const historyData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      historyData.sort((a, b) => b.timestamp - a.timestamp);
-      setStudyHistory(historyData);
-    });
-    return () => unsubscribe();
+    // const unsubscribe = onSnapshot(collection(db, "studySessions"), (snapshot) => {
+    //   const historyData = snapshot.docs.map((doc) => ({
+    //     id: doc.id,
+    //     ...doc.data(),
+    //   }));
+    //   historyData.sort((a, b) => b.timestamp - a.timestamp);
+    //   setStudyHistory(historyData);
+    // });
+    // return () => unsubscribe();
   }, []);
 
   const deleteStudySession = async (id) => {
-    if (window.confirm("この学習履歴を削除しますか？")) {
-      await deleteDoc(doc(db, "studySessions", id));
-    }
+    // if (window.confirm("この学習履歴を削除しますか？")) {
+    //   await deleteDoc(doc(db, "studySessions", id));
+    // }
   };
 
   const formatTime = (seconds) => {
@@ -255,20 +253,13 @@ function App() {
           path="/history"
           element={
             <HistoryPage
-              studyHistory={studyHistory}
-              deleteStudySession={deleteStudySession}
               formatTime={formatTime}
             />
           }
         />
         <Route
           path="/analytics"
-          element={
-            <AnalyticsPage
-              studyHistory={studyHistory}
-              formatTime={formatTime}
-            />
-          }
+          element={<AnalyticsPage formatTime={formatTime} />}
         />
         <Route
           path="/admin"
