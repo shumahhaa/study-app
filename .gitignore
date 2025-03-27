@@ -5,10 +5,13 @@
 .env.*
 */.env
 */.env.*
+# .env.example は含める
 
 # dependencies
 /node_modules
 */node_modules
+/client/node_modules
+/server/node_modules
 /.pnp
 .pnp.js
 
@@ -21,7 +24,37 @@
 /coverage
 
 # production
-/build
+/client/build
+/server/dist
+/server/build
+
+# editor settings
+.idea/
+.vscode/
+*.sublime-*
+*.swp
+*.swo
+
+# logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# deployment
+.netlify
+.firebase
+.vercel
+.render
+.git*
 
 # misc
 .DS_Store
@@ -30,11 +63,6 @@
 .env.test.local
 .env.production.local
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
 node_modules/
 **/*.pack
 
-/build

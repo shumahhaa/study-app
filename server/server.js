@@ -2,10 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
-// 環境変数のロード - NODE_ENV環境変数に応じた設定ファイルを読み込む
-const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
-console.log(`Loading environment from ${envFile}`);
-dotenv.config({ path: envFile });
+// 環境変数のロード
+if (process.env.NODE_ENV !== 'production') {
+  // 開発環境の場合のみ .env ファイルを読み込む
+  console.log('Loading environment from .env file for development');
+  dotenv.config();
+} else {
+  console.log('Using production environment variables');
+}
 
 // APIルーターのインポート
 const openaiRoutes = require('./routes/openai');
@@ -18,7 +22,17 @@ const PORT = process.env.PORT || 5000;
 
 // CORSの設定
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000', // 環境変数から読み込むか、デフォルト値を使用
+  origin: function (origin, callback) {
+    // 環境変数から許可されたオリジンを取得（カンマ区切り）
+    const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000').split(',');
+    
+    // originがundefinedの場合はローカルリクエスト
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed'));
+    }
+  },
   credentials: true, // 認証情報を含むリクエストを許可
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
