@@ -7,6 +7,7 @@ const CalendarPage = ({ formatTime }) => {
   const [studyHistory, setStudyHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentDate] = useState(new Date()); // 今日の日付を確実に設定
 
   // APIから学習履歴を取得
   useEffect(() => {
@@ -40,7 +41,11 @@ const CalendarPage = ({ formatTime }) => {
             <div style={styles.error}>{error}</div>
           </div>
         ) : (
-          <CalendarView studyHistory={studyHistory} formatTime={formatTime} />
+          <CalendarView 
+            studyHistory={studyHistory} 
+            formatTime={formatTime} 
+            initialDate={currentDate} // 初期値として今日の日付を渡す
+          />
         )}
       </div>
     </Layout>

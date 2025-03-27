@@ -683,11 +683,12 @@ const styles = {
     transition: "all 0.2s ease",
   },
   noDataContainer: {
-    textAlign: "center",
-    padding: "60px 20px",
-    backgroundColor: "#f9f9f9",
-    borderRadius: "12px",
-    marginTop: "20px",
+    textAlign: 'center',
+    padding: '40px',
+    margin: '20px 0',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '8px',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
   },
   noDataIcon: {
     fontSize: "60px",
@@ -803,10 +804,8 @@ const styles = {
     fontWeight: "500",
   },
   noDataMessage: {
-    color: "#999",
-    fontSize: "16px",
-    textAlign: "center",
-    padding: "40px 0",
+    fontSize: '16px',
+    color: '#666',
   },
   insightsSection: {
     backgroundColor: "white",
@@ -887,18 +886,6 @@ const styles = {
     color: "#f44336",
     backgroundColor: "#ffebee",
     padding: "15px 20px",
-    borderRadius: "8px",
-    display: "inline-block"
-  },
-  noDataContainer: {
-    textAlign: "center",
-    padding: "40px 0"
-  },
-  noDataMessage: {
-    fontSize: "16px",
-    color: "#666",
-    backgroundColor: "#f5f5f5",
-    padding: "20px",
     borderRadius: "8px",
     display: "inline-block"
   }

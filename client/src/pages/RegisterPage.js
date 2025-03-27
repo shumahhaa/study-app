@@ -6,6 +6,7 @@ import '../styles/AuthPages.css';
 
 const RegisterPage = () => {
   const [email, setEmail] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,7 +24,7 @@ const RegisterPage = () => {
     setLoading(true);
     
     try {
-      await register(email, password);
+      await register(email, password, displayName);
       setVerificationMessage(true);
       // メール認証案内を表示するためナビゲーションはしない
     } catch (error) {
@@ -34,7 +35,7 @@ const RegisterPage = () => {
   };
 
   const validateForm = () => {
-    if (!email || !password) {
+    if (!email || !password || !displayName) {
       setError('必須項目を入力してください');
       return false;
     }
@@ -78,7 +79,7 @@ const RegisterPage = () => {
                 className="btn btn-primary"
                 onClick={() => navigate('/login')}
               >
-                ログインページへ
+                ログイン
               </button>
             </div>
           </div>
@@ -104,6 +105,18 @@ const RegisterPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="example@example.com"
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="displayName">表示名</label>
+              <input
+                type="text"
+                id="displayName"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="あなたの表示名"
                 required
               />
             </div>

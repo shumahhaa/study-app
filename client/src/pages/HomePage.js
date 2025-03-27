@@ -60,7 +60,7 @@ const HomePage = ({
             </div>
           </div>
           
-          <div style={styles.featuresSection}>
+          <div className="features-section" style={styles.featuresSection}>
             <Link to="/review-quizzes" className="feature-card-link">
               <div className="feature-card">
                 <div className="feature-icon">📝</div>
@@ -91,13 +91,6 @@ const HomePage = ({
               </div>
             </Link>
           </div>
-        </div>
-
-        {/* 開発中のみ表示する管理ページへのリンク */}
-        <div style={styles.devSection}>
-          <Link to="/admin" style={styles.devLink}>
-            管理ページ
-          </Link>
         </div>
       </div>
     </Layout>
@@ -138,20 +131,6 @@ const styles = {
     gap: "20px",
     marginTop: "10px",
     width: "100%",
-  },
-  devSection: {
-    marginTop: "40px",
-    padding: "15px",
-    backgroundColor: "#f5f5f5",
-    borderRadius: "8px",
-    textAlign: "center",
-    borderLeft: "4px solid #ff9800",
-  },
-  devLink: {
-    color: "#ff9800",
-    textDecoration: "none",
-    fontWeight: "500",
-    fontSize: "14px",
   },
 };
 

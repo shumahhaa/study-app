@@ -6,7 +6,6 @@ import HistoryPage from "./pages/HistoryPage";
 import ActiveStudyPage from "./pages/ActiveStudyPage";
 import CompletedStudyPage from "./pages/CompletedStudyPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
-import AdminPage from "./pages/AdminPage";
 import CalendarPage from "./pages/CalendarPage";
 import ReviewQuizzesPage from "./pages/ReviewQuizzesPage";
 import LoginPage from "./pages/LoginPage";
@@ -52,8 +51,7 @@ function App() {
   }, [isStudying, isPaused, studyStartTime, pausedTime]);
 
   const startStudy = () => {
-    // 学習開始前に前回の学習セッションのチャット履歴をクリア
-    // （もし存在する場合）
+    // 新しい学習セッション開始時に前回のチャット履歴をクリア
     if (recordedStudyTopic) {
       const previousChatKey = `aiChat_${recordedStudyTopic}`;
       sessionStorage.removeItem(previousChatKey);
@@ -63,7 +61,6 @@ function App() {
     const newChatKey = `aiChat_${studyTopic}`;
     sessionStorage.removeItem(newChatKey);
     
-    // 既存のコード
     setStudyStartTime(Date.now());
     setStudyDuration(null);
     setIsStudying(true);
@@ -104,16 +101,21 @@ function App() {
     setPauseStartTime(null);
 
     try {
-      await saveStudySession({
+      // 保存するデータをログに出力
+      const sessionData = {
         topic: studyTopic,
         motivation: recordedMotivation,
         duration: totalDuration,
         startTime: studyStartTime,
         endTime: endTime,
-        pausedTime: totalPausedTime / 1000,
-      });
+        pausedtime: totalPausedTime / 1000,
+      };
+      console.log('学習セッションを保存します:', sessionData);
+      
+      const result = await saveStudySession(sessionData);
+      console.log('学習セッション保存結果:', result);
     } catch (error) {
-      console.error("エラー:", error);
+      console.error("学習セッション保存エラー:", error);
     }
   };
 
@@ -204,8 +206,11 @@ function App() {
 
   // チャット履歴をリセットする関数
   const resetChatHistory = (topic) => {
+    if (!topic) return; // トピックがない場合は何もしない
+    
     const chatStorageKey = `aiChat_${topic}`;
-    localStorage.removeItem(chatStorageKey);
+    sessionStorage.removeItem(chatStorageKey);
+    console.log(`${topic}のチャット履歴をリセットしました`);
   };
 
   return (
@@ -278,6 +283,7 @@ function App() {
                     recordedMotivation={recordedMotivation}
                     studyStartTime={studyStartTime}
                     pausedTime={pausedTime}
+                    resetChatHistory={resetChatHistory}
                   />
                 </PrivateRoute>
               }
@@ -323,14 +329,6 @@ function App() {
                   <ReviewQuizzesPage
                     formatTime={formatTime}
                   />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/admin"
-              element={
-                <PrivateRoute>
-                  <AdminPage />
                 </PrivateRoute>
               }
             />

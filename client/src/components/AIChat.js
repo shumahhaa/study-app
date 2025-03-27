@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import ReactMarkdown from 'react-markdown';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
@@ -31,7 +31,7 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
   }, [selectedModel]);
 
   // 初期ウェルカムメッセージを設定する関数
-  const setInitialWelcomeMessage = () => {
+  const setInitialWelcomeMessage = useCallback(() => {
     const welcomeMessage = {
       role: "assistant",
       content: `こんにちは！「${studyTopic}」について学習中ですね。質問があればいつでも聞いてください。`,
@@ -40,10 +40,13 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
     
     // セッションストレージに新しいウェルカムメッセージを保存
     sessionStorage.setItem(chatStorageKey, JSON.stringify([welcomeMessage]));
-  };
+  }, [studyTopic, chatStorageKey]);
 
-  // ローカルストレージからチャット履歴を読み込む
+  // セッションストレージからチャット履歴を読み込む
   useEffect(() => {
+    // studyTopicが空の場合は何もしない
+    if (!studyTopic) return;
+    
     const savedMessages = sessionStorage.getItem(chatStorageKey);
     
     if (savedMessages) {
@@ -57,14 +60,14 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
     } else {
       setInitialWelcomeMessage();
     }
-  }, [studyTopic, chatStorageKey]);
+  }, [studyTopic, chatStorageKey, setInitialWelcomeMessage]);
 
   // チャット履歴が更新されたらセッションストレージに保存
   useEffect(() => {
-    if (messages.length > 0) {
+    if (messages.length > 0 && studyTopic) {
       sessionStorage.setItem(chatStorageKey, JSON.stringify(messages));
     }
-  }, [messages, chatStorageKey]);
+  }, [messages, chatStorageKey, studyTopic]);
 
   // テキストエリアの高さを自動調整する関数
   const adjustTextAreaHeight = () => {
@@ -260,7 +263,7 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
         
         {isLoading && (
           <div style={styles.loadingContainer}>
-            <div style={styles.typingIndicator}>
+            <div style={styles.typingIndicator} className="typing-indicator">
               <span></span>
               <span></span>
               <span></span>
@@ -601,32 +604,6 @@ const styles = {
     boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
     gap: "4px",
     margin: "0 12px 0 48px",
-    "& span": {
-      width: "8px",
-      height: "8px",
-      backgroundColor: "#2196F3",
-      borderRadius: "50%",
-      display: "inline-block",
-      opacity: "0.6",
-      animation: "typingAnimation 1.4s infinite ease-in-out both",
-    },
-    "& span:nth-child(1)": {
-      animationDelay: "0s",
-    },
-    "& span:nth-child(2)": {
-      animationDelay: "0.2s",
-    },
-    "& span:nth-child(3)": {
-      animationDelay: "0.4s",
-    },
-  },
-  "@keyframes typingAnimation": {
-    "0%, 80%, 100%": {
-      transform: "scale(0.6)",
-    },
-    "40%": {
-      transform: "scale(1)",
-    },
   },
 };
 
@@ -767,6 +744,38 @@ globalStyle.innerHTML = `
   
   a:hover {
     text-decoration: underline;
+  }
+  
+  /* タイピングアニメーション */
+  .typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background-color: #2196F3;
+    border-radius: 50%;
+    display: inline-block;
+    opacity: 0.6;
+    animation: typingAnimation 1.4s infinite ease-in-out both;
+  }
+  
+  .typing-indicator span:nth-child(1) {
+    animation-delay: 0s;
+  }
+  
+  .typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+  
+  @keyframes typingAnimation {
+    0%, 80%, 100% {
+      transform: scale(0.6);
+    }
+    40% {
+      transform: scale(1);
+    }
   }
 `;
 document.head.appendChild(globalStyle);

@@ -73,10 +73,23 @@ const ReviewQuizzesPage = () => {
       let reviewStatus = quizToUpdate.reviewStatus;
       
       if (nextReviewIndex < updatedSchedule.length) {
-        nextReviewDate = updatedSchedule[nextReviewIndex].dueDate;
-        reviewStatus = 'scheduled';
+        // 次の復習ステップが存在する場合
+        const nextInterval = updatedSchedule[nextReviewIndex].interval;
+        // 次の復習日を計算（例: 1d = 1日後, 3d = 3日後, 1w = 1週間後, 2w = 2週間後, 1m = 1ヶ月後）
+        const now = new Date();
+        let daysToAdd = 1;
+        
+        if (nextInterval === '1d') daysToAdd = 1;
+        else if (nextInterval === '3d') daysToAdd = 3;
+        else if (nextInterval === '1w') daysToAdd = 7;
+        else if (nextInterval === '2w') daysToAdd = 14;
+        else if (nextInterval === '1m') daysToAdd = 30;
+        
+        nextReviewDate = new Date(now.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
+        reviewStatus = true; // まだ復習が続くのでtrue
       } else {
-        reviewStatus = 'completed';
+        // すべてのステップが完了した場合
+        reviewStatus = false; // 復習完了でfalse
       }
       
       // バックエンドAPIを使用して更新
@@ -99,6 +112,9 @@ const ReviewQuizzesPage = () => {
           lastReviewedAt: new Date()
         } : q
       ));
+      
+      // 一覧ページに戻る
+      setSelectedQuiz(null);
     } catch (error) {
       console.error('復習更新エラー:', error);
       setError('復習記録の更新に失敗しました。再度お試しください。');
@@ -219,7 +235,7 @@ const ReviewQuizzesPage = () => {
     
     if (filterMode === 'due_today') {
       filtered = filtered.filter(quiz => {
-        if (!quiz.nextReviewDate || quiz.reviewStatus === 'completed') {
+        if (!quiz.nextReviewDate || quiz.reviewStatus === false) {
           return false;
         }
         
@@ -232,7 +248,7 @@ const ReviewQuizzesPage = () => {
         return nextReviewDay <= today;
       });
     } else if (filterMode === 'completed') {
-      filtered = filtered.filter(quiz => quiz.reviewStatus === 'completed');
+      filtered = filtered.filter(quiz => quiz.reviewStatus === false);
     }
     
     return filtered;
@@ -245,7 +261,7 @@ const ReviewQuizzesPage = () => {
     const baseStyle = { ...styles.quizCard };
     
     // 完了済みの場合は緑色の線
-    if (quiz.reviewStatus === 'completed') {
+    if (quiz.reviewStatus === false) {
       return { 
         ...baseStyle, 
         borderLeft: '5px solid #4CAF50',
@@ -286,7 +302,7 @@ const ReviewQuizzesPage = () => {
 
   // 今日が復習日かどうかを判定する関数
   const isDueToday = (quiz) => {
-    if (!quiz || !quiz.nextReviewDate || quiz.reviewStatus === 'completed') return false;
+    if (!quiz || !quiz.nextReviewDate || quiz.reviewStatus === false) return false;
     
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -413,20 +429,14 @@ const ReviewQuizzesPage = () => {
         background-color: #666 !important;
         transform: translateY(-2px) !important;
         box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2) !important;
-      }
-      
-      .toggle-answer-button {
-        transition: all 0.3s ease !important;
+        border: none !important;
       }
       
       .toggle-answer-button:hover {
         background-color: #2980b9 !important;
         transform: translateY(-2px) !important;
         box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2) !important;
-      }
-      
-      .complete-review-button {
-        transition: all 0.3s ease !important;
+        border: none !important;
       }
       
       .complete-review-button:hover {
@@ -434,6 +444,7 @@ const ReviewQuizzesPage = () => {
         transform: translateY(-2px) !important;
         box-shadow: 0 5px 10px rgba(76, 175, 80, 0.3) !important;
         animation: buttonPulse 1s infinite !important;
+        border: none !important;
       }
       
       .filter-button {
@@ -443,10 +454,12 @@ const ReviewQuizzesPage = () => {
       .filter-button:hover {
         background-color: #e0e0e0 !important;
         transform: translateY(-1px) !important;
+        border: 1px solid #d5d5d5 !important;
       }
       
       .filter-button.active-filter:hover {
         background-color: #1976d2 !important;
+        border: 1px solid #1565c0 !important;
       }
       
       .delete-button {
@@ -456,7 +469,7 @@ const ReviewQuizzesPage = () => {
       .delete-button:hover {
         background-color: #f44336 !important;
         color: white !important;
-        border-color: #f44336 !important;
+        border: 1px solid #f44336 !important;
       }
       
       .katex-display {
@@ -709,7 +722,7 @@ const ReviewQuizzesPage = () => {
               }}
               onClick={() => markReviewAsCompleted(selectedQuiz.id)}
               disabled={
-                selectedQuiz.reviewStatus === 'completed' || 
+                selectedQuiz.reviewStatus === false || 
                 (selectedQuiz.currentReviewIndex >= 
                  (selectedQuiz.reviewSchedule?.length || 0)) ||
                 !isQuizDueToday
@@ -719,7 +732,7 @@ const ReviewQuizzesPage = () => {
             >
               {isQuizDueToday 
                 ? "この復習ステップを完了する" 
-                : selectedQuiz.reviewStatus === 'completed'
+                : selectedQuiz.reviewStatus === false
                   ? "全ての復習ステップが完了しています"
                   : "まだ復習の時期ではありません"}
             </button>
@@ -777,30 +790,42 @@ const ReviewQuizzesPage = () => {
           
           <div style={styles.filterContainer}>
             <button 
-              style={{
-                ...styles.filterButton, 
-                ...(filterMode === 'due_today' ? styles.activeFilter : {})
-              }}
+              style={filterMode === 'due_today' ? {
+                ...styles.filterButton,
+                backgroundColor: '#2196F3',
+                color: 'white',
+                border: '1px solid #1976d2',
+                fontWeight: '500',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.12)'
+              } : styles.filterButton}
               onClick={() => setFilterMode('due_today')}
               className={`filter-button ${filterMode === 'due_today' ? 'active-filter' : ''}`}
             >
               今日の復習
             </button>
             <button 
-              style={{
-                ...styles.filterButton, 
-                ...(filterMode === 'all' ? styles.activeFilter : {})
-              }}
+              style={filterMode === 'all' ? {
+                ...styles.filterButton,
+                backgroundColor: '#2196F3',
+                color: 'white',
+                border: '1px solid #1976d2',
+                fontWeight: '500',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.12)'
+              } : styles.filterButton}
               onClick={() => setFilterMode('all')}
               className={`filter-button ${filterMode === 'all' ? 'active-filter' : ''}`}
             >
               すべて
             </button>
             <button 
-              style={{
-                ...styles.filterButton, 
-                ...(filterMode === 'completed' ? styles.activeFilter : {})
-              }}
+              style={filterMode === 'completed' ? {
+                ...styles.filterButton,
+                backgroundColor: '#2196F3',
+                color: 'white',
+                border: '1px solid #1976d2',
+                fontWeight: '500',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.12)'
+              } : styles.filterButton}
               onClick={() => setFilterMode('completed')}
               className={`filter-button ${filterMode === 'completed' ? 'active-filter' : ''}`}
             >
@@ -831,21 +856,7 @@ const ReviewQuizzesPage = () => {
                 <div style={styles.quizCardHeader}>
                   <h3 style={styles.quizTopicTitle}>{quiz.studyTopic}</h3>
                   <button
-                    style={{
-                      backgroundColor: '#ffffff',
-                      color: '#666',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '50%',
-                      width: '24px',
-                      height: '24px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      padding: '0',
-                      marginLeft: '8px',
-                      transition: 'all 0.2s ease'
-                    }}
+                    style={styles.deleteButton}
                     onClick={(e) => {
                       e.stopPropagation(); // イベント伝播を防止
                       promptDeleteQuiz(quiz.id);
@@ -863,7 +874,7 @@ const ReviewQuizzesPage = () => {
                   <span style={styles.nextReviewLabel}>次の復習:</span>
                   <span style={{
                     ...styles.nextReviewDate,
-                    ...(quiz.reviewStatus === 'completed' 
+                    ...(quiz.reviewStatus === false 
                       ? styles.completedReview 
                       : isDueToday(quiz) 
                         ? styles.todayReview 
@@ -871,7 +882,7 @@ const ReviewQuizzesPage = () => {
                           ? styles.overdueReview 
                           : styles.futureReview)
                   }}>
-                    {quiz.reviewStatus === 'completed' 
+                    {quiz.reviewStatus === false 
                       ? '全ステップ完了' 
                       : formatDate(quiz.nextReviewDate)}
                   </span>
@@ -1011,12 +1022,6 @@ const styles = {
     fontSize: '1.1rem',
     marginBottom: '1rem',
     lineHeight: '1.6',
-    '& .katex': {
-      fontSize: '1.1em',
-    },
-    '& .katex-display > .katex': {
-      fontSize: '1.21em',
-    },
   },
   toggleAnswerButton: {
     backgroundColor: '#3498db',
@@ -1044,12 +1049,6 @@ const styles = {
   answerText: {
     fontSize: '1rem',
     lineHeight: '1.6',
-    '& .katex': {
-      fontSize: '1.1em',
-    },
-    '& .katex-display > .katex': {
-      fontSize: '1.21em',
-    },
   },
   mathContainer: {
     overflowX: 'auto',
@@ -1073,13 +1072,6 @@ const styles = {
     fontSize: '14px',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-  },
-  activeFilter: {
-    backgroundColor: '#2196F3',
-    color: 'white',
-    borderColor: '#1976d2',
-    fontWeight: '500',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
   },
   reviewStatus: {
     fontSize: '0.9rem',
@@ -1162,7 +1154,7 @@ const styles = {
     ':hover': {
       backgroundColor: '#f44336',
       color: 'white',
-      borderColor: '#f44336',
+      border: '1px solid #f44336',
     }
   },
   deleteIcon: {

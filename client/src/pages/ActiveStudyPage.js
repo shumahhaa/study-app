@@ -20,7 +20,7 @@ const ActiveStudyPage = ({
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationType, setConfirmationType] = useState("stop");
 
-  // ページロード時に実行される処理
+  // ページロード時の処理
   useEffect(() => {
     // リロードフラグをチェック
     const isReloaded = sessionStorage.getItem('pageReloaded');
@@ -34,11 +34,6 @@ const ActiveStudyPage = ({
     } else {
       // 初回アクセス時はフラグを設定
       sessionStorage.setItem('pageReloaded', 'true');
-      
-      // 学習開始時に毎回チャット履歴をリセット
-      if (recordedStudyTopic) {
-        resetChatHistory(recordedStudyTopic);
-      }
     }
     
     // beforeunloadイベントのリスナーを設定
@@ -57,7 +52,7 @@ const ActiveStudyPage = ({
       // コンポーネントがアンマウントされる時（正常な遷移時）はフラグを削除
       sessionStorage.removeItem('pageReloaded');
     };
-  }, [abandonStudy, navigate, isStudying, recordedStudyTopic, resetChatHistory]);
+  }, [abandonStudy, navigate, isStudying]);
 
   const handleStopStudy = () => {
     setConfirmationType("stop");
@@ -70,14 +65,23 @@ const ActiveStudyPage = ({
   };
 
   const confirmAction = async () => {
+    setShowConfirmation(false); // まず確認ダイアログを閉じる
+    
     if (confirmationType === "stop") {
-      // 学習終了時にチャット履歴をリセット
-      resetChatHistory(recordedStudyTopic);
-      await stopStudy();
-      navigate("/completed");
+      try {
+        // 学習終了処理を実行
+        await stopStudy();
+        // 完了ページへ遷移（チャット履歴のリセットは完了ページで行う）
+        navigate("/completed");
+      } catch (error) {
+        console.error("学習終了エラー:", error);
+        alert("学習の終了処理中にエラーが発生しました。もう一度お試しください。");
+      }
     } else {
       // 学習放棄時にチャット履歴をリセット
-      resetChatHistory(recordedStudyTopic);
+      if (recordedStudyTopic) {
+        resetChatHistory(recordedStudyTopic);
+      }
       abandonStudy();
       navigate("/");
     }
@@ -198,13 +202,17 @@ const ActiveStudyPage = ({
         
         {/* 右側：AIチャット */}
         <div style={styles.rightPanel}>
-          <AIChat 
-            studyTopic={recordedStudyTopic}
-            customStyles={{
-              boxShadow: 'none',
-              borderRadius: '0',
-            }}
-          />
+          {recordedStudyTopic ? (
+            <AIChat 
+              studyTopic={recordedStudyTopic}
+              customStyles={{
+                boxShadow: 'none',
+                borderRadius: '0',
+              }}
+            />
+          ) : (
+            <div style={styles.loadingChat}>学習トピックが設定されていません</div>
+          )}
         </div>
         
         {showConfirmation && (
@@ -419,6 +427,15 @@ const styles = {
     transition: "all 0.2s ease",
     boxShadow: "0 4px 10px rgba(33, 150, 243, 0.3)",
     flex: "1",
+  },
+  loadingChat: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100%",
+    fontSize: "18px",
+    fontWeight: "500",
+    color: "#555",
   },
 };
 

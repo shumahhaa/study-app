@@ -167,7 +167,7 @@ const styles = {
   },
   main: {
     flex: 1,
-    padding: "20px",
+    padding: "40px",
     backgroundColor: "#f9f9f9",
   },
   footer: {

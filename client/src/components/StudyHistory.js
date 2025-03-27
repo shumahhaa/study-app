@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 const StudyHistory = ({ studyHistory, deleteStudySession, formatTime }) => {
-  const [sortField, setSortField] = useState("timestamp");
+  const [sortField, setSortField] = useState("startTime");
   const [sortDirection, setSortDirection] = useState("desc");
   const [filter, setFilter] = useState("");
   const [advancedSearchOpen, setAdvancedSearchOpen] = useState(false);
@@ -93,29 +93,54 @@ const StudyHistory = ({ studyHistory, deleteStudySession, formatTime }) => {
     } else if (sortField === "motivation") {
       comparison = a.motivation - b.motivation;
     } else if (sortField === "startTime") {
-      comparison = a.startTime - b.startTime;
+      // startTimeでソート
+      const getTime = (obj) => {
+        if (!obj || !obj.startTime) return 0;
+        
+        const timestamp = obj.startTime;
+        
+        if (timestamp instanceof Date) {
+          return timestamp.getTime();
+        } else if (typeof timestamp === 'object' && timestamp.toDate) {
+          // Firestoreのタイムスタンプオブジェクトの場合
+          return timestamp.toDate().getTime();
+        } else if (timestamp._seconds !== undefined) {
+          // バックエンドから返されたJSONオブジェクトの場合
+          return timestamp._seconds * 1000;
+        } else {
+          // ISO文字列または数値タイムスタンプの場合
+          return new Date(timestamp).getTime();
+        }
+      };
+      
+      comparison = getTime(a) - getTime(b);
     } else if (sortField === "topic") {
       comparison = a.topic.localeCompare(b.topic);
     } else {
-      // デフォルトはtimestamp - バックエンドAPIの形式に対応
-      // Firestoreのtimestampオブジェクトとネイティブの日付オブジェクト両方に対応
-      const getTimestamp = (obj) => {
-        if (!obj || !obj.timestamp) return 0;
-        if (typeof obj.timestamp === 'object' && obj.timestamp.toMillis) {
-          return obj.timestamp.toMillis();
+      // デフォルトもstartTimeでソート
+      const getTime = (obj) => {
+        if (!obj || !obj.startTime) return 0;
+        
+        const timestamp = obj.startTime;
+        
+        if (timestamp instanceof Date) {
+          return timestamp.getTime();
+        } else if (typeof timestamp === 'object' && timestamp.toDate) {
+          // Firestoreのタイムスタンプオブジェクトの場合
+          return timestamp.toDate().getTime();
+        } else if (timestamp._seconds !== undefined) {
+          // バックエンドから返されたJSONオブジェクトの場合
+          return timestamp._seconds * 1000;
+        } else {
+          // ISO文字列または数値タイムスタンプの場合
+          return new Date(timestamp).getTime();
         }
-        // バックエンドから返された通常のJSONオブジェクトの場合
-        if (obj.timestamp._seconds) {
-          return obj.timestamp._seconds * 1000;
-        }
-        // ISO文字列または数値タイムスタンプの場合
-        return new Date(obj.timestamp).getTime();
       };
       
-      comparison = getTimestamp(b) - getTimestamp(a);
+      comparison = getTime(a) - getTime(b);
     }
     
-    return sortDirection === "asc" ? -comparison : comparison;
+    return sortDirection === "asc" ? comparison : -comparison;
   });
 
   // ソートアイコンを表示
@@ -160,7 +185,21 @@ const StudyHistory = ({ studyHistory, deleteStudySession, formatTime }) => {
   const formatDateTime = (timestamp) => {
     if (!timestamp) return "不明";
     
-    const date = new Date(timestamp);
+    let date;
+    
+    // タイムスタンプの型に応じた変換処理
+    if (timestamp instanceof Date) {
+      date = timestamp;
+    } else if (typeof timestamp === 'object' && timestamp.toDate) {
+      // Firestoreのタイムスタンプオブジェクトの場合
+      date = timestamp.toDate();
+    } else if (timestamp._seconds !== undefined) {
+      // バックエンドから返されたJSONオブジェクトの場合
+      date = new Date(timestamp._seconds * 1000);
+    } else {
+      // ISO文字列または数値タイムスタンプの場合
+      date = new Date(timestamp);
+    }
     
     // 曜日の配列
     const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
@@ -680,7 +719,7 @@ const styles = {
     overflow: "hidden",
   },
   topicText: {
-    fontWeight: '500',
+    fontWeight: '400',
     fontSize: '15px',
     overflow: "hidden",
     textOverflow: "ellipsis",
@@ -688,12 +727,12 @@ const styles = {
   },
   durationText: {
     fontSize: '16px',
-    fontWeight: '500',
+    fontWeight: '400',
     color: '#333',
   },
   motivationText: {
     fontSize: '16px',
-    fontWeight: '500',
+    fontWeight: '400',
     color: '#333',
   },
   deleteButton: {

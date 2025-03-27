@@ -9,7 +9,8 @@ const CompletedStudyPage = ({
   formatTime,
   recordedMotivation,
   studyStartTime,
-  pausedTime
+  pausedTime,
+  resetChatHistory
 }) => {
   const navigate = useNavigate();
   const endTime = studyStartTime ? studyStartTime + (studyDuration * 1000) + pausedTime : null;
@@ -19,8 +20,9 @@ const CompletedStudyPage = ({
   const [quizGenerated, setQuizGenerated] = useState(false);
   const [quizError, setQuizError] = useState(null);
 
-  // 学習内容がなければホームページにリダイレクト
+  // ページロード時の処理
   useEffect(() => {
+    // 学習内容がなければホームページにリダイレクト
     if (!recordedStudyTopic) {
       navigate("/");
     }
@@ -94,14 +96,12 @@ const CompletedStudyPage = ({
       const quizData = await generateQuizFromChatHistory(recordedStudyTopic);
       
       // 生成した問題をFirebaseに保存
-      await saveQuizToFirebase(quizData, recordedStudyTopic, studyDuration);
+      await saveQuizToFirebase(quizData, recordedStudyTopic);
       
       // 問題生成完了
       setQuizGenerated(true);
       
-      // 学習が完了したので、チャット履歴をクリア
-      const chatStorageKey = `aiChat_${recordedStudyTopic}`;
-      sessionStorage.removeItem(chatStorageKey);
+      // 学習が完了したので、チャット履歴をリセット（すでにページロード時にリセット済み）
       
     } catch (error) {
       console.error('復習問題の生成中にエラーが発生しました:', error);

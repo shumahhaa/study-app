@@ -4,7 +4,7 @@
   "description": "Study App with frontend and backend",
   "main": "index.js",
   "scripts": {
-    "client": "cd client && set PORT=3002 && npm start",
+    "client": "cd client && set PORT=3000 && npm start",
     "server": "cd server && npm run dev",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "install-client": "cd client && npm install",

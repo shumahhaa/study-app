@@ -39,7 +39,7 @@ export const loginWithEmail = async (email, password) => {
 };
 
 // 新規登録
-export const registerWithEmail = async (email, password) => {
+export const registerWithEmail = async (email, password, displayName = null) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     
@@ -49,6 +49,10 @@ export const registerWithEmail = async (email, password) => {
     try {
       // バックエンドAPI経由でユーザー情報を保存
       const token = await userCredential.user.getIdToken();
+      
+      // 表示名がなければメールアドレスから生成
+      const userDisplayName = displayName || userCredential.user.displayName || email.split('@')[0];
+      
       const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
@@ -56,7 +60,9 @@ export const registerWithEmail = async (email, password) => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
+          uid: userCredential.user.uid,
           email,
+          displayName: userDisplayName,
           emailVerified: false // 初期状態は未認証
         })
       });

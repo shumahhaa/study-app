@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { auth, loginWithEmail, logoutUser, registerWithEmail, sendPasswordReset, reauthenticateWithCredential, updateUserPassword, deleteUserAccount } from '../firebase';
 import { fetchUserProfile, updateUserProfile, deleteUserData } from '../utils/api';
-import { sendEmailVerification } from 'firebase/auth';
+import { sendEmailVerification, updateProfile as updateAuthProfile } from 'firebase/auth';
 
 // 認証コンテキストを作成
 const AuthContext = createContext();
@@ -27,8 +27,9 @@ export const AuthProvider = ({ children }) => {
           console.error('プロフィール取得エラー:', error);
           // エラーがあっても基本的なユーザー情報でプロファイルを設定
           setUserProfile({
+            uid: user.uid,
             email: user.email,
-            role: 'user',
+            displayName: user.displayName || user.email.split('@')[0],
             emailVerified: user.emailVerified
           });
         }
@@ -72,11 +73,20 @@ export const AuthProvider = ({ children }) => {
   };
 
   // 新規登録
-  const register = async (email, password) => {
+  const register = async (email, password, displayName) => {
     setError(null);
     try {
-      const result = await registerWithEmail(email, password);
+      // Firebase Authでユーザーを作成し、表示名も一緒に渡す
+      const result = await registerWithEmail(email, password, displayName);
+      
       try {
+        // Firebase Authのユーザー表示名を設定
+        if (displayName && result.user) {
+          await updateAuthProfile(result.user, {
+            displayName: displayName
+          });
+        }
+        
         // ユーザープロフィールを取得
         const profile = await fetchUserProfile();
         setUserProfile(profile);

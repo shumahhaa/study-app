@@ -32,10 +32,10 @@ export const generateQuizFromChatHistory = async (studyTopic) => {
 };
 
 // 復習問題をFirebaseに保存する関数
-export const saveQuizToFirebase = async (quiz, studyTopic, studyDuration) => {
+export const saveQuizToFirebase = async (quiz, studyTopic) => {
   try {
     // バックエンドAPIを使用してFirestoreに保存
-    const result = await saveQuizToFirestore(quiz, studyTopic, studyDuration);
+    const result = await saveQuizToFirestore(quiz, studyTopic);
     return result.id;
   } catch (error) {
     console.error('問題の保存エラー:', error);

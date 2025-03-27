@@ -38,11 +38,11 @@ router.post('/register', async (req, res) => {
       
       if (!userDoc.exists) {
         await db.collection('users').doc(uid).set({
+          uid: uid,
           email: email,
           displayName: displayName || email.split('@')[0],
-          createdAt: new Date(),
-          role: 'user', // デフォルトロール
-          emailVerified: emailVerified || false
+          emailVerified: emailVerified || false,
+          createdAt: new Date()
         });
         
         return res.status(201).json({ 
@@ -108,10 +108,9 @@ router.get('/user', async (req, res) => {
     }
     
     return res.status(200).json({
-      uid,
+      uid: userData.uid,
       email: userData.email,
       displayName: userData.displayName,
-      role: userData.role,
       emailVerified: userAuth.emailVerified // 常にAuthの値を使用
     });
   } catch (error) {
@@ -154,8 +153,7 @@ router.put('/user', async (req, res) => {
     
     // Firestoreのユーザープロファイルを更新
     await db.collection('users').doc(uid).update({
-      displayName,
-      updatedAt: new Date()
+      displayName
     });
     
     return res.status(200).json({
@@ -270,7 +268,7 @@ router.delete('/user', async (req, res) => {
       await db.collection('users').doc(uid).delete();
       
       // 関連データを削除（学習セッション、復習問題など）
-      const studySessionsSnapshot = await db.collection('studySessions').where('userId', '==', uid).get();
+      const studySessionsSnapshot = await db.collection('studySessions').where('uId', '==', uid).get();
       const reviewQuizzesSnapshot = await db.collection('reviewQuizzes').where('userId', '==', uid).get();
       
       const batch = db.batch();

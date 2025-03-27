@@ -76,13 +76,13 @@ export const generateQuiz = async (userQuestions, studyTopic) => {
 };
 
 // 復習問題をFirestoreに保存する関数
-export const saveQuizToFirestore = async (quiz, studyTopic, studyDuration) => {
+export const saveQuizToFirestore = async (quiz, studyTopic) => {
   try {
     const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/firestore/review-quizzes`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ quiz, studyTopic, studyDuration }),
+      body: JSON.stringify({ quiz, studyTopic }),
     });
 
     if (!response.ok) {

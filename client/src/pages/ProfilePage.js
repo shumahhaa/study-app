@@ -154,33 +154,31 @@ function ProfilePage() {
           <form onSubmit={handleUpdateProfile} className="profile-form">
             <h2>プロフィール情報</h2>
             <div className="profile-info">
-            <p><strong>メールアドレス:</strong> {currentUser?.email}</p>
-            {userProfile?.role && <p><strong>ロール:</strong> {userProfile.role}</p>}
-            <p>
-              <strong>メール認証:</strong> 
-              {currentUser?.emailVerified ? 
-                <span className="verified">認証済み</span> : 
-                <span className="not-verified">未認証</span>
-              }
-            </p>
-          </div>
-          
-          {!currentUser?.emailVerified && (
-            <div className="verification-section">
-              <div className="verification-alert">
-                <p>アカウントのメールアドレスが未認証です。認証メールをご確認ください。</p>
-                {verificationError && <div className="error-message">{verificationError}</div>}
-                {verificationSuccess && <div className="success-message">{verificationSuccess}</div>}
-                <button 
-                  className="btn btn-secondary" 
-                  onClick={handleResendVerification} 
-                  disabled={verificationLoading}
-                >
-                  {verificationLoading ? '送信中...' : '認証メールを再送信'}
-                </button>
-              </div>
+              <p><strong>メールアドレス:</strong> {currentUser?.email}</p>
+              <p><strong>表示名:</strong> {displayName || '未設定'}</p>
             </div>
-          )}
+            
+            {error && <div className="error-message">{error}</div>}
+            {success && <div className="success-message">{success}</div>}
+            
+            <div className="form-group">
+              <label htmlFor="displayName">表示名</label>
+              <input
+                type="text"
+                id="displayName"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="表示名を入力"
+              />
+            </div>
+            
+            <button 
+              type="submit" 
+              className="btn btn-primary" 
+              disabled={loading}
+            >
+              {loading ? '更新中...' : 'プロフィールを更新'}
+            </button>
           </form>
           
           <form onSubmit={handleChangePassword} className="profile-form password-form">

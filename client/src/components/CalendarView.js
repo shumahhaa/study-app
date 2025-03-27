@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import { Link } from 'react-router-dom';
 
-const CalendarView = ({ studyHistory, formatTime }) => {
+const CalendarView = ({ studyHistory, formatTime, initialDate }) => {
   const [calendarData, setCalendarData] = useState({});
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(initialDate || new Date());
   const [selectedDateSessions, setSelectedDateSessions] = useState([]);
   const [topicDistribution, setTopicDistribution] = useState([]);
 
@@ -72,23 +71,45 @@ const CalendarView = ({ studyHistory, formatTime }) => {
     
     setCalendarData(data);
     
-    // 選択中の日付のセッションを更新
-    updateSelectedDateSessions(selectedDate, data);
-  }, [studyHistory, selectedDate]);
+    // 選択中の日付のセッションを更新（selectedDateとdataが正しい場合のみ）
+    if (selectedDate) {
+      updateSelectedDateSessions(selectedDate, data);
+    }
+  }, [studyHistory]);
+
+  // 選択された日付が変更されたとき
+  useEffect(() => {
+    if (selectedDate && Object.keys(calendarData).length > 0) {
+      updateSelectedDateSessions(selectedDate, calendarData);
+    }
+  }, [selectedDate, calendarData]);
 
   // 選択された日付のセッションを更新
   const updateSelectedDateSessions = (date, data) => {
-    // 選択された日付をローカルタイムゾーンでYYYY-MM-DD形式に変換
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const dateStr = `${year}-${month}-${day}`;
+    // dateがnullまたはundefinedの場合は処理を中止
+    if (!date) {
+      console.log("日付が指定されていません");
+      setSelectedDateSessions([]);
+      return;
+    }
     
-    const sessions = data[dateStr]?.sessions || [];
-    setSelectedDateSessions(sessions);
-    
-    // トピック分布データを計算
-    calculateTopicDistribution(sessions);
+    try {
+      // 選択された日付をローカルタイムゾーンでYYYY-MM-DD形式に変換
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+      
+      const sessions = data[dateStr]?.sessions || [];
+      setSelectedDateSessions(sessions);
+      
+      // トピック分布データを計算
+      calculateTopicDistribution(sessions);
+    } catch (err) {
+      console.error("日付処理エラー:", err, date);
+      setSelectedDateSessions([]);
+      setTopicDistribution([]);
+    }
   };
 
   // トピック分布を計算
@@ -128,8 +149,12 @@ const CalendarView = ({ studyHistory, formatTime }) => {
 
   // 日付が変更されたときの処理
   const handleDateChange = (date) => {
+    if (!date) return;
+    
     setSelectedDate(date);
-    updateSelectedDateSessions(date, calendarData);
+    if (calendarData) {
+      updateSelectedDateSessions(date, calendarData);
+    }
   };
 
   // 日付のコンテンツをカスタマイズ
@@ -407,6 +432,13 @@ const CalendarView = ({ studyHistory, formatTime }) => {
     );
   };
 
+  // 初期日付が変更された場合に選択日を更新
+  useEffect(() => {
+    if (initialDate) {
+      setSelectedDate(initialDate);
+    }
+  }, [initialDate]);
+
   return (
     <div style={styles.container}>
       <div style={styles.calendarSection}>
@@ -518,7 +550,7 @@ const CalendarView = ({ studyHistory, formatTime }) => {
                       
                       <div style={styles.sessionItem}>
                         <span style={styles.itemLabel}>休憩時間</span>
-                        <span style={styles.itemValue}>{session.pausedTime > 0 ? formatTime(session.pausedTime) : "0秒"}</span>
+                        <span style={styles.itemValue}>{session.pausedtime > 0 ? formatTime(session.pausedtime) : "0秒"}</span>
                       </div>
                       
                       <div style={styles.motivationContainer}>
