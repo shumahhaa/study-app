@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import AIChat from "../components/AIChat";
+import MaintenanceMessage from "../components/MaintenanceMessage";
 
 const ActiveStudyPage = ({
   recordedStudyTopic,
@@ -19,6 +20,9 @@ const ActiveStudyPage = ({
   const navigate = useNavigate();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationType, setConfirmationType] = useState("stop");
+  
+  // 環境変数からメンテナンスモードの設定を取得
+  const isMaintenanceMode = process.env.REACT_APP_AI_CHAT_MAINTENANCE_MODE === "true";
 
   // ページロード時の処理
   useEffect(() => {
@@ -200,16 +204,25 @@ const ActiveStudyPage = ({
           </div>
         </div>
         
-        {/* 右側：AIチャット */}
+        {/* 右側：AIチャットまたはメンテナンス画面 */}
         <div style={styles.rightPanel}>
           {recordedStudyTopic ? (
-            <AIChat 
-              studyTopic={recordedStudyTopic}
-              customStyles={{
-                boxShadow: 'none',
-                borderRadius: '0',
-              }}
-            />
+            isMaintenanceMode ? (
+              <MaintenanceMessage 
+                customStyles={{
+                  boxShadow: 'none',
+                  borderRadius: '0',
+                }}
+              />
+            ) : (
+              <AIChat 
+                studyTopic={recordedStudyTopic}
+                customStyles={{
+                  boxShadow: 'none',
+                  borderRadius: '0',
+                }}
+              />
+            )
           ) : (
             <div style={styles.loadingChat}>学習トピックが設定されていません</div>
           )}
