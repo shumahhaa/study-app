@@ -34,7 +34,7 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
   const setInitialWelcomeMessage = useCallback(() => {
     const welcomeMessage = {
       role: "assistant",
-      content: `こんにちは！「${studyTopic}」について学習中ですね。質問があればいつでも聞いてください。`,
+      content: `「${studyTopic}」について学習中ですね！質問があればいつでも聞いてください！`,
     };
     setMessages([welcomeMessage]);
     
@@ -225,7 +225,6 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
               <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
             </svg>
           </button>
-          <div style={styles.modelBadge}>{modelName}</div>
         </div>
       </div>
       
@@ -343,13 +342,6 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "10px",
-  },
-  modelBadge: {
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    padding: "4px 10px",
-    borderRadius: "12px",
-    fontSize: "12px",
-    fontWeight: "600",
   },
   clearButton: {
     backgroundColor: "transparent",

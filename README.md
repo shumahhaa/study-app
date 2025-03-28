@@ -78,5 +78,4 @@ npm run dev
 - `PUT /api/firestore/review-quizzes/:id` - 復習問題の更新
 - `DELETE /api/firestore/review-quizzes/:id` - 復習問題の削除
 
-APIを利用するには、`.env`ファイルに`REACT_APP_API_BASE_URL`を設定してください：
 ```
