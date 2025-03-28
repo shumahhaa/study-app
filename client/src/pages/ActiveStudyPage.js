@@ -210,16 +210,18 @@ const ActiveStudyPage = ({
             isMaintenanceMode ? (
               <MaintenanceMessage 
                 customStyles={{
-                  boxShadow: 'none',
-                  borderRadius: '0',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(0, 0, 0, 0.08)',
                 }}
               />
             ) : (
               <AIChat 
                 studyTopic={recordedStudyTopic}
                 customStyles={{
-                  boxShadow: 'none',
-                  borderRadius: '0',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(0, 0, 0, 0.08)',
                 }}
               />
             )
@@ -279,6 +281,10 @@ const styles = {
     height: "auto",
     maxHeight: "calc(100vh - 180px)",
     overflowY: "auto",
+    backgroundColor: "#fff",
+    borderRadius: "20px",
+    boxShadow: "0 5px 15px rgba(0,0,0,0.03)",
+    border: "1px solid rgba(0, 0, 0, 0.04)",
   },
   studyInfoCard: {
     backgroundColor: "white",
@@ -288,7 +294,7 @@ const styles = {
     height: "100%",
     display: "flex",
     flexDirection: "column",
-    maxHeight: "calc(100vh - 200px)",
+    maxHeight: "calc(100vh - 220px)", // 上下のパディングを考慮して調整
     overflowY: "auto",
   },
   statusIndicator: {

@@ -9,26 +9,12 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [modelName, setModelName] = useState("GPT-3.5"); // モデル名の状態を追加
   const messagesEndRef = useRef(null);
   const textAreaRef = useRef(null);
   const chatStorageKey = `aiChat_${studyTopic}`; // 学習トピックごとに固有のストレージキー
 
   // モデル選択用の設定
   const selectedModel = "gpt-3.5-turbo"; // ここでモデルを指定（環境変数から取得することも可能）
-
-  // モデル名とAPI呼び出し用のモデルIDのマッピング
-  const modelMapping = {
-    "gpt-3.5-turbo": "GPT-3.5",
-    "gpt-4-turbo": "GPT-4",
-    "gpt-4o": "GPT-4o",
-    // 他のモデルを必要に応じて追加
-  };
-
-  // 初期化時にモデル名を設定
-  useEffect(() => {
-    setModelName(modelMapping[selectedModel] || "AI");
-  }, [selectedModel]);
 
   // 初期ウェルカムメッセージを設定する関数
   const setInitialWelcomeMessage = useCallback(() => {
@@ -157,14 +143,6 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
     }
   };
 
-  // チャット履歴をクリアする関数（手動クリア用）
-  const clearChat = () => {
-    if (window.confirm("チャット履歴をクリアしますか？")) {
-      sessionStorage.removeItem(chatStorageKey);
-      setInitialWelcomeMessage();
-    }
-  };
-
   // Markdownコンテンツをレンダリングするコンポーネント
   const MarkdownContent = ({ content }) => {
     return (
@@ -213,19 +191,9 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
 
   return (
     <div style={{ ...styles.container, ...customStyles }}>
+      {/* AIアシスタントのヘッダーバーを追加 */}
       <div style={styles.header}>
         <h3 style={styles.title}>AIアシスタント</h3>
-        <div style={styles.headerActions}>
-          <button 
-            onClick={clearChat} 
-            style={styles.clearButton}
-            title="チャット履歴をクリア"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
-            </svg>
-          </button>
-        </div>
       </div>
       
       <div style={styles.chatContent}>
@@ -314,50 +282,14 @@ const styles = {
     width: "100%",
     backgroundColor: "#fff",
     borderRadius: "16px",
-    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+    border: "1px solid rgba(0, 0, 0, 0.1)",
     marginBottom: "0",
-    height: "100%",
+    height: "calc(100% - 60px)",
+    marginTop: "45px",
+    marginBottom: "30px",
     position: "relative",
-  },
-  header: {
-    backgroundColor: "#2196F3",
-    color: "white",
-    padding: "16px 20px",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderTopLeftRadius: "16px",
-    borderTopRightRadius: "16px",
-    borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
-    position: "sticky",
-    top: 0,
-    zIndex: 10,
-  },
-  title: {
-    margin: 0,
-    fontSize: "18px",
-    fontWeight: "600",
-  },
-  headerActions: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-  },
-  clearButton: {
-    backgroundColor: "transparent",
-    border: "none",
-    color: "rgba(255, 255, 255, 0.7)",
-    cursor: "pointer",
-    padding: "5px",
-    borderRadius: "4px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    transition: "all 0.2s",
-    "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.1)",
-      color: "white",
-    },
+    overflow: "hidden",
   },
   chatContent: {
     padding: "20px",
@@ -369,6 +301,8 @@ const styles = {
     flex: 1,
     overflowY: "auto",
     paddingBottom: "80px",
+    borderTopLeftRadius: "0",
+    borderTopRightRadius: "0",
   },
   message: {
     display: "flex",
@@ -501,7 +435,7 @@ const styles = {
   },
   inputContainer: {
     padding: "16px 70px",
-    borderTop: "1px solid rgba(0, 0, 0, 0.08)",
+    borderTop: "1px solid rgba(0, 0, 0, 0.12)",
     backgroundColor: "#fff",
     position: "absolute",
     bottom: "0",
@@ -510,7 +444,7 @@ const styles = {
     zIndex: 10,
     borderBottomLeftRadius: "16px",
     borderBottomRightRadius: "16px",
-    boxShadow: "0 -2px 10px rgba(0, 0, 0, 0.05)",
+    boxShadow: "0 -2px 10px rgba(0, 0, 0, 0.08)",
   },
   inputForm: {
     display: "flex",
@@ -597,6 +531,21 @@ const styles = {
     gap: "4px",
     margin: "0 12px 0 48px",
   },
+  header: {
+    padding: "16px 20px",
+    backgroundColor: "#2196F3",
+    color: "white",
+    borderTopLeftRadius: "16px",
+    borderTopRightRadius: "16px",
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    display: "flex",
+    alignItems: "center",
+  },
+  title: {
+    fontSize: "18px",
+    fontWeight: "600",
+    margin: 0,
+  },
 };
 
 // コードハイライト、Markdown、KaTeXのスタイル
@@ -614,7 +563,18 @@ globalStyle.innerHTML = `
   }
   
   .katex-display > .katex {
+    display: block;
+    text-align: center;
     font-size: 1.21em;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  
+  .katex-html {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
   
   /* コードブロックのスタイル */

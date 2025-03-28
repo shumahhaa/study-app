@@ -19,9 +19,8 @@ router.post('/chat', verifyToken, async (req, res) => {
     2. **Markdown形式** で記述し、**見やすい構成** にしてください。
     3. **数式が必要な場合** は **LaTeX 記法**（\`$$\` で囲む）を使用してください。
        - ✅ **例**：\`$$ E = mc^2 $$\`
-       - ✅ **分数の例**：\`$$ \\frac{a}{b} $$\`
+       - ✅ **分数の例**：\`$$ \\\\frac{a}{b} $$\`
     4. **適切なMarkdown記法** を活用してください：
-       - **見出し** → \`# タイトル\`
        - **強調** → \`**重要ポイント**\`
        - **箇条書き** → \`- ポイント1\`
     5. **コードブロックが必要な場合** は **言語指定を含めてください**。
@@ -43,7 +42,7 @@ router.post('/chat', verifyToken, async (req, res) => {
       model: model,
       messages: [systemMessage, ...messages],
       temperature: 0.7,
-      max_tokens: 1000,
+      max_tokens: 2000,
     });
 
     // 応答を返す
