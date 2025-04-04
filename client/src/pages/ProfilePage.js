@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import '../styles/ProfilePage.css';
 import Layout from '../components/Layout';
 
-function ProfilePage() {
+function ProfilePage({ isStudying }) {
   const { currentUser, userProfile, logout, updateProfile, changePassword, resendVerificationEmail, deleteAccount } = useAuth();
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
@@ -33,6 +33,12 @@ function ProfilePage() {
   }, [currentUser]);
 
   const handleLogout = async () => {
+    // 学習中の場合はログアウトできないようにする
+    if (isStudying) {
+      setError('学習セッション中はログアウトできません。学習を終了するか、完了してからお試しください。');
+      return;
+    }
+    
     setError('');
     try {
       await logout();
@@ -107,6 +113,12 @@ function ProfilePage() {
 
   // アカウント削除モーダルを表示
   const handleShowDeleteModal = () => {
+    // 学習中の場合はアカウント削除できないようにする
+    if (isStudying) {
+      setError('学習セッション中はアカウント削除できません。学習を終了するか、完了してからお試しください。');
+      return;
+    }
+    
     setShowDeleteModal(true);
     setDeletePassword('');
     setDeleteConfirm('');
@@ -148,7 +160,7 @@ function ProfilePage() {
   };
 
   return (
-    <Layout>
+    <Layout isStudying={isStudying}>
       <div className="profile-container">
         <div className="profile-card">
           <form onSubmit={handleUpdateProfile} className="profile-form">
@@ -230,15 +242,27 @@ function ProfilePage() {
           
           <div className="account-actions">
             <div className="logout-container">
-              <button type="button" className="btn btn-secondary" onClick={handleLogout}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={handleLogout}
+                disabled={isStudying}
+              >
                 ログアウト
               </button>
+              {isStudying && <div className="study-session-warning">学習セッション中</div>}
             </div>
             
             <div className="delete-account-container">
-              <button type="button" className="btn btn-danger" onClick={handleShowDeleteModal}>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={handleShowDeleteModal}
+                disabled={isStudying}
+              >
                 アカウント削除
               </button>
+              {isStudying && <div className="study-session-warning">学習セッション中</div>}
             </div>
           </div>
         </div>

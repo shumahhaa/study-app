@@ -171,7 +171,8 @@
 
 .logout-container, .delete-account-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   width: 48%;
 }
 
@@ -286,6 +287,17 @@
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
+}
+
+.study-session-warning {
+  color: #e67e22;
+  background-color: rgba(230, 126, 34, 0.1);
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin-top: 8px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 @media (max-width: 768px) {

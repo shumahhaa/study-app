@@ -248,7 +248,7 @@ function App() {
               path="/profile"
               element={
                 <PrivateRoute>
-                  <ProfilePage />
+                  <ProfilePage isStudying={isStudying} />
                 </PrivateRoute>
               }
             />
