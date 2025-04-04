@@ -166,7 +166,6 @@ const ActiveStudyPage = ({
             <div style={styles.timerContainer}>
               <div style={styles.timerCircle}>
                 <div style={styles.timerValue}>{formatDuration(studyDuration)}</div>
-                <div style={styles.timerLabel}>経過時間</div>
               </div>
             </div>
             
@@ -360,11 +359,6 @@ const styles = {
     fontFamily: "'Roboto Mono', monospace",
     letterSpacing: "1px",
     marginBottom: "6px",
-  },
-  timerLabel: {
-    fontSize: "16px",
-    color: "#888",
-    fontWeight: "500",
   },
   controlsContainer: {
     display: "flex",
