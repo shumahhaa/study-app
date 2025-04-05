@@ -26,6 +26,12 @@ const ActiveStudyPage = ({
 
   // ページロード時の処理
   useEffect(() => {
+    // 学習中でない場合、ホームページに戻る
+    if (!isStudying) {
+      navigate('/');
+      return;
+    }
+    
     // リロードフラグをチェック
     const isReloaded = sessionStorage.getItem('pageReloaded');
     
