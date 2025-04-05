@@ -9,12 +9,18 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  // チャットの使用回数を追跡するstate
+  const [usageCount, setUsageCount] = useState(0);
   const messagesEndRef = useRef(null);
   const textAreaRef = useRef(null);
   const chatStorageKey = `aiChat_${studyTopic}`; // 学習トピックごとに固有のストレージキー
+  const usageCountKey = `aiChatUsage_${studyTopic}`; // 使用回数保存用のキー
 
   // モデル選択用の設定
   const selectedModel = "gpt-3.5-turbo"; // ここでモデルを指定（環境変数から取得することも可能）
+  
+  // 最大使用回数の制限
+  const MAX_USAGE_COUNT = 20;
 
   // 初期ウェルカムメッセージを設定する関数
   const setInitialWelcomeMessage = useCallback(() => {
@@ -28,12 +34,13 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
     sessionStorage.setItem(chatStorageKey, JSON.stringify([welcomeMessage]));
   }, [studyTopic, chatStorageKey]);
 
-  // セッションストレージからチャット履歴を読み込む
+  // セッションストレージからチャット履歴と使用回数を読み込む
   useEffect(() => {
     // studyTopicが空の場合は何もしない
     if (!studyTopic) return;
     
     const savedMessages = sessionStorage.getItem(chatStorageKey);
+    const savedUsageCount = sessionStorage.getItem(usageCountKey);
     
     if (savedMessages) {
       try {
@@ -46,7 +53,19 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
     } else {
       setInitialWelcomeMessage();
     }
-  }, [studyTopic, chatStorageKey, setInitialWelcomeMessage]);
+    
+    if (savedUsageCount) {
+      try {
+        const parsedUsageCount = parseInt(savedUsageCount, 10);
+        setUsageCount(parsedUsageCount);
+      } catch (error) {
+        console.error("使用回数の読み込みエラー:", error);
+        setUsageCount(0);
+      }
+    } else {
+      setUsageCount(0);
+    }
+  }, [studyTopic, chatStorageKey, usageCountKey, setInitialWelcomeMessage]);
 
   // チャット履歴が更新されたらセッションストレージに保存
   useEffect(() => {
@@ -54,6 +73,13 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
       sessionStorage.setItem(chatStorageKey, JSON.stringify(messages));
     }
   }, [messages, chatStorageKey, studyTopic]);
+  
+  // 使用回数が更新されたらセッションストレージに保存
+  useEffect(() => {
+    if (studyTopic) {
+      sessionStorage.setItem(usageCountKey, usageCount.toString());
+    }
+  }, [usageCount, usageCountKey, studyTopic]);
 
   // テキストエリアの高さを自動調整する関数
   const adjustTextAreaHeight = () => {
@@ -76,6 +102,17 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
   const sendMessage = async (e) => {
     e.preventDefault();
     if (input.trim() === "") return;
+    
+    // 使用回数が上限に達している場合は送信しない
+    if (usageCount >= MAX_USAGE_COUNT) {
+      const limitMessage = {
+        role: "assistant",
+        content: "申し訳ありませんが、この学習セッションでのAIチャットの使用回数上限（30回）に達しました。",
+        isError: true,
+      };
+      setMessages((prevMessages) => [...prevMessages, limitMessage]);
+      return;
+    }
 
     const userMessage = {
       role: "user",
@@ -108,6 +145,8 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
       };
 
       setMessages((prevMessages) => [...prevMessages, botResponse]);
+      // 使用回数をインクリメント
+      setUsageCount(prevCount => prevCount + 1);
     } catch (error) {
       console.error("API呼び出しエラー:", error);
       
@@ -254,6 +293,10 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
       
       <div style={styles.inputContainer}>
         <form onSubmit={sendMessage} style={styles.inputForm}>
+          {/* 使用回数カウンターを表示 */}
+          <div style={styles.usageCounter}>
+            １セッション：{usageCount}/{MAX_USAGE_COUNT}
+          </div>
           <textarea
             ref={textAreaRef}
             value={input}
@@ -261,7 +304,7 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
             onKeyDown={handleKeyDown}
             placeholder="質問を入力してください..."
             style={styles.textArea}
-            disabled={isLoading}
+            disabled={isLoading || usageCount >= MAX_USAGE_COUNT}
             rows="1"
             spellCheck="false"
             className="text-area-center-placeholder"
@@ -272,9 +315,9 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
             className="send-button"
             style={{
               ...styles.sendButton,
-              ...(isLoading || input.trim() === "" ? styles.disabledButton : {})
+              ...(isLoading || input.trim() === "" || usageCount >= MAX_USAGE_COUNT ? styles.disabledButton : {})
             }}
-            disabled={isLoading || input.trim() === ""}
+            disabled={isLoading || input.trim() === "" || usageCount >= MAX_USAGE_COUNT}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/>
@@ -556,6 +599,20 @@ const styles = {
     fontSize: "18px",
     fontWeight: "600",
     margin: 0,
+  },
+  usageCounter: {
+    position: "absolute",
+    top: "-28px",
+    right: "16px",
+    fontSize: "14px",
+    color: "#757575",
+    fontWeight: "500",
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    padding: "4px 10px",
+    borderRadius: "12px",
+    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+    border: "1px solid rgba(0, 0, 0, 0.08)",
+    zIndex: 1,
   },
 };
 
