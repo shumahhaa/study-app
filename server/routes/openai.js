@@ -2,12 +2,54 @@ const express = require('express');
 const router = express.Router();
 const openai = require('../config/openai');
 const { verifyToken } = require('../middleware/authMiddleware');
+const { db } = require('../config/firebase');
+const admin = require('firebase-admin');
+
+// 1日のチャット使用上限
+const DAILY_CHAT_LIMIT = 100;
 
 // チャット応答を生成するエンドポイント
 router.post('/chat', verifyToken, async (req, res) => {
   try {
     const { messages, studyTopic, model = 'gpt-3.5-turbo' } = req.body;
     const userId = req.user.uid; // 認証されたユーザーID
+    
+    // ユーザーのチャット使用回数を取得・更新
+    const userRef = db.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+    
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: 'ユーザーが見つかりません' });
+    }
+    
+    // ユーザードキュメントからchatCountを取得
+    const userData = userDoc.data();
+    // chatCountフィールドが存在しない場合は0とする
+    const currentChatCount = userData.chatCount || 0;
+    
+    // 現在の日付（日本時間）
+    const now = admin.firestore.Timestamp.now();
+    const today = new Date(now.toDate());
+    today.setHours(0, 0, 0, 0);
+    
+    // 最終リセット日時を取得（存在しない場合は過去の日付）
+    const lastResetDate = userData.lastChatCountReset 
+      ? new Date(userData.lastChatCountReset.toDate()) 
+      : new Date(0);
+    lastResetDate.setHours(0, 0, 0, 0);
+    
+    // 日付が変わっていれば、カウンターをリセット
+    let chatCount = currentChatCount;
+    if (today.getTime() > lastResetDate.getTime()) {
+      chatCount = 0;
+    }
+    
+    // 1日の上限をチェック
+    if (chatCount >= DAILY_CHAT_LIMIT) {
+      return res.status(429).json({ 
+        error: `1日のAIチャット使用回数上限（${DAILY_CHAT_LIMIT}回）に達しました。明日になるとリセットされます。`
+      });
+    }
     
     // システムメッセージを作成
     const systemMessage = {
@@ -39,10 +81,20 @@ router.post('/chat', verifyToken, async (req, res) => {
       max_tokens: 2000,
     });
 
+    // チャットカウントを更新
+    await userRef.update({
+      chatCount: chatCount + 1,
+      lastChatCountReset: today
+    });
+    
     // 応答を返す
     res.json({ 
       message: completion.choices[0].message.content,
-      model: model
+      model: model,
+      dailyUsage: {
+        current: chatCount + 1,
+        limit: DAILY_CHAT_LIMIT
+      }
     });
     
     // 使用状況を記録することもできます
@@ -56,6 +108,54 @@ router.post('/chat', verifyToken, async (req, res) => {
   } catch (error) {
     console.error('OpenAI APIエラー:', error);
     res.status(500).json({ error: error.message || 'OpenAI APIエラー' });
+  }
+});
+
+// チャット使用回数を取得するエンドポイント
+router.get('/chat-usage', verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.uid;
+    const userRef = db.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+    
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: 'ユーザーが見つかりません' });
+    }
+    
+    const userData = userDoc.data();
+    const chatCount = userData.chatCount || 0;
+    
+    // 現在の日付（日本時間）
+    const now = admin.firestore.Timestamp.now();
+    const today = new Date(now.toDate());
+    today.setHours(0, 0, 0, 0);
+    
+    // 最終リセット日時を取得
+    const lastResetDate = userData.lastChatCountReset 
+      ? new Date(userData.lastChatCountReset.toDate()) 
+      : new Date(0);
+    lastResetDate.setHours(0, 0, 0, 0);
+    
+    // 日付が変わっていれば、カウンターをリセット
+    let currentCount = chatCount;
+    if (today.getTime() > lastResetDate.getTime()) {
+      currentCount = 0;
+      // 実際にデータベースを更新
+      await userRef.update({
+        chatCount: 0,
+        lastChatCountReset: today
+      });
+    }
+    
+    res.json({
+      dailyUsage: {
+        current: currentCount,
+        limit: DAILY_CHAT_LIMIT
+      }
+    });
+  } catch (error) {
+    console.error('チャット使用回数取得エラー:', error);
+    res.status(500).json({ error: error.message || 'チャット使用回数取得エラー' });
   }
 });
 

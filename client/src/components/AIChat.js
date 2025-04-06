@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
 import "katex/dist/katex.min.css"; // KaTeXのスタイルをインポート
-import { fetchChatResponse } from "../utils/api";
+import { fetchChatResponse, fetchChatUsage } from "../utils/api";
 
 const AIChat = ({ studyTopic, customStyles = {} }) => {
   const [messages, setMessages] = useState([]);
@@ -11,6 +11,9 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
   const [isLoading, setIsLoading] = useState(false);
   // チャットの使用回数を追跡するstate
   const [usageCount, setUsageCount] = useState(0);
+  // 1日のチャット使用回数を追跡するstate
+  const [dailyUsage, setDailyUsage] = useState({ current: 0, limit: 50 });
+  const [dailyLimitExceeded, setDailyLimitExceeded] = useState(false);
   const messagesEndRef = useRef(null);
   const textAreaRef = useRef(null);
   const chatStorageKey = `aiChat_${studyTopic}`; // 学習トピックごとに固有のストレージキー
@@ -21,6 +24,22 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
   
   // 最大使用回数の制限
   const MAX_USAGE_COUNT = 20;
+
+  // 1日の使用回数を取得
+  const fetchDailyUsage = useCallback(async () => {
+    try {
+      const response = await fetchChatUsage();
+      setDailyUsage(response.dailyUsage);
+      setDailyLimitExceeded(response.dailyUsage.current >= response.dailyUsage.limit);
+    } catch (error) {
+      console.error('1日のチャット使用回数取得エラー:', error);
+    }
+  }, []);
+
+  // コンポーネントのマウント時にチャット使用回数を取得
+  useEffect(() => {
+    fetchDailyUsage();
+  }, [fetchDailyUsage]);
 
   // 初期ウェルカムメッセージを設定する関数
   const setInitialWelcomeMessage = useCallback(() => {
@@ -107,7 +126,18 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
     if (usageCount >= MAX_USAGE_COUNT) {
       const limitMessage = {
         role: "assistant",
-        content: "申し訳ありませんが、この学習セッションでのAIチャットの使用回数上限（30回）に達しました。",
+        content: "申し訳ありませんが、この学習セッションでのAIチャットの使用回数上限（20回）に達しました。",
+        isError: true,
+      };
+      setMessages((prevMessages) => [...prevMessages, limitMessage]);
+      return;
+    }
+
+    // 1日の使用制限チェック
+    if (dailyLimitExceeded) {
+      const limitMessage = {
+        role: "assistant",
+        content: `申し訳ありませんが、1日のAIチャット使用回数上限（${dailyUsage.limit}回）に達しました。明日になるとリセットされます。`,
         isError: true,
       };
       setMessages((prevMessages) => [...prevMessages, limitMessage]);
@@ -147,12 +177,24 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
       setMessages((prevMessages) => [...prevMessages, botResponse]);
       // 使用回数をインクリメント
       setUsageCount(prevCount => prevCount + 1);
+      
+      // 1日の使用回数を更新
+      if (response.dailyUsage) {
+        setDailyUsage(response.dailyUsage);
+        setDailyLimitExceeded(response.dailyUsage.current >= response.dailyUsage.limit);
+      }
     } catch (error) {
       console.error("API呼び出しエラー:", error);
       
+      // レート制限エラーの場合
+      if (error.message && error.message.includes('1日のAIチャット使用回数上限')) {
+        setDailyLimitExceeded(true);
+        fetchDailyUsage(); // 最新の使用状況を取得
+      }
+      
       const errorMessage = {
         role: "assistant",
-        content: "すみません、エラーが発生しました。しばらくしてからもう一度お試しください。",
+        content: error.message || "すみません、エラーが発生しました。しばらくしてからもう一度お試しください。",
         isError: true,
       };
       
@@ -256,28 +298,23 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
               ...(message.isError ? styles.errorMessage : {})
             }}
           >
-            {message.role === "assistant" && (
-              <div style={styles.avatarContainer}>
-                <div style={styles.avatar}>AI</div>
-              </div>
-            )}
-            <div style={styles.bubble}>
-              <div style={styles.messageContent}>
-                {message.role === "user" ? (
-                  message.content // ユーザーメッセージはプレーンテキストとして表示
-                ) : (
-                  <MarkdownContent content={message.content} /> // AIの回答はMarkdownとして表示
-                )}
+            <div style={styles.avatarContainer}>
+              <div
+                style={message.role === "user" ? styles.userAvatar : styles.avatar}
+              >
+                {message.role === "user" ? "U" : "AI"}
               </div>
             </div>
-            {message.role === "user" && (
-              <div style={styles.avatarContainer}>
-                <div style={styles.userAvatar}>You</div>
-              </div>
-            )}
+            <div style={styles.bubble}>
+              {message.role === "assistant" ? (
+                <MarkdownContent content={message.content} />
+              ) : (
+                <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{message.content}</p>
+              )}
+            </div>
           </div>
         ))}
-        
+
         {isLoading && (
           <div style={styles.loadingContainer}>
             <div style={styles.typingIndicator} className="typing-indicator">
@@ -295,7 +332,8 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
         <form onSubmit={sendMessage} style={styles.inputForm}>
           {/* 使用回数カウンターを表示 */}
           <div style={styles.usageCounter}>
-            １セッション：{usageCount}/{MAX_USAGE_COUNT}
+            <div>１セッション：{usageCount}/{MAX_USAGE_COUNT}</div>
+            <div>１日：{dailyUsage.current}/{dailyUsage.limit}</div>
           </div>
           <textarea
             ref={textAreaRef}
@@ -304,7 +342,7 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
             onKeyDown={handleKeyDown}
             placeholder="質問を入力してください..."
             style={styles.textArea}
-            disabled={isLoading || usageCount >= MAX_USAGE_COUNT}
+            disabled={isLoading || usageCount >= MAX_USAGE_COUNT || dailyLimitExceeded}
             rows="1"
             spellCheck="false"
             className="text-area-center-placeholder"
@@ -315,9 +353,9 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
             className="send-button"
             style={{
               ...styles.sendButton,
-              ...(isLoading || input.trim() === "" || usageCount >= MAX_USAGE_COUNT ? styles.disabledButton : {})
+              ...(isLoading || input.trim() === "" || usageCount >= MAX_USAGE_COUNT || dailyLimitExceeded ? styles.disabledButton : {})
             }}
-            disabled={isLoading || input.trim() === "" || usageCount >= MAX_USAGE_COUNT}
+            disabled={isLoading || input.trim() === "" || usageCount >= MAX_USAGE_COUNT || dailyLimitExceeded}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/>
@@ -603,16 +641,11 @@ const styles = {
   usageCounter: {
     position: "absolute",
     top: "-28px",
-    right: "16px",
-    fontSize: "14px",
-    color: "#757575",
-    fontWeight: "500",
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    padding: "4px 10px",
-    borderRadius: "12px",
-    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-    border: "1px solid rgba(0, 0, 0, 0.08)",
-    zIndex: 1,
+    right: "10px",
+    fontSize: "12px",
+    color: "#666",
+    display: "flex",
+    gap: "12px",
   },
 };
 

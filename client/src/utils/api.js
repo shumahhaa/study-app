@@ -54,6 +54,25 @@ export const fetchChatResponse = async (messages, studyTopic, model = 'gpt-3.5-t
   }
 };
 
+// チャット使用回数を取得する関数
+export const fetchChatUsage = async () => {
+  try {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${API_BASE_URL}/openai/chat-usage`, {
+      headers
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'チャット使用回数の取得に失敗しました');
+    }
+
+    return await response.json();
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 // OpenAI APIを使用してクイズを生成する関数
 export const generateQuiz = async (userQuestions, studyTopic) => {
   try {
