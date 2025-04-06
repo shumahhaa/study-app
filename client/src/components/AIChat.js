@@ -253,14 +253,12 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
           },
           // 数式用のカスタムレンダリング
           math: ({ value }) => (
-            <div className="katex-display">
-              {value}
+            <div className="katex-display-wrapper">
+              <div className="katex-display">{value}</div>
             </div>
           ),
           inlineMath: ({ value }) => (
-            <span className="katex-inline">
-              {value}
-            </span>
+            <span className="katex-inline">{value}</span>
           ),
           // 他のMarkdown要素もカスタマイズできます
           h1: ({ node, ...props }) => <h1 style={styles.markdownH1} {...props} />,
@@ -653,23 +651,32 @@ const styles = {
 const globalStyle = document.createElement('style');
 globalStyle.innerHTML = `
   /* KaTeXスタイルの調整 */
-  .katex-display {
-    margin: 1em 0;
+  .katex-display-wrapper {
+    width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
+    margin: 1em 0;
     padding: 8px 0;
     background-color: #f8f9fa;
     border-radius: 4px;
   }
   
+  .katex-display {
+    margin: 0;
+    padding: 0 16px;
+    text-align: center;
+  }
+  
   .katex {
     font-size: 1.1em;
+    text-align: center;
   }
   
   .katex-display > .katex {
     font-size: 1.21em;
-    display: flex !important;
-    justify-content: center;
+    display: inline-block;
+    text-align: center;
+    max-width: 100%;
   }
   
   /* インライン数式のスタイル */
@@ -678,16 +685,16 @@ globalStyle.innerHTML = `
   }
   
   /* 数式のスクロールバーがあるときの処理 */
-  .katex-display::-webkit-scrollbar {
+  .katex-display-wrapper::-webkit-scrollbar {
     height: 6px;
   }
   
-  .katex-display::-webkit-scrollbar-thumb {
+  .katex-display-wrapper::-webkit-scrollbar-thumb {
     background-color: #c1c1c1;
     border-radius: 3px;
   }
   
-  .katex-display::-webkit-scrollbar-track {
+  .katex-display-wrapper::-webkit-scrollbar-track {
     background-color: #f1f1f1;
   }
   
