@@ -11,17 +11,17 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
   // チャットの使用回数を追跡するstate
   const [usageCount, setUsageCount] = useState(0);
   // 1日のチャット使用回数を追跡するstate
-  const [dailyUsage, setDailyUsage] = useState({ current: 0, limit: 50 });
+  const [dailyUsage, setDailyUsage] = useState({ current: 0, limit: 100 });
   const [dailyLimitExceeded, setDailyLimitExceeded] = useState(false);
   const messagesEndRef = useRef(null);
   const chatStorageKey = `aiChat_${studyTopic}`; // 学習トピックごとに固有のストレージキー
   const usageCountKey = `aiChatUsage_${studyTopic}`; // 使用回数保存用のキー
 
   // モデル選択用の設定
-  const selectedModel = "gpt-3.5-turbo"; // ここでモデルを指定（環境変数から取得することも可能）
+  const selectedModel = process.env.REACT_APP_SELECTED_MODEL || "gpt-3.5-turbo";
   
-  // 最大使用回数の制限
-  const MAX_USAGE_COUNT = 20;
+  // 最大使用回数の制限（環境変数またはデフォルト値を使用）
+  const MAX_USAGE_COUNT = parseInt(process.env.REACT_APP_MAX_USAGE_COUNT || "20", 10);
 
   // グローバルスタイルの適用
   useEffect(() => {
