@@ -1,117 +1,94 @@
 import React from "react";
 import { styles } from "./styles";
 
-const StudyInput = ({ studyTopic, setStudyTopic, motivation, setMotivation }) => {
+const StudyInput = ({
+  studyTopic,
+  setStudyTopic,
+  motivation,
+  setMotivation
+}) => {
+  // モチベーションレベルの設定（1〜5）
   const handleMotivationChange = (level) => {
     setMotivation(level);
   };
 
+  // モチベーションに応じた色を取得
   const getMotivationColor = (level) => {
-    switch (level) {
-      case 1:
-        return "#e53935"; // Red
-      case 2:
-        return "#FB8C00"; // Orange
-      case 3:
-        return "#FFD600"; // Yellow
-      case 4:
-        return "#7CB342"; // Light Green
-      case 5:
-        return "#43A047"; // Green
-      default:
-        return "#e0e0e0"; // Grey
-    }
+    const colors = {
+      1: "#ff6b6b", // 低いモチベーション（赤）
+      2: "#ffa06b", // やや低いモチベーション（オレンジ）
+      3: "#ffd06b", // 普通のモチベーション（黄色）
+      4: "#9be36b", // やや高いモチベーション（黄緑）
+      5: "#4CAF50"  // 高いモチベーション（緑）
+    };
+    return colors[level] || "#ddd";
   };
 
+  // モチベーションレベルに応じたメッセージ
   const getMotivationMessage = (level) => {
-    switch (level) {
-      case 1:
-        return "やる気が出ないですね。無理せず少しだけ始めてみましょう。";
-      case 2:
-        return "モチベーションが低めです。小さな目標から始めましょう。";
-      case 3:
-        return "平均的なモチベーションです。コツコツ進めていきましょう。";
-      case 4:
-        return "モチベーション高いですね！この調子で頑張りましょう。";
-      case 5:
-        return "最高のモチベーションです！今日は大きな進歩が期待できます！";
-      default:
-        return "モチベーションレベルを選択してください";
-    }
-  };
-
-  const renderMotivationMessage = () => {
-    if (motivation === 0) return null;
-
-    return (
-      <div style={styles.motivationMessageContainer}>
-        <div
-          style={{
-            ...styles.motivationIcon,
-            backgroundColor: getMotivationColor(motivation),
-          }}
-        >
-          {motivation}
-        </div>
-        <p style={styles.motivationMessage}>{getMotivationMessage(motivation)}</p>
-      </div>
-    );
+    const messages = {
+      1: "今日は少しだけでも良い。始めることが大切。",
+      2: "小さな一歩から始めよう。短時間でも質の高い学習を。",
+      3: "コツコツ続けることが、大きな成果につながる。",
+      4: "一歩一歩、確実に前進しよう。今日の学びが未来を変える。",
+      5: "今日のあなたなら、どんな難題も乗り越えられる！"
+    };
+    return messages[level] || "";
   };
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.heading}>学習セッション設定</h2>
-
+      <h2 style={styles.heading}>新しい学習セッションを始める</h2>
+      
       <div style={styles.formGroup}>
-        <label style={styles.label}>
-          勉強するトピック <span style={styles.required}>*</span>
+        <label htmlFor="studyTopic" style={styles.label}>
+          学習内容 <span style={styles.required}>*</span>
         </label>
         <div style={styles.inputWrapper}>
           <input
+            id="studyTopic"
             type="text"
             value={studyTopic}
             onChange={(e) => setStudyTopic(e.target.value)}
-            placeholder="例: React Hooks、微分方程式、英語の過去形..."
-            style={styles.input}
+            placeholder="例: TOEIC、数学、簿記２級..."
+            className="study-topic-input"
             required
           />
         </div>
-        {!studyTopic && (
-          <p style={styles.helperText}>トピックを入力してください</p>
-        )}
       </div>
-
+      
       <div style={styles.formGroup}>
-        <label style={styles.label}>現在のモチベーションレベル</label>
+        <label style={styles.label}>
+          モチベーション
+        </label>
         <div style={styles.motivationButtons}>
           {[1, 2, 3, 4, 5].map((level) => (
             <button
               key={level}
               type="button"
+              className={`motivation-button ${motivation === level ? 'active' : ''}`}
+              data-level={level}
               onClick={() => handleMotivationChange(level)}
-              style={{
-                ...styles.motivationButton,
-                backgroundColor:
-                  motivation === level
-                    ? getMotivationColor(level)
-                    : "#f5f5f5",
-                color: motivation === level ? "white" : "#333",
-                border: `2px solid ${
-                  motivation === level ? getMotivationColor(level) : "#ddd"
-                }`,
-                outline: "none",
-              }}
             >
               {level}
             </button>
           ))}
         </div>
-        <div style={styles.motivationLabels}>
-          <span>低</span>
-          <span>高</span>
-        </div>
-        {renderMotivationMessage()}
       </div>
+      
+      {motivation > 0 && (
+        <div style={styles.motivationMessageContainer}>
+          <div style={{
+            ...styles.motivationIcon,
+            backgroundColor: getMotivationColor(motivation)
+          }}>
+            {motivation >= 4 ? "✨" : motivation >= 2 ? "👍" : "🚶"}
+          </div>
+          <p style={styles.motivationMessage}>
+            {getMotivationMessage(motivation)}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
