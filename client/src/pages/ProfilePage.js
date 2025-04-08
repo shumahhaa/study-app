@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import '../styles/ProfilePage.css';
 import Layout from '../components/Layout';
+import {
+  ProfileForm,
+  PasswordChangeForm,
+  AccountActions,
+  DeleteAccountModal,
+  styles
+} from '../components/Profile';
 
 function ProfilePage({ isStudying }) {
-  const { currentUser, userProfile, logout, updateProfile, changePassword, resendVerificationEmail, deleteAccount } = useAuth();
+  const { currentUser, logout, updateProfile, changePassword, resendVerificationEmail, deleteAccount } = useAuth();
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -161,165 +167,50 @@ function ProfilePage({ isStudying }) {
 
   return (
     <Layout isStudying={isStudying}>
-      <div className="profile-container">
-        <div className="profile-card">
-          <form onSubmit={handleUpdateProfile} className="profile-form">
-            <h2>プロフィール情報</h2>
-            <div className="profile-info">
-              <p><strong>メールアドレス:</strong> {currentUser?.email}</p>
-              <p><strong>表示名:</strong> {displayName || '未設定'}</p>
-            </div>
-            
-            {error && <div className="error-message">{error}</div>}
-            {success && <div className="success-message">{success}</div>}
-            
-            <div className="form-group">
-              <label htmlFor="displayName">表示名</label>
-              <input
-                type="text"
-                id="displayName"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="表示名を入力"
-              />
-            </div>
-            
-            <button 
-              type="submit" 
-              className="btn btn-primary" 
-              disabled={loading}
-            >
-              {loading ? '更新中...' : 'プロフィールを更新'}
-            </button>
-          </form>
+      <div style={styles.profileContainer}>
+        <div style={styles.profileCard}>
+          <ProfileForm
+            currentUser={currentUser}
+            displayName={displayName}
+            setDisplayName={setDisplayName}
+            loading={loading}
+            error={error}
+            success={success}
+            handleUpdateProfile={handleUpdateProfile}
+          />
           
-          <form onSubmit={handleChangePassword} className="profile-form password-form">
-            <h2>パスワード変更</h2>
-            
-            <div className="form-group">
-              <label htmlFor="currentPassword">現在のパスワード</label>
-              <input
-                type="password"
-                id="currentPassword"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                required
-              />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="newPassword">新しいパスワード</label>
-              <input
-                type="password"
-                id="newPassword"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-                minLength="6"
-              />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="confirmPassword">パスワード（確認）</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-            </div>
-            
-            {passwordError && <div className="error-message">{passwordError}</div>}
-            {passwordSuccess && <div className="success-message">{passwordSuccess}</div>}
-            
-            <div className="profile-actions">
-              <button type="submit" className="btn btn-primary" disabled={passwordChangeLoading}>
-                {passwordChangeLoading ? '更新中...' : 'パスワードを変更'}
-              </button>
-            </div>
-          </form>
+          <PasswordChangeForm
+            currentPassword={currentPassword}
+            setCurrentPassword={setCurrentPassword}
+            newPassword={newPassword}
+            setNewPassword={setNewPassword}
+            confirmPassword={confirmPassword}
+            setConfirmPassword={setConfirmPassword}
+            passwordChangeLoading={passwordChangeLoading}
+            passwordError={passwordError}
+            passwordSuccess={passwordSuccess}
+            handleChangePassword={handleChangePassword}
+          />
           
-          <div className="account-actions">
-            <div className="logout-container">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={handleLogout}
-                disabled={isStudying}
-              >
-                ログアウト
-              </button>
-              {isStudying && <div className="study-session-warning">学習セッション中</div>}
-            </div>
-            
-            <div className="delete-account-container">
-              <button
-                type="button"
-                className="btn btn-danger"
-                onClick={handleShowDeleteModal}
-                disabled={isStudying}
-              >
-                アカウント削除
-              </button>
-              {isStudying && <div className="study-session-warning">学習セッション中</div>}
-            </div>
-          </div>
+          <AccountActions
+            isStudying={isStudying}
+            handleLogout={handleLogout}
+            handleShowDeleteModal={handleShowDeleteModal}
+          />
         </div>
       </div>
       
-      {/* アカウント削除確認モーダル */}
-      {showDeleteModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2>アカウント削除の確認</h2>
-              <button className="modal-close" onClick={handleCloseDeleteModal}>&times;</button>
-            </div>
-            
-            <div className="modal-body">
-              <p className="warning-text">
-                アカウントを削除すると、すべてのデータが完全に削除され、復元できなくなります。
-              </p>
-              
-              <form onSubmit={handleDeleteAccount}>
-                <div className="form-group">
-                  <label htmlFor="deletePassword">パスワード</label>
-                  <input
-                    type="password"
-                    id="deletePassword"
-                    value={deletePassword}
-                    onChange={(e) => setDeletePassword(e.target.value)}
-                    required
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label htmlFor="deleteConfirm">確認のため「削除します」と入力してください</label>
-                  <input
-                    type="text"
-                    id="deleteConfirm"
-                    value={deleteConfirm}
-                    onChange={(e) => setDeleteConfirm(e.target.value)}
-                    required
-                  />
-                </div>
-                
-                {deleteError && <div className="error-message">{deleteError}</div>}
-                
-                <div className="modal-actions">
-                  <button type="button" className="btn btn-secondary" onClick={handleCloseDeleteModal}>
-                    キャンセル
-                  </button>
-                  <button type="submit" className="btn btn-danger" disabled={deleteLoading}>
-                    {deleteLoading ? '処理中...' : 'アカウントを削除'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteAccountModal
+        showDeleteModal={showDeleteModal}
+        deletePassword={deletePassword}
+        setDeletePassword={setDeletePassword}
+        deleteConfirm={deleteConfirm}
+        setDeleteConfirm={setDeleteConfirm}
+        deleteError={deleteError}
+        deleteLoading={deleteLoading}
+        handleCloseDeleteModal={handleCloseDeleteModal}
+        handleDeleteAccount={handleDeleteAccount}
+      />
     </Layout>
   );
 }
