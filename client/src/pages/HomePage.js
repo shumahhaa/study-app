@@ -9,17 +9,7 @@ const HomePage = ({
   motivation,
   setMotivation,
   isStudying,
-  isPaused,
-  pauseStudy,
-  resumeStudy,
   startStudy,
-  stopStudy,
-  abandonStudy,
-  studyDuration,
-  recordedStudyTopic,
-  recordedMotivation,
-  formatTime,
-  getStatus
 }) => {
   const navigate = useNavigate();
   
