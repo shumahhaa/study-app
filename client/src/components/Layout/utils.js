@@ -5,6 +5,6 @@ export const isActive = (currentPath, targetPath) => {
 
 // 認証ページかどうかを判定
 export const isAuthPage = (path) => {
-  const authPaths = ['/login', '/register', '/reset-password'];
+  const authPaths = ['/', '/login', '/register', '/reset-password'];
   return authPaths.includes(path);
 }; 

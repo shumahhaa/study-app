@@ -1,9 +1,11 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
 import { useStudy } from "../../contexts/StudyContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 // Pages
 import HomePage from "../../pages/HomePage";
+import LandingPage from "../../pages/LandingPage";
 import HistoryPage from "../../pages/HistoryPage";
 import ActiveStudyPage from "../../pages/ActiveStudyPage";
 import CompletedStudyPage from "../../pages/CompletedStudyPage";
@@ -16,6 +18,7 @@ import ResetPasswordPage from "../../pages/ResetPasswordPage";
 import ProfilePage from "../../pages/ProfilePage";
 
 const AppRouter = () => {
+  const { currentUser } = useAuth();
   const {
     studyTopic,
     setStudyTopic,
@@ -44,9 +47,17 @@ const AppRouter = () => {
     <Router>
       <div className="app-container">
         <Routes>
-          {/* 認証が必要なルート */}
+          {/* メインランディングページ（認証不要） */}
           <Route
             path="/"
+            element={
+              currentUser ? <Navigate to="/home" /> : <LandingPage />
+            }
+          />
+
+          {/* 認証が必要なルート */}
+          <Route
+            path="/home"
             element={
               <PrivateRoute>
                 <HomePage

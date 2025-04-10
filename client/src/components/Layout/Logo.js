@@ -5,7 +5,7 @@ import styles from './styles';
 const Logo = ({ logoLinkPath, currentUser }) => {
   return (
     <div style={styles.logoContainer}>
-      <Link to={currentUser ? logoLinkPath : "/login"} style={styles.logoLink} title={logoLinkPath === "/active" ? "学習管理画面へ" : "ホームに戻る"}>
+      <Link to={currentUser ? logoLinkPath : "/"} style={styles.logoLink} title={logoLinkPath === "/active" ? "学習管理画面へ" : "ホームに戻る"}>
         <div className="logo-container" style={styles.logo}>
           <img 
             src="/logo.png" 

@@ -12,6 +12,12 @@ const Navigation = ({ pathname, currentUser }) => {
       {!isAuth && currentUser && (
         <>
           <Link 
+            to="/home" 
+            className={`nav-link ${isActivePath('/home') ? 'active-link' : ''}`}
+          >
+            ホーム
+          </Link>
+          <Link 
             to="/review-quizzes" 
             className={`nav-link ${isActivePath('/review-quizzes') ? 'active-link' : ''}`}
           >
@@ -45,22 +51,20 @@ const Navigation = ({ pathname, currentUser }) => {
       )}
       {isAuth && (
         <>
-          {pathname !== '/login' && (
-            <Link 
-              to="/login" 
-              className={`nav-link ${isActivePath('/login') ? 'active-link' : ''}`}
-            >
-              ログイン
-            </Link>
-          )}
-          {pathname !== '/register' && (
-            <Link 
-              to="/register" 
-              className={`nav-link ${isActivePath('/register') ? 'active-link' : ''}`}
-            >
-              新規登録
-            </Link>
-          )}
+          <Link 
+            to="/login" 
+            className={`nav-link ${isActivePath('/login') ? 'active-link' : ''}`}
+            style={{ fontWeight: isActivePath('/login') ? 'bold' : 'normal' }}
+          >
+            ログイン
+          </Link>
+          <Link 
+            to="/register" 
+            className={`nav-link ${isActivePath('/register') ? 'active-link' : ''}`}
+            style={{ fontWeight: isActivePath('/register') ? 'bold' : 'normal' }}
+          >
+            新規登録
+          </Link>
         </>
       )}
     </nav>

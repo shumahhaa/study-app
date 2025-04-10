@@ -2,7 +2,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 150px); /* ヘッダーとフッターの分を引く */
+  min-height: calc(100vh - 200px); /* ヘッダーとフッターの分を引く */
   background-color: #f5f7fa;
 }
 
