@@ -12,12 +12,6 @@ const Navigation = ({ pathname, currentUser }) => {
       {!isAuth && currentUser && (
         <>
           <Link 
-            to="/home" 
-            className={`nav-link ${isActivePath('/home') ? 'active-link' : ''}`}
-          >
-            ホーム
-          </Link>
-          <Link 
             to="/review-quizzes" 
             className={`nav-link ${isActivePath('/review-quizzes') ? 'active-link' : ''}`}
           >
