@@ -1,6 +1,5 @@
 import React from 'react';
 import styles from './styles';
-import StatusIndicator from './StatusIndicator';
 import TopicSection from './TopicSection';
 import Timer from './Timer';
 import ControlButtons from './ControlButtons';
@@ -19,8 +18,6 @@ const StudyPanel = ({
   return (
     <div style={styles.leftPanel}>
       <div style={styles.studyInfoCard}>
-        <StatusIndicator isPaused={isPaused} />
-        
         <TopicSection 
           topic={recordedStudyTopic} 
           motivation={recordedMotivation} 

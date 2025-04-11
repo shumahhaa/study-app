@@ -31,7 +31,7 @@ export const styles = {
   message: {
     display: "flex",
     alignItems: "flex-start",
-    maxWidth: "85%",
+    maxWidth: "95%",
     margin: "4px 0",
   },
   userMessage: {
@@ -60,7 +60,7 @@ export const styles = {
     fontWeight: "bold",
   },
   userAvatar: {
-    backgroundColor: "#9c27b0",
+    backgroundColor: "#4CAF50",
     color: "white",
     width: "36px",
     height: "36px",
@@ -76,7 +76,7 @@ export const styles = {
     borderRadius: "18px",
     margin: "0 12px",
     boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
-    maxWidth: "calc(100% - 72px)",
+    maxWidth: "calc(100% - 60px)",
     wordBreak: "break-word",
     background: "white",
   },
@@ -257,7 +257,7 @@ export const styles = {
   },
   header: {
     padding: "16px 20px",
-    backgroundColor: "#2196F3",
+    background: "linear-gradient(135deg, #2196F3 0%, #4CAF50 100%)",
     color: "white",
     borderTopLeftRadius: "16px",
     borderTopRightRadius: "16px",

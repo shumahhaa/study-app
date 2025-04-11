@@ -1,21 +1,24 @@
 import React from 'react';
 import styles from './styles';
-import { getMotivationColor } from './utils';
 
-// 学習トピックとモチベーションを表示するコンポーネント
+// 学習トピックを表示するコンポーネント
 const TopicSection = ({ topic, motivation }) => {
   return (
     <div style={styles.topicSection}>
-      <h1 style={styles.topicTitle}>{topic}</h1>
-      <div 
-        style={{
-          ...styles.motivationTag,
-          backgroundColor: `${getMotivationColor(motivation)}20`,
-          color: getMotivationColor(motivation)
-        }}
-      >
-        モチベーション {motivation}/5
-      </div>
+      <div style={{
+        position: "absolute",
+        left: "0",
+        top: "17px",
+        height: "calc(100% - 34px)",
+        width: "4px",
+        background: "linear-gradient(to bottom, #2196F3, #4CAF50)",
+        borderRadius: "2px",
+      }}></div>
+      <h1 style={{
+        ...styles.topicTitle,
+        paddingLeft: "8px",
+        textAlign: "left",
+      }}>{topic}</h1>
     </div>
   );
 };
