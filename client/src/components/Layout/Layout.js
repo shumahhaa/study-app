@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import styles from './styles';
@@ -8,6 +8,7 @@ import Footer from './Footer';
 const Layout = ({ children, isStudying }) => {
   const location = useLocation();
   const { currentUser } = useAuth();
+  const [scrolled, setScrolled] = useState(false);
   
   // ロゴのリンク先を決定
   const logoLinkPath = isStudying ? "/active" : "/";
@@ -17,7 +18,8 @@ const Layout = ({ children, isStudying }) => {
       <Header 
         currentUser={currentUser} 
         pathname={location.pathname} 
-        logoLinkPath={logoLinkPath} 
+        logoLinkPath={logoLinkPath}
+        setScrolled={setScrolled} 
       />
       
       <main style={styles.main}>

@@ -3,15 +3,19 @@ import styles from './styles';
 import Logo from './Logo';
 import Navigation from './Navigation';
 
-const Header = ({ currentUser, pathname, logoLinkPath }) => {
-  const [scrolled, setScrolled] = useState(false);
+const Header = ({ currentUser, pathname, logoLinkPath, setScrolled }) => {
+  const [headerScrolled, setHeaderScrolled] = useState(false);
   
   // スクロール検出のためのイベントリスナー
   useEffect(() => {
     const handleScroll = () => {
       const isScrolled = window.scrollY > 10;
-      if (isScrolled !== scrolled) {
-        setScrolled(isScrolled);
+      if (isScrolled !== headerScrolled) {
+        setHeaderScrolled(isScrolled);
+        // 親コンポーネントにもスクロール状態を伝える
+        if (setScrolled) {
+          setScrolled(isScrolled);
+        }
       }
     };
 
@@ -20,21 +24,25 @@ const Header = ({ currentUser, pathname, logoLinkPath }) => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [scrolled]);
+  }, [headerScrolled, setScrolled]);
 
   // スクロール状態に基づいたヘッダーのスタイル
   const headerStyle = {
     ...styles.header,
-    boxShadow: scrolled 
+    boxShadow: headerScrolled 
       ? '0 4px 20px rgba(0,0,0,0.08)' 
       : '0 2px 10px rgba(0,0,0,0.05)',
-    height: scrolled ? '55px' : '60px',
-    backgroundColor: scrolled ? 'rgba(255,255,255,0.98)' : '#ffffff',
+    backgroundColor: headerScrolled ? 'rgba(255,255,255,0.98)' : '#ffffff',
+  };
+
+  const headerContentStyle = {
+    ...styles.headerContent,
+    height: '100%',
   };
 
   return (
     <header style={headerStyle}>
-      <div style={styles.headerContent}>
+      <div style={headerContentStyle}>
         <Logo 
           logoLinkPath={logoLinkPath} 
           currentUser={currentUser} 
