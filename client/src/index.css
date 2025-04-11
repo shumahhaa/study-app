@@ -70,6 +70,42 @@ code {
   }
 }
 
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(33, 150, 243, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
+  }
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px rgba(33, 150, 243, 0.5), 0 0 10px rgba(33, 150, 243, 0.2), inset 0 0 5px rgba(255, 255, 255, 0);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(33, 150, 243, 0.7), 0 0 20px rgba(33, 150, 243, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.1);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(33, 150, 243, 0.5), 0 0 10px rgba(33, 150, 243, 0.2), inset 0 0 5px rgba(255, 255, 255, 0);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 /* カレンダーのカスタムスタイル */
 .react-calendar {
   width: 100% !important;
@@ -190,7 +226,7 @@ code {
   align-items: center;
   justify-content: center;
   height: 100%;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -204,15 +240,15 @@ code {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(145deg, rgba(33, 150, 243, 0.01) 0%, rgba(76, 175, 80, 0.05) 100%);
+  background: linear-gradient(145deg, rgba(33, 150, 243, 0.05) 0%, rgba(76, 175, 80, 0.08) 100%);
   z-index: -1;
   opacity: 0;
   transition: opacity 0.4s ease;
 }
 
 .feature-card:hover {
-  transform: translateY(-12px) scale(1.02);
   box-shadow: 0 20px 40px rgba(33, 150, 243, 0.15), 0 10px 20px rgba(0, 0, 0, 0.08);
+  background-color: rgba(227, 242, 253, 0.7);
 }
 
 .feature-card:hover:before {
@@ -220,19 +256,23 @@ code {
 }
 
 .feature-card:hover .feature-icon {
-  transform: scale(1.15) translateY(-3px);
   filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.15));
+  color: #1976d2;
 }
 
 .feature-card:hover .feature-title {
   color: #1565C0;
-  transform: translateY(-2px);
+  font-weight: 800;
+}
+
+.feature-card:hover .feature-description {
+  color: #455a64;
 }
 
 .feature-icon {
   font-size: 48px;
   margin-bottom: 20px;
-  transition: all 0.4s ease;
+  transition: filter 0.4s ease;
 }
 
 .feature-title {
@@ -240,7 +280,7 @@ code {
   font-size: 20px;
   font-weight: 700;
   margin: 0 0 12px 0;
-  transition: all 0.3s ease;
+  transition: color 0.3s ease;
 }
 
 .feature-description {
@@ -486,55 +526,70 @@ code {
 
 /* 学習開始ボタンのスタイル */
 .start-button {
-  padding: 14px 36px;
+  padding: 16px 38px;
   border: none;
   border-radius: 50px;
-  font-size: 16px;
+  font-size: 17px;
+  font-weight: 600;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: box-shadow 0.4s ease, background 0.4s ease, transform 0.2s ease;
   text-align: center;
-  min-width: 180px;
+  min-width: 200px;
   outline: none;
+  background: linear-gradient(135deg, #2196F3 0%, #1565C0 100%);
+  color: white;
+  letter-spacing: 0.8px;
+  animation: pulse 2s infinite;
 }
 
 .start-button:before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: all 0.4s ease;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
 .start-button:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(33, 150, 243, 0.4), 0 5px 15px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 25px rgba(33, 150, 243, 0.4);
+  background: linear-gradient(135deg, #1E88E5 0%, #0D47A1 100%);
+  background-size: 200% 200%;
+  animation: pulse 0s, gradientShift 3s ease infinite, glow 2s ease-in-out infinite;
 }
 
 .start-button:hover:before {
-  left: 100%;
+  opacity: 0.2;
 }
 
 .start-button:active {
-  transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(33, 150, 243, 0.3);
+  background: linear-gradient(135deg, #1976D2 0%, #0D47A1 100%);
+  transform: scale(0.98);
 }
 
 .start-button.disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  background: #e0e0e0;
-  color: #999;
+  background: linear-gradient(135deg, #9E9E9E 0%, #757575 100%);
+  color: #EEEEEE;
   box-shadow: none;
+  animation: none;
 }
 
 .start-button.disabled:hover {
-  transform: none;
   box-shadow: none;
+  background: linear-gradient(135deg, #9E9E9E 0%, #757575 100%);
+  animation: none;
+}
+
+.start-button.disabled:hover:before {
+  opacity: 0;
 }
 
 /* 学習内容入力欄のスタイル */
@@ -568,7 +623,7 @@ code {
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  transition: background-color 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
   position: relative;
   z-index: 1;
   background-color: white !important;
@@ -591,7 +646,6 @@ code {
 }
 
 .motivation-button:hover {
-  transform: translateY(-3px) !important;
   box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
   background-color: #f8f9fb !important;
 }
@@ -601,7 +655,6 @@ code {
 }
 
 .motivation-button.active {
-  transform: translateY(-2px) !important;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
   font-weight: 700 !important;
   filter: brightness(1.05);
@@ -653,7 +706,7 @@ code {
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
   width: 100%;
   min-height: 48px;
@@ -661,12 +714,10 @@ code {
 
 .action-button:hover {
   background-color: #1976d2;
-  transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
 }
 
 .action-button:active {
-  transform: translateY(0);
   box-shadow: 0 3px 8px rgba(33, 150, 243, 0.3);
 }
 
@@ -680,7 +731,7 @@ code {
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   width: 100%;
   min-height: 48px;
@@ -688,12 +739,10 @@ code {
 
 .pause-button:hover {
   background-color: #e0e0e0;
-  transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
 .pause-button:active {
-  transform: translateY(0);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -707,7 +756,7 @@ code {
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
   width: 100%;
   min-height: 48px;
@@ -715,12 +764,10 @@ code {
 
 .stop-button:hover {
   background-color: #3d8b40;
-  transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
 }
 
 .stop-button:active {
-  transform: translateY(0);
   box-shadow: 0 3px 8px rgba(76, 175, 80, 0.3);
 }
 
@@ -734,7 +781,7 @@ code {
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
   margin-top: 30px;
   width: 100%;
   min-height: 48px;
@@ -742,12 +789,10 @@ code {
 
 .abandon-button:hover {
   background-color: #fff5f5;
-  transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(244, 67, 54, 0.2);
 }
 
 .abandon-button:active {
-  transform: translateY(0);
   box-shadow: 0 2px 5px rgba(244, 67, 54, 0.1);
 }
 
@@ -761,18 +806,16 @@ code {
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
   flex: 1;
 }
 
 .cancel-button:hover {
   background-color: #e0e0e0;
-  transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .cancel-button:active {
-  transform: translateY(0);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
@@ -785,7 +828,7 @@ code {
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
   flex: 1;
 }
 
@@ -797,12 +840,10 @@ code {
 
 .confirm-button.stop:hover {
   background-color: #1976d2;
-  transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
 }
 
 .confirm-button.stop:active {
-  transform: translateY(0);
   box-shadow: 0 3px 8px rgba(33, 150, 243, 0.3);
 }
 
@@ -814,11 +855,9 @@ code {
 
 .confirm-button.abandon:hover {
   background-color: #e53935;
-  transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(244, 67, 54, 0.4);
 }
 
 .confirm-button.abandon:active {
-  transform: translateY(0);
   box-shadow: 0 3px 8px rgba(244, 67, 54, 0.3);
 }

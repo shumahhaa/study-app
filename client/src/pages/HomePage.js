@@ -107,7 +107,7 @@ const styles = {
     padding: "30px",
     maxWidth: "800px",
     width: "100%",
-    transition: "transform 0.3s ease, box-shadow 0.3s ease",
+    transition: "box-shadow 0.3s ease",
     border: "1px solid rgba(255, 255, 255, 0.7)",
     backdropFilter: "blur(10px)",
     position: "relative",
@@ -152,7 +152,7 @@ const styles = {
     justifyContent: "center",
     position: "relative",
     overflow: "hidden",
-    transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+    transition: "box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
     border: "1px solid rgba(255, 255, 255, 0.7)",
   },
   featureIcon: {
@@ -160,7 +160,7 @@ const styles = {
     marginBottom: "20px",
     position: "relative",
     zIndex: "1",
-    transition: "all 0.3s ease",
+    transition: "filter 0.3s ease",
     filter: "drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))",
   },
   featureTitle: {
