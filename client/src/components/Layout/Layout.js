@@ -13,7 +13,7 @@ const Layout = ({ children, isStudying }) => {
   const logoLinkPath = isStudying ? "/active" : "/";
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} key={location.pathname}>
       <Header 
         currentUser={currentUser} 
         pathname={location.pathname} 

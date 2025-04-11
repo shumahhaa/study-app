@@ -4,18 +4,23 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     minHeight: "100vh",
+    overflow: "hidden",
+    width: "100%",
   },
   header: {
-    padding: "15px 20px",
-    borderBottom: "1px solid #eaeaea",
-    backgroundColor: "#fff",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+    padding: "12px 20px",
+    borderBottom: "1px solid rgba(0,0,0,0.06)",
+    backgroundColor: "#ffffff",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
     position: "sticky",
     top: 0,
     zIndex: 100,
     width: "100%",
-    height: "50px",
-    transition: "none",
+    height: "60px",
+    transition: "all 0.3s ease",
+    left: 0,
+    right: 0,
+    backdropFilter: "blur(5px)",
   },
   headerContent: {
     display: "flex",
@@ -28,7 +33,7 @@ const styles = {
     height: "100%",
   },
   logoContainer: {
-    paddingLeft: "20px",
+    paddingLeft: "10px",
   },
   logoLink: {
     textDecoration: "none",
@@ -43,26 +48,31 @@ const styles = {
     cursor: "pointer",
   },
   logoImage: {
-    height: "33px",
-    marginRight: "10px",
+    height: "35px",
+    marginRight: "12px",
   },
   logoText: {
-    fontSize: "27px",
+    fontSize: "28px",
     fontWeight: "700",
     color: "#333",
-    letterSpacing: "0.5px"
+    letterSpacing: "0.5px",
+    background: "linear-gradient(135deg, #2196F3 0%, #1976D2 100%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
   },
   logoHighlight: {
     color: "#2196F3"
   },
   nav: {
     display: "flex",
-    gap: "15px",
+    gap: "18px",
   },
   main: {
     flex: 1,
     padding: "40px",
     backgroundColor: "#f9f9f9",
+    overflow: "hidden",
+    width: "100%",
   },
   footer: {
     padding: "15px 20px",

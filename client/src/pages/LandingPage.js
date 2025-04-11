@@ -14,6 +14,8 @@ const LandingPage = () => {
       maxWidth: '1200px',
       margin: '0 auto',
       padding: '0 20px',
+      overflow: 'hidden',
+      width: '100%',
     },
     hero: {
       background: 'linear-gradient(135deg, #1E88E5 0%, #1976D2 30%, #00BFA5 70%, #00897B 100%)',
