@@ -42,7 +42,7 @@ const StudyInput = ({
       
       <div style={styles.formGroup}>
         <label htmlFor="studyTopic" style={styles.label}>
-          学習内容 <span style={styles.required}>*</span>
+          学習内容
         </label>
         <div style={styles.inputWrapper}>
           <input

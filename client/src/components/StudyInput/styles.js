@@ -30,10 +30,6 @@ export const styles = {
     letterSpacing: "0.4px",
     textShadow: "0 1px 1px rgba(255, 255, 255, 0.8)"
   },
-  required: {
-    color: "#f44336",
-    fontSize: "14px"
-  },
   inputWrapper: {
     position: "relative"
   },
