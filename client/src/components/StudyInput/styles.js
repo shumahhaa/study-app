@@ -1,30 +1,37 @@
 export const styles = {
   container: {
-    backgroundColor: "#f9f9f9",
-    borderRadius: "8px",
-    padding: "18px",
-    marginBottom: "20px"
+    backgroundColor: "transparent",
+    borderRadius: "12px",
+    padding: "22px",
+    marginBottom: "10px"
   },
   heading: {
-    fontSize: "21px",
+    fontSize: "26px",
     color: "#333",
     marginTop: 0,
-    marginBottom: "25px",
-    borderBottom: "1px solid #eaeaea",
-    paddingBottom: "8px"
+    marginBottom: "30px",
+    borderBottom: "1px solid rgba(33, 150, 243, 0.15)",
+    paddingBottom: "15px",
+    fontWeight: "600",
+    background: "linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    letterSpacing: "0.5px",
   },
   formGroup: {
-    marginBottom: "20px"
+    marginBottom: "28px"
   },
   label: {
     display: "block",
     fontWeight: "600",
     fontSize: "16px",
-    marginBottom: "8px",
-    color: "#444"
+    marginBottom: "12px",
+    color: "#1976D2",
+    letterSpacing: "0.4px",
+    textShadow: "0 1px 1px rgba(255, 255, 255, 0.8)"
   },
   required: {
-    color: "#e53935",
+    color: "#f44336",
     fontSize: "14px"
   },
   inputWrapper: {
@@ -32,67 +39,76 @@ export const styles = {
   },
   input: {
     width: "100%",
-    padding: "12px 15px",
+    padding: "16px 20px",
     fontSize: "16px",
-    borderRadius: "6px",
-    border: "1px solid #ddd",
+    borderRadius: "12px",
+    border: "1px solid rgba(33, 150, 243, 0.2)",
     boxSizing: "border-box",
-    transition: "border 0.3s, box-shadow 0.3s",
-    outlineColor: "#4CAF50"
+    transition: "all 0.3s ease",
+    outlineColor: "#4CAF50",
+    boxShadow: "0 4px 16px rgba(0, 0, 0, 0.03), inset 0 1px 2px rgba(255, 255, 255, 0.5)",
+    backgroundColor: "rgba(255, 255, 255, 0.8)"
   },
   helperText: {
-    margin: "5px 0 0 0",
+    margin: "6px 0 0 0",
     fontSize: "14px",
-    color: "#e53935"
+    color: "#f44336"
   },
   motivationButtons: {
     display: "flex",
     justifyContent: "space-between",
-    gap: "8px",
-    marginBottom: "5px"
+    gap: "12px",
+    marginBottom: "8px"
   },
   motivationButton: {
     flex: 1,
-    padding: "10px 0",
+    padding: "12px 0",
     border: "none",
-    borderRadius: "6px",
+    borderRadius: "12px",
     fontSize: "16px",
     fontWeight: "600",
     cursor: "pointer",
-    transition: "all 0.2s ease",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+    transition: "all 0.3s ease",
+    boxShadow: "0 5px 15px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.15)",
+    transform: "translateY(0)",
+    letterSpacing: "0.5px"
   },
   motivationLabels: {
     display: "flex",
     justifyContent: "space-between",
     fontSize: "14px",
-    color: "#666",
-    marginTop: "5px"
+    color: "#546E7A",
+    marginTop: "8px"
   },
   motivationMessageContainer: {
     display: "flex",
     alignItems: "center",
-    backgroundColor: "#f0f0f0",
-    borderRadius: "6px",
-    padding: "12px 15px",
-    marginTop: "15px",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
+    backgroundColor: "#ffffff",
+    borderRadius: "16px",
+    padding: "20px 24px",
+    marginTop: "24px",
+    boxShadow: "0 10px 25px rgba(0, 0, 0, 0.04), 0 4px 10px rgba(0, 0, 0, 0.02)",
+    border: "1px solid rgba(33, 150, 243, 0.12)",
   },
   motivationIcon: {
-    width: "36px",
-    height: "36px",
+    width: "48px",
+    height: "48px",
     borderRadius: "50%",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    marginRight: "15px",
+    marginRight: "20px",
     color: "white",
-    fontSize: "18px"
+    fontSize: "22px",
+    boxShadow: "0 6px 16px rgba(0, 0, 0, 0.2), inset 0 2px 4px rgba(255, 255, 255, 0.2)"
   },
   motivationMessage: {
     margin: 0,
-    color: "#333",
+    color: "#263238",
     fontWeight: "500",
-    fontSize: "16px"
+    fontSize: "16px",
+    lineHeight: "1.6",
+    letterSpacing: "0.2px",
+    textShadow: "0 1px 1px rgba(255, 255, 255, 0.4)"
   }
 }; 
