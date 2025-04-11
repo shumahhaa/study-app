@@ -17,7 +17,7 @@ const styles = {
     zIndex: 100,
     width: "100%",
     height: "60px",
-    transition: "all 0.3s ease",
+    transition: "box-shadow 0.3s ease, background-color 0.3s ease, height 0.3s ease",
     left: 0,
     right: 0,
     backdropFilter: "blur(5px)",
@@ -44,7 +44,7 @@ const styles = {
     alignItems: "center",
     padding: "5px",
     borderRadius: "8px",
-    transition: "transform 0.3s ease",
+    transition: "color 0.3s ease",
     cursor: "pointer",
   },
   logoImage: {

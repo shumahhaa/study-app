@@ -261,7 +261,7 @@ code {
   border-radius: 8px;
   font-weight: 500;
   font-size: 14px;
-  transition: all 0.3s ease;
+  transition: color 0.3s ease, background-color 0.3s ease;
   margin: 0 4px;
   min-width: 80px;
   height: 36px;
@@ -285,7 +285,6 @@ code {
 .nav-link:hover {
   background-color: rgba(33, 150, 243, 0.05);
   color: #1976d2;
-  transform: translateY(-2px);
   text-decoration: none;
 }
 
@@ -306,7 +305,6 @@ code {
 .active-link:hover {
   background-color: rgba(33, 150, 243, 0.12);
   color: #1565c0;
-  transform: translateY(-2px);
   text-decoration: none;
 }
 
@@ -321,7 +319,6 @@ code {
 }
 
 .logo-container:hover {
-  transform: scale(1.03);
   filter: brightness(1.05);
 }
 
@@ -340,7 +337,6 @@ code {
 .period-button:hover {
   background-color: #d0d0d0;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  transform: translateY(-1px);
 }
 
 .period-button-active {
@@ -440,7 +436,6 @@ code {
 .advanced-search-button:hover {
   background-color: #e3f2fd;
   color: #1976d2;
-  transform: translateY(-1px);
   box-shadow: 0 2px 5px rgba(33, 150, 243, 0.2);
 }
 
@@ -469,7 +464,6 @@ code {
 .reset-button:hover {
   background-color: #e0e0e0;
   color: #333;
-  transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
@@ -487,7 +481,6 @@ code {
 
 .reset-filters-button:hover {
   background-color: #1976d2;
-  transform: translateY(-1px);
   box-shadow: 0 2px 5px rgba(33, 150, 243, 0.3);
 }
 
