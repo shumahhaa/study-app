@@ -6,6 +6,10 @@ const AccountActions = ({
   handleLogout,
   handleShowDeleteModal
 }) => {
+  // ホバー状態を管理
+  const [isLogoutHovered, setIsLogoutHovered] = React.useState(false);
+  const [isDeleteHovered, setIsDeleteHovered] = React.useState(false);
+  
   return (
     <div style={styles.accountActions}>
       <div style={styles.logoutContainer}>
@@ -13,10 +17,13 @@ const AccountActions = ({
           type="button"
           style={{
             ...styles.btnSecondary,
-            ...(isStudying ? styles.btnSecondaryDisabled : {})
+            ...(isStudying ? styles.btnSecondaryDisabled : {}),
+            ...(isLogoutHovered && !isStudying ? styles.btnSecondaryHover : {})
           }}
           onClick={handleLogout}
           disabled={isStudying}
+          onMouseEnter={() => setIsLogoutHovered(true)}
+          onMouseLeave={() => setIsLogoutHovered(false)}
         >
           ログアウト
         </button>
@@ -28,10 +35,13 @@ const AccountActions = ({
           type="button"
           style={{
             ...styles.btnDanger,
-            ...(isStudying ? styles.btnDangerDisabled : {})
+            ...(isStudying ? styles.btnDangerDisabled : {}),
+            ...(isDeleteHovered && !isStudying ? styles.btnDangerHover : {})
           }}
           onClick={handleShowDeleteModal}
           disabled={isStudying}
+          onMouseEnter={() => setIsDeleteHovered(true)}
+          onMouseLeave={() => setIsDeleteHovered(false)}
         >
           アカウント削除
         </button>

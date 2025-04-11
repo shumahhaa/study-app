@@ -10,6 +10,9 @@ const ProfileForm = ({
   success,
   handleUpdateProfile
 }) => {
+  // ホバー状態を管理
+  const [isHovered, setIsHovered] = React.useState(false);
+  
   return (
     <form onSubmit={handleUpdateProfile} className="profile-form" style={styles.profileForm}>
       <h2>プロフィール情報</h2>
@@ -33,16 +36,21 @@ const ProfileForm = ({
         />
       </div>
       
-      <button 
-        type="submit" 
-        style={{
-          ...styles.btnPrimary,
-          ...(loading ? styles.btnPrimaryDisabled : {})
-        }}
-        disabled={loading}
-      >
-        {loading ? '更新中...' : 'プロフィールを更新'}
-      </button>
+      <div style={styles.profileActions}>
+        <button 
+          type="submit" 
+          style={{
+            ...styles.btnPrimary,
+            ...(loading ? styles.btnPrimaryDisabled : {}),
+            ...(isHovered && !loading ? styles.btnPrimaryHover : {})
+          }}
+          disabled={loading}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          {loading ? '更新中...' : 'プロフィールを更新'}
+        </button>
+      </div>
     </form>
   );
 };

@@ -13,6 +13,9 @@ const PasswordChangeForm = ({
   passwordSuccess,
   handleChangePassword
 }) => {
+  // ホバー状態を管理
+  const [isHovered, setIsHovered] = React.useState(false);
+  
   return (
     <form onSubmit={handleChangePassword} className="profile-form" style={{...styles.profileForm, ...styles.passwordForm}}>
       <h2>パスワード変更</h2>
@@ -62,9 +65,12 @@ const PasswordChangeForm = ({
           type="submit" 
           style={{
             ...styles.btnPrimary,
-            ...(passwordChangeLoading ? styles.btnPrimaryDisabled : {})
+            ...(passwordChangeLoading ? styles.btnPrimaryDisabled : {}),
+            ...(isHovered && !passwordChangeLoading ? styles.btnPrimaryHover : {})
           }}
           disabled={passwordChangeLoading}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
           {passwordChangeLoading ? '更新中...' : 'パスワードを変更'}
         </button>
