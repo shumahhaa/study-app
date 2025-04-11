@@ -13,20 +13,16 @@ const GlobalStyles = () => {
       }
       
       .quiz-card {
-        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-                    box-shadow 0.3s ease !important;
-        will-change: transform, box-shadow !important;
+        transition: box-shadow 0.3s ease !important;
       }
       
       .quiz-card:hover {
-        transform: translateY(-5px) !important;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15) !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
       }
       
       .quiz-card:active {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1) !important;
-        transition: transform 0.1s, box-shadow 0.1s !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+        transition: box-shadow 0.1s !important;
       }
       
       .back-button {
@@ -34,24 +30,29 @@ const GlobalStyles = () => {
       }
       
       .back-button:hover {
-        background-color: #666 !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2) !important;
-        border: none !important;
+        background-color: #e9e9e9 !important;
+        color: #333 !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+        border: 1px solid #d5d5d5 !important;
       }
       
       .toggle-answer-button:hover {
-        background-color: #2980b9 !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2) !important;
-        border: none !important;
+        background-color: rgba(76, 175, 80, 0.08) !important;
+        color: #388e3c !important;
+        box-shadow: 0 1px 3px rgba(76, 175, 80, 0.15) !important;
+        border: 1px solid #4CAF50 !important;
+      }
+      
+      .toggle-answer-button.active-toggle-button:hover {
+        background-color: #eeeeee !important;
+        color: #222 !important;
+        border: 1px solid #cccccc !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08) !important;
       }
       
       .complete-review-button:hover {
         background-color: #388e3c !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 5px 10px rgba(76, 175, 80, 0.3) !important;
-        animation: buttonPulse 1s infinite !important;
+        box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
         border: none !important;
       }
       
@@ -60,14 +61,15 @@ const GlobalStyles = () => {
       }
       
       .filter-button:hover {
-        background-color: #e0e0e0 !important;
-        transform: translateY(-1px) !important;
-        border: 1px solid #d5d5d5 !important;
+        background-color: transparent !important;
+        color: #4CAF50 !important;
+        border-bottom: 2px solid rgba(76, 175, 80, 0.3) !important;
       }
       
       .filter-button.active-filter:hover {
-        background-color: #1976d2 !important;
-        border: 1px solid #1565c0 !important;
+        background-color: transparent !important;
+        color: #4CAF50 !important;
+        border-bottom: 2px solid #4CAF50 !important;
       }
       
       .delete-button {

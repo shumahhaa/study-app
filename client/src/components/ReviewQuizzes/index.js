@@ -160,7 +160,25 @@ const ReviewQuizzesPage = () => {
           />
         ) : (
           <>
-            <h1 style={styles.title}>復習問題一覧</h1>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '2rem'
+            }}>
+              <h1 style={{
+                ...styles.title,
+                margin: 0,
+                textAlign: 'left'
+              }}>復習問題一覧</h1>
+              
+              <FilterControls 
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                filterMode={filterMode}
+                setFilterMode={setFilterMode}
+              />
+            </div>
             
             {/* 削除確認ダイアログ */}
             {confirmDelete && (
@@ -170,12 +188,15 @@ const ReviewQuizzesPage = () => {
               />
             )}
             
-            <FilterControls 
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              filterMode={filterMode}
-              setFilterMode={setFilterMode}
-            />
+            <div style={styles.searchContainer}>
+              <input
+                type="text"
+                placeholder="トピックで検索..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={styles.searchInput}
+              />
+            </div>
             
             <QuizList 
               quizzes={quizzes}

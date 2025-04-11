@@ -25,9 +25,12 @@ const QuizDetail = ({ quiz, onBackToList, onMarkCompleted }) => {
           onClick={onBackToList}
           className="back-button"
         >
+          <span style={{ marginRight: '6px', fontSize: '18px' }}>←</span>
           一覧に戻る
         </button>
+        
         <h2 style={styles.quizTitle}>{quiz.studyTopic}</h2>
+        
         <div style={styles.quizMeta}>
           <p style={styles.quizDate}>
             作成日: {formatDateSafe(quiz.createdAt)}

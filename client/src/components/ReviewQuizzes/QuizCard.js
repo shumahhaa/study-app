@@ -12,12 +12,13 @@ const QuizCard = ({ quiz, onClick, onDelete }) => {
     
     const baseStyle = { ...styles.quizCard };
     
-    // 完了済みの場合は緑色の線
+    // 完了済みの場合は緑色の線と薄緑色の背景
     if (quiz.reviewStatus === false) {
       return { 
         ...baseStyle, 
         borderLeft: '5px solid #4CAF50',
-        paddingLeft: '1.2rem'
+        paddingLeft: '1.2rem',
+        backgroundColor: 'rgba(76, 175, 80, 0.05)'
       };
     }
     
@@ -26,29 +27,32 @@ const QuizCard = ({ quiz, onClick, onDelete }) => {
     
     const nextReviewDate = toDateObject(quiz.nextReviewDate);
     
-    // 次の復習日が過去の場合（期限切れ）は赤色の線
+    // 次の復習日が過去の場合（期限切れ）は赤色の線と薄い赤色の背景
     if (nextReviewDate && nextReviewDate < today) {
       return { 
         ...baseStyle, 
         borderLeft: '5px solid #f44336',
-        paddingLeft: '1.2rem'
+        paddingLeft: '1.2rem',
+        backgroundColor: 'rgba(244, 67, 54, 0.05)'
       };
     }
     
-    // 今日が復習日の場合は青色の線
+    // 今日が復習日の場合は青色の線と薄青色の背景
     if (nextReviewDate && isDueToday(quiz)) {
       return { 
         ...baseStyle, 
         borderLeft: '5px solid #2196F3',
-        paddingLeft: '1.2rem' 
+        paddingLeft: '1.2rem',
+        backgroundColor: 'rgba(33, 150, 243, 0.05)'
       };
     }
     
-    // それ以外（未来の復習予定）は灰色の線
+    // それ以外（未来の復習予定）は灰色の線と薄いグレーの背景
     return { 
       ...baseStyle, 
       borderLeft: '5px solid #9e9e9e',
-      paddingLeft: '1.2rem'
+      paddingLeft: '1.2rem',
+      backgroundColor: 'rgba(158, 158, 158, 0.05)'
     };
   };
 

@@ -17,9 +17,19 @@ const QuestionItem = ({ question, index, showAnswer, onToggleAnswer }) => {
           ...(showAnswer ? styles.activeToggleButton : {})
         }}
         onClick={onToggleAnswer}
-        className="toggle-answer-button"
+        className={`toggle-answer-button ${showAnswer ? 'active-toggle-button' : ''}`}
       >
-        {showAnswer ? '解答を隠す' : '解答を表示'}
+        {showAnswer ? (
+          <>
+            <span style={{ marginRight: '6px', fontSize: '14px' }}>▲</span>
+            解答を隠す
+          </>
+        ) : (
+          <>
+            <span style={{ marginRight: '6px', fontSize: '14px' }}>▼</span>
+            解答を表示
+          </>
+        )}
       </button>
       
       {showAnswer && (
