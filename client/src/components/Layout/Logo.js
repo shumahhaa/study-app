@@ -8,7 +8,7 @@ const Logo = ({ logoLinkPath, currentUser }) => {
       <Link to={currentUser ? logoLinkPath : "/"} style={styles.logoLink} title={logoLinkPath === "/active" ? "学習管理画面へ" : "ホームに戻る"}>
         <div className="logo-container" style={styles.logo}>
           <img 
-            src="/logo.png" 
+            src="/LearnTime.png" 
             alt="LearnTime Logo" 
             style={styles.logoImage} 
           />
