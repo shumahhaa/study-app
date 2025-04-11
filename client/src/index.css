@@ -575,46 +575,79 @@ code {
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #f5f5f5;
-  color: #333;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  position: relative;
+  z-index: 1;
+  background-color: white !important;
+  color: #444 !important;
+  border: 1px solid rgba(200, 200, 200, 0.2) !important;
+}
+
+.motivation-button:before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: inherit;
+  filter: blur(8px);
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
 }
 
 .motivation-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  background-color: #e3f2fd;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  background-color: #f8f9fb !important;
+}
+
+.motivation-button:hover:before {
+  opacity: 0.4;
 }
 
 .motivation-button.active {
-  color: white;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  font-weight: 700 !important;
+  filter: brightness(1.05);
+  color: white !important;
+  border: none !important;
 }
 
+.motivation-button.active:after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40%;
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 3px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+/* モチベーションボタンの色別スタイルは既存のまま維持 */
 .motivation-button.active[data-level="1"] {
-  background-color: #ff6b6b;
+  background-color: #ff6b6b !important;
 }
 
 .motivation-button.active[data-level="2"] {
-  background-color: #ffa06b;
+  background-color: #ffa06b !important;
 }
 
 .motivation-button.active[data-level="3"] {
-  background-color: #ffd06b;
+  background-color: #ffd06b !important;
 }
 
 .motivation-button.active[data-level="4"] {
-  background-color: #9be36b;
+  background-color: #9be36b !important;
 }
 
 .motivation-button.active[data-level="5"] {
-  background-color: #4CAF50;
-}
-
-.motivation-button.active:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.05);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  background-color: #4CAF50 !important;
 }
 
 /* 再開ボタン */
