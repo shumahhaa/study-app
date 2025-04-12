@@ -112,9 +112,7 @@ const styles = {
     backdropFilter: "blur(10px)",
     position: "relative",
     overflow: "hidden",
-    background: 
-      "linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 247, 255, 0.85) 40%, rgba(236, 253, 245, 0.85) 100%), " +
-      "linear-gradient(135deg, rgba(21, 101, 192, 0.18) 0%, rgba(56, 142, 60, 0.22) 100%)",
+    background: "#fff",
   },
   startButtonContainer: {
     display: "flex",
@@ -141,7 +139,7 @@ const styles = {
     width: "100%",
   },
   featureCard: {
-    background: "linear-gradient(145deg, #ffffff 0%, #f5fbff 100%)",
+    background: "#fff",
     borderRadius: "16px",
     padding: "30px",
     boxShadow: "0 15px 35px rgba(0, 0, 0, 0.06), 0 5px 15px rgba(0, 0, 0, 0.02)",

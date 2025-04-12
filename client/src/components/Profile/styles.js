@@ -9,7 +9,7 @@ const styles = {
     backgroundColor: '#f9fafb',
   },
   profileCard: {
-    background: 'linear-gradient(135deg, rgba(236, 246, 255, 0.9) 0%, rgba(240, 253, 250, 0.9) 50%, rgba(236, 253, 245, 0.9) 100%)',
+    background: '#fff',
     borderRadius: '12px',
     boxShadow: '0 8px 30px rgba(0, 0, 0, 0.06)',
     padding: '35px',
@@ -21,7 +21,7 @@ const styles = {
   },
   profileInfo: {
     padding: '18px',
-    backgroundColor: 'rgba(236, 253, 245, 0.6)',
+    backgroundColor: '#fff',
     borderRadius: '8px',
     marginBottom: '25px',
     borderLeft: '3px solid #10b981',
@@ -172,7 +172,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#fff',
     borderTopLeftRadius: '12px',
     borderTopRightRadius: '12px',
   },

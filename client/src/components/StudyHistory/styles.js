@@ -2,7 +2,6 @@
 const styles = {
   container: {
     backgroundColor: "#fff",
-    backgroundImage: "linear-gradient(135deg, rgba(33, 150, 243, 0.05) 0%, rgba(76, 175, 80, 0.1) 100%)",
     borderRadius: "8px",
     boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
     padding: "20px",
@@ -48,8 +47,7 @@ const styles = {
     boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
   },
   advancedSearchContainer: {
-    backgroundColor: "#f9f9f9",
-    backgroundImage: "linear-gradient(135deg, rgba(33, 150, 243, 0.02) 0%, rgba(76, 175, 80, 0.05) 100%)",
+    backgroundColor: "#fff",
     borderRadius: "8px",
     padding: "20px",
     marginBottom: "30px",
@@ -142,7 +140,6 @@ const styles = {
     borderRadius: "12px",
     boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
     backgroundColor: "#fff",
-    backgroundImage: "linear-gradient(135deg, rgba(33, 150, 243, 0.01) 0%, rgba(76, 175, 80, 0.03) 100%)",
   },
   table: {
     width: "100%",
