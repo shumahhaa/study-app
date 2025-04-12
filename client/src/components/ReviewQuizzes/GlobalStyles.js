@@ -12,6 +12,63 @@ const GlobalStyles = () => {
         100% { transform: scale(1); }
       }
       
+      /* カスタム緑色ナビゲーションリンク */
+      .green-nav-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 16px;
+        color: #555;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 14px;
+        transition: color 0.3s ease, background-color 0.3s ease;
+        margin: 0 4px;
+        min-width: 80px;
+        height: 36px;
+        background-color: transparent;
+        border: none;
+        position: relative;
+        cursor: pointer;
+      }
+      
+      .green-nav-link:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #4CAF50 0%, #388E3C 100%);
+        transition: width 0.3s ease;
+      }
+      
+      .green-nav-link:hover {
+        background-color: rgba(76, 175, 80, 0.05);
+        color: #388e3c;
+      }
+      
+      .green-nav-link:hover:after {
+        width: 70%;
+      }
+      
+      .green-active-link {
+        color: #4CAF50;
+        font-weight: 600;
+        background-color: rgba(76, 175, 80, 0.08);
+      }
+      
+      .green-active-link:after {
+        width: 70%;
+      }
+      
+      .green-active-link:hover {
+        background-color: rgba(76, 175, 80, 0.12);
+        color: #2E7D32;
+      }
+      
       .quiz-card {
         transition: box-shadow 0.3s ease !important;
       }
@@ -242,6 +299,37 @@ const GlobalStyles = () => {
         width: 90%;
         max-width: 400px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      }
+      
+      .toggle-answer-button {
+        transition: all 0.2s ease;
+      }
+      
+      .toggle-answer-button:hover {
+        background-color: #f5f5f5;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+      
+      .active-toggle-button {
+        background-color: #f5f5f5;
+      }
+      
+      .filter-button {
+        transition: all 0.2s ease;
+      }
+      
+      .filter-button:hover {
+        color: #3f51b5;
+      }
+      
+      .active-filter {
+        color: #3f51b5;
+        font-weight: 600;
+      }
+      
+      .back-button:hover {
+        background-color: #e0e0e0;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
       }
     `;
     document.head.appendChild(style);
