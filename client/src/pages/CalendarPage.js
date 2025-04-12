@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import CalendarView from '../components/CalendarView';
 import { fetchStudySessions } from '../utils/api';
+import { DelayedLoader } from '../components/Common';
 
 const CalendarPage = ({ formatTime }) => {
   const [studyHistory, setStudyHistory] = useState([]);
@@ -32,15 +33,18 @@ const CalendarPage = ({ formatTime }) => {
     <Layout>
       <div style={styles.container}>
         <h1 style={styles.title}>学習カレンダー</h1>
-        {loading ? (
+        
+        <DelayedLoader loading={loading}>
           <div style={styles.loadingContainer}>
             <div style={styles.loading}>データを読み込み中...</div>
           </div>
-        ) : error ? (
+        </DelayedLoader>
+        
+        {!loading && error ? (
           <div style={styles.errorContainer}>
             <div style={styles.error}>{error}</div>
           </div>
-        ) : (
+        ) : !loading && (
           <CalendarView 
             studyHistory={studyHistory} 
             formatTime={formatTime} 

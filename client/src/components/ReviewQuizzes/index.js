@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../../components/Layout';
 import { fetchReviewQuizzes, updateReviewQuiz, deleteReviewQuiz } from '../../utils/api';
+import { DelayedLoader } from '../../components/Common';
 import styles from './styles';
 import GlobalStyles from './GlobalStyles';
 import QuizList from './QuizList';
@@ -132,14 +133,6 @@ const ReviewQuizzesPage = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <Layout>
-        <div style={styles.loading}>読み込み中...</div>
-      </Layout>
-    );
-  }
-
   if (error) {
     return (
       <Layout>
@@ -152,13 +145,17 @@ const ReviewQuizzesPage = () => {
     <Layout>
       <GlobalStyles />
       <div style={styles.container}>
-        {selectedQuiz ? (
+        <DelayedLoader loading={loading}>
+          <div style={styles.loading}>読み込み中...</div>
+        </DelayedLoader>
+        
+        {!loading && selectedQuiz ? (
           <QuizDetail 
             quiz={selectedQuiz} 
             onBackToList={handleBackToList} 
             onMarkCompleted={markReviewAsCompleted}
           />
-        ) : (
+        ) : !loading && (
           <>
             <div style={{
               display: 'flex',

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import StudyHistory from "../components/StudyHistory";
 import Layout from "../components/Layout";
 import { fetchStudySessions, deleteStudySession } from "../utils/api"; // APIをインポート
+import { DelayedLoader } from "../components/Common"; // 遅延ローディングコンポーネントをインポート
 
 const HistoryPage = ({ formatTime }) => {
   const [studyHistory, setStudyHistory] = useState([]);
@@ -47,15 +48,17 @@ const HistoryPage = ({ formatTime }) => {
   return (
     <Layout>
       <div style={styles.container}>
-        {loading ? (
+        <DelayedLoader loading={loading}>
           <div style={styles.loadingContainer}>
             <p>学習履歴を読み込み中...</p>
           </div>
-        ) : error ? (
+        </DelayedLoader>
+        
+        {!loading && error ? (
           <div style={styles.errorContainer}>
             <p>{error}</p>
           </div>
-        ) : (
+        ) : !loading && (
           <StudyHistory
             studyHistory={studyHistory}
             deleteStudySession={handleDeleteStudySession}

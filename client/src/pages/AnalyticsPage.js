@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import { fetchStudySessions } from "../utils/api"; // APIをインポート
+import { DelayedLoader } from "../components/Common"; // 遅延ローディングコンポーネントをインポート
 import { 
   StatCards, 
   TopicDistributionChart, 
@@ -213,19 +214,21 @@ const AnalyticsPage = ({ formatTime }) => {
   return (
     <Layout>
       <div style={styles.container}>
-        {loading ? (
+        <DelayedLoader loading={loading}>
           <div style={styles.loadingContainer}>
             <div style={styles.loading}>データを読み込み中...</div>
           </div>
-        ) : error ? (
+        </DelayedLoader>
+        
+        {!loading && error ? (
           <div style={styles.errorContainer}>
             <div style={styles.error}>{error}</div>
           </div>
-        ) : studyHistory.length === 0 ? (
+        ) : !loading && studyHistory.length === 0 ? (
           <div style={styles.noDataContainer}>
             <p style={styles.noDataMessage}>まだ学習履歴がありません。学習を開始してデータを作成しましょう。</p>
           </div>
-        ) : (
+        ) : !loading && (
           <>
             {/* ヘッダー部分を修正 */}
             <div style={styles.header}>
