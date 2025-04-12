@@ -7,32 +7,78 @@ const StatsPanel = ({ selectedDateSessions, topicDistribution, formatTime }) => 
     return null;
   }
 
+  // 合計学習時間を計算
+  const totalStudyTime = selectedDateSessions.reduce((sum, session) => sum + session.duration, 0);
+  
+  // 平均学習時間を計算（セッション数で割る）
+  const averageStudyTime = Math.round(totalStudyTime / selectedDateSessions.length);
+  
+  // 平均モチベーションを計算
+  const averageMotivation = (selectedDateSessions.reduce((sum, session) => sum + session.motivation, 0) / selectedDateSessions.length).toFixed(1);
+
   return (
     <div style={styles.sessionsSummary}>
-      <div style={styles.summaryCard}>
-        <div style={styles.statsSummary}>
-          <div style={styles.summaryHeader}>学習概要</div>
-          <div style={styles.summaryItem}>
-            <span style={styles.summaryLabel}>合計学習時間</span>
-            <span style={styles.summaryValue}>
-              {formatTime(selectedDateSessions.reduce((sum, session) => sum + session.duration, 0))}
-            </span>
+      {/* 2×2のカード形式で学習概要を表示 */}
+      <div style={styles.statsCardsGrid}>
+        {/* 合計学習時間カード */}
+        <div style={styles.statsCard}>
+          <img 
+            src="/total-study-time.png" 
+            alt="合計学習時間"
+            style={styles.statsCardIcon}
+          />
+          <div style={styles.statsCardContent}>
+            <div style={styles.statsCardValue}>{formatTime(totalStudyTime)}</div>
           </div>
-          <div style={styles.summaryItem}>
-            <span style={styles.summaryLabel}>学習セッション数</span>
-            <span style={styles.summaryValue}>{selectedDateSessions.length}回</span>
+        </div>
+        
+        {/* 学習セッション数カード */}
+        <div style={styles.statsCard}>
+          <img 
+            src="/study-session.png" 
+            alt="学習セッション数"
+            style={styles.statsCardIcon}
+          />
+          <div style={styles.statsCardContent}>
+            <div style={styles.statsCardValue}>{selectedDateSessions.length}回</div>
           </div>
-          <div style={styles.summaryItem}>
-            <span style={styles.summaryLabel}>平均モチベーション</span>
-            <span style={styles.summaryValue}>
-              {(selectedDateSessions.reduce((sum, session) => sum + session.motivation, 0) / selectedDateSessions.length).toFixed(1)}/5
-            </span>
+        </div>
+        
+        {/* 平均モチベーションカード */}
+        <div style={styles.statsCard}>
+          <img 
+            src="/average-motivation.png" 
+            alt="平均モチベーション"
+            style={styles.statsCardIcon}
+          />
+          <div style={styles.statsCardContent}>
+            <div style={styles.statsCardValue}>{averageMotivation}/5</div>
+          </div>
+        </div>
+        
+        {/* 平均学習時間カード */}
+        <div style={styles.statsCard}>
+          <img 
+            src="/average-study-time.png" 
+            alt="平均学習時間"
+            style={styles.statsCardIcon}
+          />
+          <div style={styles.statsCardContent}>
+            <div style={styles.statsCardValue}>{formatTime(averageStudyTime)}</div>
           </div>
         </div>
       </div>
       
-      <div style={styles.summaryCard}>
-        <div style={styles.pieChartHeader}>学習内容の分布</div>
+      {/* 学習内容の分布 */}
+      <div style={{
+        ...styles.summaryCard,
+        marginTop: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '20px 15px',
+        boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+      }}>
+        <div style={{...styles.pieChartHeader, fontSize: '18px', color: '#000000', textAlign: 'center'}}>学習内容の分布</div>
         <PieChart 
           topicDistribution={topicDistribution} 
           formatTime={formatTime} 

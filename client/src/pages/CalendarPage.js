@@ -32,7 +32,6 @@ const CalendarPage = ({ formatTime }) => {
   return (
     <Layout>
       <div style={styles.container}>
-        <h1 style={styles.title}>学習カレンダー</h1>
         
         <DelayedLoader loading={loading}>
           <div style={styles.loadingContainer}>
@@ -61,13 +60,6 @@ const styles = {
     maxWidth: '1200px',
     margin: '0 auto',
     padding: '20px',
-  },
-  title: {
-    fontSize: '28px',
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: '30px',
-    textAlign: 'center',
   },
   description: {
     fontSize: '16px',

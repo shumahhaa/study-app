@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './styles';
-import { formatDateTime, getMotivationColor } from './utils';
+import { formatDateTime } from './utils';
 
 const SessionsList = ({ sessions, formatTime }) => {
   if (sessions.length === 0) {
@@ -25,6 +25,13 @@ const SessionsList = ({ sessions, formatTime }) => {
               </div>
               
               <div style={styles.sessionItem}>
+                <span style={styles.itemLabel}>モチベーション</span>
+                <span style={styles.itemValue}>{session.motivation}/5</span>
+              </div>
+            </div>
+            
+            <div style={{...styles.sessionRow, marginTop: '10px'}}>
+              <div style={styles.sessionItem}>
                 <span style={styles.itemLabel}>開始時間</span>
                 <span style={styles.itemValue}>{formatDateTime(session.startTime)}</span>
               </div>
@@ -37,17 +44,6 @@ const SessionsList = ({ sessions, formatTime }) => {
               <div style={styles.sessionItem}>
                 <span style={styles.itemLabel}>休憩時間</span>
                 <span style={styles.itemValue}>{session.pausedtime > 0 ? formatTime(session.pausedtime) : "0秒"}</span>
-              </div>
-              
-              <div style={styles.motivationContainer}>
-                <div 
-                  style={{
-                    ...styles.motivationBadge,
-                    backgroundColor: getMotivationColor(session.motivation)
-                  }}
-                >
-                  モチベーション: {session.motivation}/5
-                </div>
               </div>
             </div>
           </div>

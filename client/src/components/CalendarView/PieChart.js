@@ -48,7 +48,7 @@ const PieChart = ({ topicDistribution, formatTime }) => {
         dominantBaseline="middle"
         fill="#fff"
         fontWeight="bold"
-        fontSize="16"
+        fontSize="18"
       >
         100%
       </text>
@@ -64,7 +64,7 @@ const PieChart = ({ topicDistribution, formatTime }) => {
         dominantBaseline="middle"
         fill="#fff"
         fontWeight="bold"
-        fontSize="12"
+        fontSize="14"
       >
         {item.topic}
       </text>
@@ -128,7 +128,7 @@ const PieChart = ({ topicDistribution, formatTime }) => {
             dominantBaseline="middle"
             fill="#fff"
             fontWeight="bold"
-            fontSize="12"
+            fontSize="14"
           >
             {item.percentage}%
           </text>
@@ -146,7 +146,7 @@ const PieChart = ({ topicDistribution, formatTime }) => {
             dominantBaseline="middle"
             fill="#fff"
             fontWeight="bold"
-            fontSize="10"
+            fontSize="12"
           >
             {shortTopicName}
           </text>
@@ -159,21 +159,36 @@ const PieChart = ({ topicDistribution, formatTime }) => {
   
   return (
     <div style={styles.pieChartContainer}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <circle 
-          cx={centerX} 
-          cy={centerY} 
-          r={radius} 
-          fill="#f5f5f5" 
-        />
-        {paths}
-        {labels}
-      </svg>
-      <div style={styles.pieChartLegend}>
+      {/* 円グラフ部分（中央揃え） */}
+      <div style={{ textAlign: 'center', width: '100%' }}>
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          <circle 
+            cx={centerX} 
+            cy={centerY} 
+            r={radius} 
+            fill="#f5f5f5" 
+          />
+          {paths}
+          {labels}
+        </svg>
+      </div>
+      
+      {/* レジェンド部分（左揃え） */}
+      <div style={{ 
+        ...styles.pieChartLegend,
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+        textAlign: 'left',
+        paddingLeft: '10px'
+      }}>
         {validDistribution.map((item, index) => (
           <div 
             key={index} 
-            style={styles.legendItem}
+            style={{
+              ...styles.legendItem,
+              justifyContent: 'flex-start',
+              textAlign: 'left'
+            }}
           >
             <div 
               style={{ 

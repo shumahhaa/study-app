@@ -19,10 +19,23 @@ const CalendarComponent = ({ selectedDate, handleDateChange, calendarData }) => 
     
     if (!dateData) return null;
     
-    // 学習時間に応じた色の濃さを計算
-    const maxTime = 4 * 60 * 60; // 4時間を最大値とする
-    const intensity = Math.min(dateData.totalTime / maxTime, 1);
-    const backgroundColor = `rgba(76, 175, 80, ${intensity * 0.8})`;
+    // 学習時間に応じた色の濃さを計算（4段階）
+    const maxTime = 3 * 60 * 60; // 3時間を最大値とする（4段階目）
+    let intensity;
+    
+    const totalMinutes = dateData.totalTime / 60; // 分単位に変換
+    
+    if (totalMinutes <= 60) { // 1時間以下
+      intensity = 0.25;
+    } else if (totalMinutes <= 120) { // 1-2時間
+      intensity = 0.5;
+    } else if (totalMinutes <= 180) { // 2-3時間
+      intensity = 0.75;
+    } else { // 3時間以上
+      intensity = 1.0;
+    }
+    
+    const backgroundColor = `rgba(76, 175, 80, ${intensity})`;
     
     return (
       <div style={{ 
@@ -60,6 +73,9 @@ const CalendarComponent = ({ selectedDate, handleDateChange, calendarData }) => 
           tileClassName={tileClassName}
           locale="ja-JP"
           className="custom-calendar"
+          showFixedNumberOfWeeks={false}
+          showNeighboringMonth={false}
+          maxDetail="month"
         />
       </div>
       <CalendarLegend />

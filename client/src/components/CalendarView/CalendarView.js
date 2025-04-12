@@ -12,6 +12,25 @@ const CalendarView = ({ studyHistory, formatTime, initialDate }) => {
   const [selectedDate, setSelectedDate] = useState(initialDate || new Date());
   const [selectedDateSessions, setSelectedDateSessions] = useState([]);
   const [topicDistribution, setTopicDistribution] = useState([]);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // モバイル表示の検出
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    // 初期チェック
+    checkIfMobile();
+    
+    // リサイズ時にチェック
+    window.addEventListener('resize', checkIfMobile);
+    
+    // クリーンアップ
+    return () => {
+      window.removeEventListener('resize', checkIfMobile);
+    };
+  }, []);
 
   // 日付ごとの学習データを集計
   useEffect(() => {
@@ -137,34 +156,78 @@ const CalendarView = ({ studyHistory, formatTime, initialDate }) => {
   }, [initialDate]);
 
   return (
-    <div style={styles.container}>
-      <div style={styles.calendarSection}>
-        <CalendarComponent 
-          selectedDate={selectedDate}
-          handleDateChange={handleDateChange}
-          calendarData={calendarData}
-        />
+    <div style={{
+      ...styles.container,
+      ...(isMobile ? styles.containerMobile : {}),
+      flexDirection: 'column',
+      paddingTop: '20px',
+    }}>
+      {/* ヘッダー部分 */}
+      <div style={styles.calendarHeader}>
+        <h2 style={styles.calendarTitle}>学習カレンダー</h2>
+        <div style={styles.calendarDate}>{formatDate(selectedDate)}</div>
       </div>
       
-      <div style={styles.sessionsContainer}>
-        <h3 style={styles.dateHeading}>{formatDate(selectedDate)}</h3>
+      {/* コンテンツレイアウト */}
+      <div style={{
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
+        width: '100%',
+        gap: '30px',
+      }}>
+        {/* 左側カラム（カレンダーとセッション詳細） */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: isMobile ? '100%' : '50%',
+          gap: '20px',
+        }}>
+          {/* カレンダー部分 */}
+          <div style={{
+            ...styles.calendarSection,
+            width: '100%',
+            marginTop: '0',
+          }}>
+            <CalendarComponent 
+              selectedDate={selectedDate}
+              handleDateChange={handleDateChange}
+              calendarData={calendarData}
+            />
+          </div>
+          
+          {/* 学習セッション詳細部分（カレンダーの下） */}
+          {selectedDateSessions.length > 0 && (
+            <div style={{
+              width: '100%',
+              backgroundColor: '#ffffff',
+              borderRadius: '10px',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+              marginTop: '10px',
+            }}>
+              <SessionsList 
+                sessions={selectedDateSessions} 
+                formatTime={formatTime} 
+              />
+            </div>
+          )}
+        </div>
         
-        {selectedDateSessions.length === 0 ? (
-          <NoSessionsMessage />
-        ) : (
-          <>
+        {/* 右側カラム（統計パネル） */}
+        <div style={{
+          ...styles.sessionsContainer,
+          width: isMobile ? '100%' : '50%',
+          marginTop: isMobile ? '20px' : '0',
+        }}>
+          {selectedDateSessions.length === 0 ? (
+            <NoSessionsMessage />
+          ) : (
             <StatsPanel 
               selectedDateSessions={selectedDateSessions}
               topicDistribution={topicDistribution}
               formatTime={formatTime}
             />
-            
-            <SessionsList 
-              sessions={selectedDateSessions} 
-              formatTime={formatTime} 
-            />
-          </>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
