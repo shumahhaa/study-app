@@ -2,37 +2,53 @@ import React from "react";
 import styles from "./styles";
 
 const StatCards = ({ totalStudyTime, filteredHistory, averageMotivation, averageStudyTime, formatTime }) => {
+  const iconContainerStyle = { 
+    ...styles.statsIcon,
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center'
+  };
+  
+  const valueStyle = {
+    ...styles.statsValue,
+    textAlign: 'center',
+  };
+  
   return (
     <div style={styles.statsCards}>
       <div style={styles.statsCard}>
-        <div style={styles.statsIcon}>⏱️</div>
+        <div style={iconContainerStyle}>
+          <img src="/total-study-time.png" alt="" style={{ width: '80px', height: '80px' }} />
+        </div>
         <div style={styles.statsInfo}>
-          <h3 style={styles.statsTitle}>合計学習時間</h3>
-          <div style={styles.statsValue}>{formatTime(totalStudyTime)}</div>
+          <div style={valueStyle}>{formatTime(totalStudyTime)}</div>
         </div>
       </div>
       
       <div style={styles.statsCard}>
-        <div style={styles.statsIcon}>📚</div>
+        <div style={iconContainerStyle}>
+          <img src="/study-session.png" alt="" style={{ width: '80px', height: '80px' }} />
+        </div>
         <div style={styles.statsInfo}>
-          <h3 style={styles.statsTitle}>学習セッション数</h3>
-          <div style={styles.statsValue}>{filteredHistory.length}回</div>
+          <div style={valueStyle}>{filteredHistory.length}回</div>
         </div>
       </div>
       
       <div style={styles.statsCard}>
-        <div style={styles.statsIcon}>⚡</div>
+        <div style={iconContainerStyle}>
+          <img src="/average-motivation.png" alt="" style={{ width: '80px', height: '80px' }} />
+        </div>
         <div style={styles.statsInfo}>
-          <h3 style={styles.statsTitle}>平均モチベーション</h3>
-          <div style={styles.statsValue}>{averageMotivation.toFixed(1)}/5</div>
+          <div style={valueStyle}>{averageMotivation.toFixed(1)}/5</div>
         </div>
       </div>
       
       <div style={styles.statsCard}>
-        <div style={styles.statsIcon}>⚡</div>
+        <div style={iconContainerStyle}>
+          <img src="/average-study-time.png" alt="" style={{ width: '80px', height: '80px' }} />
+        </div>
         <div style={styles.statsInfo}>
-          <h3 style={styles.statsTitle}>平均学習時間</h3>
-          <div style={styles.statsValue}>{formatTime(averageStudyTime)}</div>
+          <div style={valueStyle}>{formatTime(averageStudyTime)}</div>
         </div>
       </div>
     </div>

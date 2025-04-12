@@ -366,27 +366,50 @@ code {
 .period-button {
   padding: 8px 16px;
   border: none;
-  border-radius: 20px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.2s ease;
-  background-color: #e0e0e0;
-  color: #333;
+  transition: all 0.3s ease;
+  background-color: transparent;
+  color: #555;
+  font-size: 14px;
+  position: relative;
 }
 
 .period-button:hover {
-  background-color: #d0d0d0;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  background-color: rgba(76, 175, 80, 0.05);
+  color: #388e3c;
+}
+
+.period-button:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #4CAF50 0%, #388E3C 100%);
+  transition: width 0.3s ease;
+}
+
+.period-button:hover:after {
+  width: 70%;
 }
 
 .period-button-active {
-  background-color: #2196F3;
-  color: white;
+  background-color: rgba(76, 175, 80, 0.08);
+  color: #4CAF50;
+  font-weight: 600;
+}
+
+.period-button-active:after {
+  width: 70%;
 }
 
 .period-button-active:hover {
-  background-color: #1976d2;
-  box-shadow: 0 2px 5px rgba(33,150,243,0.3);
+  background-color: rgba(76, 175, 80, 0.12);
+  color: #2E7D32;
 }
 
 /* 削除ボタンのスタイル */

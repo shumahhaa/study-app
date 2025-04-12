@@ -12,7 +12,7 @@ const styles = {
     flexWrap: "wrap",
   },
   title: {
-    color: "#333",
+    color: "rgb(25, 118, 210)",
     margin: 0,
     fontSize: "28px",
   },
@@ -61,7 +61,7 @@ const styles = {
   statsCard: {
     backgroundColor: "white",
     borderRadius: "12px",
-    padding: "20px",
+    padding: "10px",
     boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
     display: "flex",
     alignItems: "center",

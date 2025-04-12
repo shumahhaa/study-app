@@ -12,27 +12,50 @@ const PeriodSelector = ({ selectedPeriod, setSelectedPeriod }) => {
         .period-button {
           padding: 8px 16px;
           border: none;
-          background-color: #f5f5f5;
-          border-radius: 20px;
+          background-color: transparent;
+          border-radius: 8px;
           cursor: pointer;
           font-weight: 500;
-          transition: all 0.2s ease;
+          transition: all 0.3s ease;
+          color: #555;
+          position: relative;
+          font-size: 14px;
         }
         
         .period-button:hover {
-          background-color: #e0e0e0;
-          transform: translateY(-2px);
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+          background-color: rgba(76, 175, 80, 0.05);
+          color: #388e3c;
+        }
+        
+        .period-button:after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 0;
+          height: 2px;
+          background: linear-gradient(90deg, #4CAF50 0%, #388E3C 100%);
+          transition: width 0.3s ease;
+        }
+        
+        .period-button:hover:after {
+          width: 70%;
         }
         
         .period-button-active {
-          background-color: #2196F3;
-          color: white;
+          background-color: rgba(76, 175, 80, 0.08);
+          color: #4CAF50;
+          font-weight: 600;
+        }
+        
+        .period-button-active:after {
+          width: 70%;
         }
         
         .period-button-active:hover {
-          background-color: #1976D2;
-          box-shadow: 0 2px 5px rgba(33, 150, 243, 0.3);
+          background-color: rgba(76, 175, 80, 0.12);
+          color: #2E7D32;
         }
       `;
       document.head.appendChild(styleElement);

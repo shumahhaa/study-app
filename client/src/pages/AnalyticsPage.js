@@ -7,7 +7,6 @@ import {
   WeeklyStudyChart, 
   TopicMotivationChart, 
   DayMotivationChart,
-  Insights,
   PeriodSelector,
   styles
 } from "../components/Analytics";
@@ -271,17 +270,6 @@ const AnalyticsPage = ({ formatTime }) => {
                 formatTime={formatTime}
               />
             </div>
-            
-            <Insights 
-              selectedPeriod={selectedPeriod}
-              totalStudyTime={totalStudyTime}
-              mostStudiedTopic={mostStudiedTopic}
-              topicDistribution={topicDistribution}
-              weeklyData={weeklyData}
-              topicMotivation={topicMotivation}
-              dayMotivation={dayMotivation}
-              formatTime={formatTime}
-            />
           </>
         )}
       </div>
