@@ -15,7 +15,7 @@ const ProfileForm = ({
   
   return (
     <form onSubmit={handleUpdateProfile} className="profile-form" style={styles.profileForm}>
-      <h2>プロフィール情報</h2>
+      <h2 style={styles.heading}>プロフィール情報</h2>
       <div style={styles.profileInfo}>
         <p><strong>メールアドレス:</strong> {currentUser?.email}</p>
         <p><strong>表示名:</strong> {displayName || '未設定'}</p>

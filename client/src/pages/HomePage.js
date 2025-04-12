@@ -12,6 +12,8 @@ const HomePage = ({
   startStudy,
 }) => {
   const navigate = useNavigate();
+  // ホバー状態を管理するstate
+  const [isHovered, setIsHovered] = useState(false);
   
   // 学習開始時に学習中ページに遷移
   const handleStartStudy = () => {
@@ -43,8 +45,22 @@ const HomePage = ({
               <button
                 onClick={handleStartStudy}
                 disabled={studyTopic.trim() === ""}
-                className={`start-button ${studyTopic.trim() === "" ? "disabled" : ""}`}
-                style={styles.startButton}
+                className="start-button"
+                style={{
+                  ...styles.startButton,
+                  ...(studyTopic.trim() === "" ? styles.startButtonDisabled : {}),
+                  ...(isHovered && studyTopic.trim() !== "" ? styles.startButtonHover : {})
+                }}
+                onMouseEnter={() => {
+                  if(studyTopic.trim() !== "") {
+                    setIsHovered(true);
+                  }
+                }}
+                onMouseLeave={() => {
+                  if(studyTopic.trim() !== "") {
+                    setIsHovered(false);
+                  }
+                }}
               >
                 学習開始
               </button>
@@ -104,7 +120,7 @@ const styles = {
     backgroundColor: "white",
     borderRadius: "16px",
     boxShadow: "0 20px 40px rgba(32, 145, 249, 0.15), 0 8px 20px rgba(76, 175, 80, 0.08)",
-    padding: "30px",
+    padding: "20px 30px",
     maxWidth: "800px",
     width: "100%",
     transition: "box-shadow 0.3s ease",
@@ -118,18 +134,42 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    marginTop: "35px",
-    marginBottom: "15px",
+    marginTop: "25px",
+    marginBottom: "10px",
   },
   startButton: {
-    background: "linear-gradient(135deg, #2196F3 0%, #1565C0 100%)",
-    boxShadow: "0 10px 25px rgba(33, 150, 243, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.1)",
+    background: "linear-gradient(135deg, #2196F3 0%, #4CAF50 100%)",
+    boxShadow: "0 6px 15px rgba(33, 150, 243, 0.2)",
     position: "relative",
     overflow: "hidden",
     border: "none",
     color: "white",
     fontWeight: "600",
-    letterSpacing: "0.5px",
+    letterSpacing: "1px",
+    padding: "0 20px",
+    fontSize: "18px",
+    borderRadius: "50px",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+    textTransform: "uppercase",
+    width: "220px",
+    height: "60px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    outline: "solid 1px rgba(255, 255, 255, 0.2)",
+    outlineOffset: "-4px",
+  },
+  startButtonHover: {
+    background: "linear-gradient(135deg, #1976D2 0%, #388E3C 100%)",
+    boxShadow: "0 8px 20px rgba(33, 150, 243, 0.25)",
+  },
+  startButtonDisabled: {
+    background: "#90a4ae",
+    boxShadow: "none",
+    cursor: "not-allowed",
+    opacity: "0.7",
+    outline: "none",
   },
   featuresSection: {
     display: "grid",

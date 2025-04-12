@@ -18,7 +18,7 @@ const PasswordChangeForm = ({
   
   return (
     <form onSubmit={handleChangePassword} className="profile-form" style={{...styles.profileForm, ...styles.passwordForm}}>
-      <h2>パスワード変更</h2>
+      <h2 style={styles.heading}>パスワード変更</h2>
       
       <div style={styles.formGroup}>
         <label htmlFor="currentPassword" style={styles.label}>現在のパスワード</label>

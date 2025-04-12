@@ -19,6 +19,15 @@ const styles = {
   profileForm: {
     marginBottom: '30px',
   },
+  // プロフィールページの見出し（h2）のスタイル
+  heading: {
+    color: 'rgb(25, 118, 210)',
+    fontSize: '22px',
+    fontWeight: '600',
+    marginBottom: '20px',
+    paddingBottom: '10px',
+    borderBottom: '1px solid rgba(25, 118, 210, 0.2)',
+  },
   profileInfo: {
     padding: '18px',
     backgroundColor: '#fff',

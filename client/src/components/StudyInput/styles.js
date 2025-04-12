@@ -85,7 +85,7 @@ export const styles = {
   motivationMessageContainer: {
     display: "flex",
     alignItems: "center",
-    backgroundColor: "#f5f7fa",
+    backgroundColor: "#fff",
     borderRadius: "16px",
     padding: "20px 24px",
     marginTop: "24px",
