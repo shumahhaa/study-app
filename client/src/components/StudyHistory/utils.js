@@ -82,8 +82,8 @@ export const getMotivationColor = (level) => {
  * ソートアイコンを表示
  */
 export const getSortIcon = (currentField, sortField, sortDirection) => {
-  if (currentField !== sortField) return "↕️";
-  return sortDirection === "asc" ? "↑" : "↓";
+  if (currentField !== sortField) return "⇵";
+  return sortDirection === "asc" ? "⬆" : "⬇";
 };
 
 /**

@@ -2,6 +2,7 @@
 const styles = {
   container: {
     backgroundColor: "#fff",
+    backgroundImage: "linear-gradient(135deg, rgba(33, 150, 243, 0.05) 0%, rgba(76, 175, 80, 0.1) 100%)",
     borderRadius: "8px",
     boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
     padding: "20px",
@@ -16,7 +17,7 @@ const styles = {
   },
   title: {
     margin: 0,
-    color: "#333",
+    color: "rgb(25, 118, 210)",
     fontSize: "24px"
   },
   filterContainer: {
@@ -48,9 +49,10 @@ const styles = {
   },
   advancedSearchContainer: {
     backgroundColor: "#f9f9f9",
+    backgroundImage: "linear-gradient(135deg, rgba(33, 150, 243, 0.02) 0%, rgba(76, 175, 80, 0.05) 100%)",
     borderRadius: "8px",
     padding: "20px",
-    marginBottom: "20px",
+    marginBottom: "30px",
     boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
   },
   advancedSearchHeader: {
@@ -116,7 +118,7 @@ const styles = {
     color: "#666",
     backgroundColor: "#f9f9f9",
     borderRadius: "8px",
-    margin: "20px 0",
+    margin: "30px 0",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -133,9 +135,14 @@ const styles = {
   },
   tableContainer: {
     overflowX: "auto",
+    marginTop: "10px",
     marginBottom: "20px",
     width: "100%",
     minWidth: "0",
+    borderRadius: "12px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+    backgroundColor: "#fff",
+    backgroundImage: "linear-gradient(135deg, rgba(33, 150, 243, 0.01) 0%, rgba(76, 175, 80, 0.03) 100%)",
   },
   table: {
     width: "100%",
@@ -143,24 +150,23 @@ const styles = {
     borderSpacing: "0",
     border: "1px solid #eaeaea",
     tableLayout: "auto",
+    borderRadius: "12px",
+    overflow: "hidden",
   },
   tableHeader: {
     padding: "15px",
     textAlign: "left",
-    color: "#555",
-    fontWeight: "600",
-    borderBottom: "2px solid #eaeaea",
+    color: "#333",
+    fontWeight: "700",
+    borderBottom: "2px solid #4CAF50",
     borderRight: "1px solid #eaeaea",
     cursor: "pointer",
     transition: "background-color 0.2s",
-    backgroundColor: "#fff",
+    backgroundColor: "#e8f5e9",
   },
   tableRow: {
     transition: "all 0.2s",
     height: "60px",
-    "&:hover": {
-      backgroundColor: "#f5f5f5",
-    }
   },
   tableCell: {
     padding: "15px 10px",
@@ -207,7 +213,6 @@ const styles = {
     border: "1px solid #f44336",
     borderRadius: "20px",
     cursor: "pointer",
-    transition: "all 0.3s ease",
     fontSize: "14px",
     fontWeight: "500",
     boxShadow: "0 2px 4px rgba(244, 67, 54, 0.1)",
@@ -220,6 +225,45 @@ const styles = {
   },
   deleteText: {
     fontSize: "14px",
+  },
+  statsCards: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+    gap: "20px",
+    marginBottom: "40px",
+  },
+  statsCard: {
+    backgroundColor: "white",
+    backgroundImage: "none",
+    borderRadius: "12px",
+    padding: "20px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  statsIcon: {
+    fontSize: "36px",
+    marginRight: "15px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  statsInfo: {
+    flex: 1,
+    textAlign: "center",
+  },
+  statsTitle: {
+    color: "#666",
+    fontSize: "14px",
+    margin: "5px 0 0 0",
+    fontWeight: "500",
+  },
+  statsValue: {
+    color: "#333",
+    fontSize: "24px",
+    fontWeight: "700",
+    textAlign: "center",
   },
   stats: {
     display: "flex",

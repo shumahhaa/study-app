@@ -8,14 +8,47 @@ const GlobalStyles = () => {
     const style = document.createElement('style');
     style.innerHTML = `
       .study-history-table tr:hover {
-        background-color: #f5f5f5;
+        background-color: #f0f8ff !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      }
+      
+      .study-history-table th:hover {
+        background-color: #c8e6c9 !important;
       }
       
       .delete-button:hover {
         background-color: #f44336 !important;
         color: white !important;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(244, 67, 54, 0.2);
+      }
+      
+      .search-input:hover, .search-input:focus {
+        border-color: #4CAF50 !important;
+        box-shadow: 0 1px 3px rgba(76, 175, 80, 0.3) !important;
+      }
+      
+      .advanced-search-button:hover {
+        background-color: #4CAF50 !important;
+        color: white !important;
+      }
+      
+      .advanced-search-button.active {
+        background-color: #388E3C !important;
+        color: white !important;
+      }
+      
+      .reset-button:hover {
+        background-color: #4CAF50 !important;
+        color: white !important;
+      }
+      
+      .reset-filters-button:hover {
+        background-color: #4CAF50 !important;
+      }
+      
+      input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus, select:focus {
+        border-color: #4CAF50 !important;
+        box-shadow: 0 1px 3px rgba(76, 175, 80, 0.2) !important;
+        outline: none;
       }
       
       @media (max-width: 768px) {
