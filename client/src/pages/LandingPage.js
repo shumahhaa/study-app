@@ -77,8 +77,8 @@ const LandingPage = () => {
       boxShadow: '0 10px 20px rgba(0,0,0,0.15)',
       border: 'none',
       cursor: 'pointer',
-      transition: 'all 0.3s ease',
       margin: '0 12px',
+      transition: 'background-color 0.3s ease, color 0.3s ease',
     },
     featureSection: {
       display: 'grid',
@@ -101,7 +101,7 @@ const LandingPage = () => {
       position: 'relative',
       overflow: 'hidden',
       border: '1px solid rgba(0,0,0,0.04)',
-      height: '450px',
+      height: '490px',
       justifyContent: 'flex-start',
     },
     featureIconWrapper: {
@@ -150,7 +150,7 @@ const LandingPage = () => {
       display: 'inline-block',
       boxShadow: '0 10px 20px rgba(0,0,0,0.15)',
       margin: '0 12px',
-      transition: 'all 0.3s ease',
+      transition: 'background-color 0.3s ease',
     },
     buttonContainer: {
       marginTop: '50px',
@@ -200,23 +200,21 @@ const LandingPage = () => {
             <div style={styles.buttonContainer}>
               <Link to="/login" style={styles.ctaButton}
                 onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-5px)';
-                  e.currentTarget.style.boxShadow = '0 15px 25px rgba(0,0,0,0.2)';
+                  e.currentTarget.style.backgroundColor = '#f0f8ff';
+                  e.currentTarget.style.color = '#1976D2';
                 }} 
                 onMouseOut={(e) => {
-                  e.currentTarget.style.transform = 'none';
-                  e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.15)';
+                  e.currentTarget.style.backgroundColor = 'white';
+                  e.currentTarget.style.color = '#2196F3';
                 }}>
                 ログイン
               </Link>
               <Link to="/register" style={styles.secondaryButton}
                 onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-5px)';
-                  e.currentTarget.style.boxShadow = '0 15px 25px rgba(0,0,0,0.2)';
+                  e.currentTarget.style.backgroundColor = '#00a547';
                 }} 
                 onMouseOut={(e) => {
-                  e.currentTarget.style.transform = 'none';
-                  e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.15)';
+                  e.currentTarget.style.backgroundColor = '#00C853';
                 }}>
                 新規登録
               </Link>
@@ -227,44 +225,38 @@ const LandingPage = () => {
         <section style={styles.featureSection}>
           <div style={{
             ...styles.featureCard,
-            background: 'linear-gradient(135deg, rgba(33, 150, 243, 0.05) 0%, rgba(33, 150, 243, 0.1) 100%)',
+            background: 'white',
             borderLeft: '4px solid #2196F3'
           }}>
             <h3 style={styles.featureTitle}>AIチャットアシスタント</h3>
             <p style={styles.featureDesc}>
               AIアシスタントが学習をサポートします。質問への回答や、学習内容の理解を深めるための会話が可能です。学習中に生じた疑問点を解決しアドバイスを提供します。
             </p>
-            <div style={{...styles.featureIconWrapper, background: 'linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)'}}>
-              <div style={styles.featureIcon}>💬</div>
-            </div>
+            <img src="/AIChat-icon.png" alt="AIチャット" style={{width: '120px', height: '120px', marginTop: '30px', alignSelf: 'center'}} />
           </div>
 
           <div style={{
             ...styles.featureCard,
-            background: 'linear-gradient(135deg, rgba(38, 166, 154, 0.05) 0%, rgba(38, 166, 154, 0.1) 100%)',
+            background: 'white',
             borderLeft: '4px solid #26A69A'
           }}>
             <h3 style={styles.featureTitle}>復習とインターバル</h3>
             <p style={styles.featureDesc}>
               AIが学習中のチャット履歴から復習問題を作成し、記憶の定着を向上させるために最適なインターバル（1日、3日、7日、14日、30日）を空けて復習することが可能です。
             </p>
-            <div style={{...styles.featureIconWrapper, background: 'linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 100%)'}}>
-              <div style={styles.featureIcon}>🧠</div>
-            </div>
+            <img src="/ReviewQuiz-icon.png" alt="復習クイズ" style={{width: '120px', height: '120px', marginTop: '30px', alignSelf: 'center'}} />
           </div>
 
           <div style={{
             ...styles.featureCard,
-            background: 'linear-gradient(135deg, rgba(33, 150, 243, 0.03) 0%, rgba(38, 166, 154, 0.08) 100%)',
+            background: 'white',
             borderLeft: '4px solid #00BCD4'
           }}>
             <h3 style={styles.featureTitle}>学習の可視化</h3>
             <p style={styles.featureDesc}>
-              学習トピックとモチベーション、学習時間などを簡単に記録し、データ分析によって学習パターンを可視化します。勉強時間や自身の勉強サイクルを可視化することで、学習計画の改善や学習習慣の向上に役立ちます。
+              学習トピックとモチベーション、学習時間などを記録し、学習パターンを可視化します。勉強時間や勉強サイクルを可視化することで、学習計画の改善や学習習慣の向上に役立ちます。
             </p>
-            <div style={{...styles.featureIconWrapper, background: 'linear-gradient(135deg, #E1F5FE 0%, #B3E5FC 100%)'}}>
-              <div style={styles.featureIcon}>📊</div>
-            </div>
+            <img src="/Analytics-icon.png" alt="分析" style={{width: '120px', height: '120px', marginTop: '30px', alignSelf: 'center'}} />
           </div>
         </section>
       </div>
