@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { styles } from "./styles";
 
 const StudyInput = ({
@@ -7,6 +7,26 @@ const StudyInput = ({
   motivation,
   setMotivation
 }) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  // モバイル表示の検出
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    // 初期チェック
+    checkIfMobile();
+    
+    // リサイズ時にチェック
+    window.addEventListener('resize', checkIfMobile);
+    
+    // クリーンアップ
+    return () => {
+      window.removeEventListener('resize', checkIfMobile);
+    };
+  }, []);
+
   // モチベーションレベルの設定（1〜5）
   const handleMotivationChange = (level) => {
     setMotivation(level);
@@ -37,8 +57,13 @@ const StudyInput = ({
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.heading}>新しい学習セッションを始める</h2>
+    <div style={{
+      ...styles.container,
+      ...(isMobile ? styles.containerMobile : {})
+    }}>
+      <h2 style={styles.heading}>
+        {isMobile ? "新しい学習を始める" : "新しい学習セッションを始める"}
+      </h2>
       
       <div style={styles.formGroup}>
         <label htmlFor="studyTopic" style={styles.label}>
@@ -77,14 +102,21 @@ const StudyInput = ({
       </div>
       
       {motivation > 0 && (
-        <div style={styles.motivationMessageContainer}>
+        <div style={{
+          ...styles.motivationMessageContainer,
+          ...(isMobile ? styles.motivationMessageContainerMobile : {})
+        }}>
           <div style={{
             ...styles.motivationIcon,
+            ...(isMobile ? styles.motivationIconMobile : {}),
             backgroundColor: getMotivationColor(motivation)
           }}>
             {motivation >= 4 ? "✨" : motivation >= 2 ? "👍" : "🚶"}
           </div>
-          <p style={styles.motivationMessage}>
+          <p style={{
+            ...styles.motivationMessage,
+            ...(isMobile ? styles.motivationMessageMobile : {})
+          }}>
             {getMotivationMessage(motivation)}
           </p>
         </div>

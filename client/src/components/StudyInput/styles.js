@@ -5,6 +5,9 @@ export const styles = {
     padding: "22px",
     marginBottom: "10px"
   },
+  containerMobile: {
+    padding: "0"
+  },
   heading: {
     fontSize: "26px",
     color: "#333",
@@ -92,6 +95,9 @@ export const styles = {
     boxShadow: "0 10px 25px rgba(0, 0, 0, 0.04), 0 4px 10px rgba(0, 0, 0, 0.02)",
     border: "1px solid rgba(33, 150, 243, 0.12)",
   },
+  motivationMessageContainerMobile: {
+    padding: "10px",
+  },
   motivationIcon: {
     width: "48px",
     height: "48px",
@@ -104,6 +110,14 @@ export const styles = {
     fontSize: "22px",
     boxShadow: "0 6px 16px rgba(0, 0, 0, 0.2), inset 0 2px 4px rgba(255, 255, 255, 0.2)"
   },
+  motivationIconMobile: {
+    width: "36px",
+    height: "36px",
+    minWidth: "36px",
+    minHeight: "36px",
+    marginRight: "10px",
+    fontSize: "18px"
+  },
   motivationMessage: {
     margin: 0,
     color: "#263238",
@@ -112,5 +126,9 @@ export const styles = {
     lineHeight: "1.6",
     letterSpacing: "0.2px",
     textShadow: "0 1px 1px rgba(255, 255, 255, 0.4)"
+  },
+  motivationMessageMobile: {
+    fontSize: "14px",
+    lineHeight: "1.4"
   }
 }; 
