@@ -5,7 +5,12 @@ import MarkdownContent from './MarkdownContent';
 // 問題項目を表示するコンポーネント
 const QuestionItem = ({ question, index, showAnswer, onToggleAnswer }) => {
   return (
-    <div key={index} style={styles.questionCard}>
+    <div key={index} style={{
+      ...styles.questionCard,
+      backgroundColor: '#fff',
+      boxShadow: '0 3px 8px rgba(0, 0, 0, 0.07)',
+      border: '1px solid rgba(0, 0, 0, 0.05)'
+    }}>
       <h3 style={styles.questionNumber}>問題 {index + 1}</h3>
       <div style={styles.questionText}>
         <MarkdownContent content={question.question} />

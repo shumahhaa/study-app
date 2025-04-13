@@ -9,6 +9,9 @@ const CalendarComponent = ({ selectedDate, handleDateChange, calendarData }) => 
   const tileContent = ({ date, view }) => {
     if (view !== 'month') return null;
     
+    // calendarDataがない場合は早期リターン
+    if (!calendarData) return null;
+    
     // 選択された日付をローカルタイムゾーンでYYYY-MM-DD形式に変換
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -54,6 +57,9 @@ const CalendarComponent = ({ selectedDate, handleDateChange, calendarData }) => 
   const tileClassName = ({ date, view }) => {
     if (view !== 'month') return '';
     
+    // calendarDataがない場合は早期リターン
+    if (!calendarData) return '';
+    
     // 選択された日付をローカルタイムゾーンでYYYY-MM-DD形式に変換
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -63,11 +69,21 @@ const CalendarComponent = ({ selectedDate, handleDateChange, calendarData }) => 
     return calendarData[dateStr] ? 'has-study-session' : '';
   };
 
+  // 日付変更ハンドラのラッパー - 同期処理を保証
+  const onDateChange = (date) => {
+    if (!date) return;
+    
+    // 同期的に処理
+    if (handleDateChange) {
+      handleDateChange(date);
+    }
+  };
+
   return (
     <div style={styles.calendarWrapper}>
       <div style={styles.calendarContainer}>
         <Calendar
-          onChange={handleDateChange}
+          onChange={onDateChange}
           value={selectedDate}
           tileContent={tileContent}
           tileClassName={tileClassName}
@@ -76,6 +92,7 @@ const CalendarComponent = ({ selectedDate, handleDateChange, calendarData }) => 
           showFixedNumberOfWeeks={false}
           showNeighboringMonth={false}
           maxDetail="month"
+          tileDisabled={({ activeStartDate, date, view }) => false} // 無効化条件なし（同期処理）
         />
       </div>
       <CalendarLegend />

@@ -5,6 +5,11 @@ const GlobalStyles = () => {
   useEffect(() => {
     const style = document.createElement('style');
     style.innerHTML = `
+      /* 全体の背景色 */
+      body {
+        background-color: #f6f8fa;
+      }
+      
       /* ホバー効果のアニメーション */
       @keyframes buttonPulse {
         0% { transform: scale(1); }

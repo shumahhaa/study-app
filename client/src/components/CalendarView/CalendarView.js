@@ -81,6 +81,15 @@ const CalendarView = ({ studyHistory, formatTime, initialDate }) => {
     if (!date) {
       console.log("日付が指定されていません");
       setSelectedDateSessions([]);
+      setTopicDistribution([]);
+      return;
+    }
+    
+    // dataが無効な場合も早期リターン
+    if (!data || typeof data !== 'object') {
+      console.log("カレンダーデータが無効です");
+      setSelectedDateSessions([]);
+      setTopicDistribution([]);
       return;
     }
     
@@ -142,9 +151,22 @@ const CalendarView = ({ studyHistory, formatTime, initialDate }) => {
   const handleDateChange = (date) => {
     if (!date) return;
     
-    setSelectedDate(date);
-    if (calendarData) {
-      updateSelectedDateSessions(date, calendarData);
+    try {
+      setSelectedDate(date);
+      
+      // カレンダーデータが準備できている場合のみ処理
+      if (calendarData && Object.keys(calendarData).length > 0) {
+        updateSelectedDateSessions(date, calendarData);
+      } else {
+        // データがない場合は空のセッションを設定
+        setSelectedDateSessions([]);
+        setTopicDistribution([]);
+      }
+    } catch (error) {
+      console.error("日付変更エラー:", error);
+      // エラー時も状態をクリア
+      setSelectedDateSessions([]);
+      setTopicDistribution([]);
     }
   };
 

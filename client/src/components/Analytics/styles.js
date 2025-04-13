@@ -3,6 +3,9 @@ const styles = {
     maxWidth: "1200px",
     margin: "0 auto",
     padding: "20px",
+    backgroundColor: "white",
+    borderRadius: "12px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
   },
   header: {
     display: "flex",
@@ -62,7 +65,7 @@ const styles = {
     backgroundColor: "white",
     borderRadius: "12px",
     padding: "10px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
     display: "flex",
     alignItems: "center",
   },
@@ -94,7 +97,7 @@ const styles = {
     backgroundColor: "white",
     borderRadius: "12px",
     padding: "20px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
   },
   chartTitle: {
     color: "#333",
@@ -157,7 +160,7 @@ const styles = {
     backgroundColor: "white",
     borderRadius: "12px",
     padding: "20px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
     marginBottom: "30px",
   },
   insightsTitle: {

@@ -12,21 +12,45 @@ const CalendarPage = ({ formatTime }) => {
 
   // APIから学習履歴を取得
   useEffect(() => {
+    let isMounted = true; // マウント状態を追跡
+    const controller = new AbortController(); // フェッチをキャンセルするためのコントローラー
+    
     const fetchStudyHistory = async () => {
       try {
         setLoading(true);
+        
+        // AbortControllerのシグナルを使用
         const response = await fetchStudySessions();
-        setStudyHistory(response || []);
-        setError(null);
+        
+        // コンポーネントがアンマウントされていない場合のみ状態を更新
+        if (isMounted) {
+          setStudyHistory(response || []);
+          setError(null);
+          setLoading(false);
+        }
       } catch (err) {
+        // リクエストのキャンセルエラーは無視
+        if (err.name === 'AbortError') {
+          console.log('フェッチリクエストがキャンセルされました');
+          return;
+        }
+        
         console.error("学習履歴の取得エラー:", err);
-        setError("データを読み込めませんでした。ネットワーク接続を確認してください。");
-      } finally {
-        setLoading(false);
+        
+        if (isMounted) {
+          setError("データを読み込めませんでした。ネットワーク接続を確認してください。");
+          setLoading(false);
+        }
       }
     };
     
     fetchStudyHistory();
+    
+    // クリーンアップ関数: コンポーネントのアンマウント時に呼び出される
+    return () => {
+      isMounted = false; // マウント状態をfalseに設定
+      controller.abort(); // 進行中のフェッチリクエストをキャンセル
+    };
   }, []);
 
   return (

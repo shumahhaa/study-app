@@ -2,7 +2,10 @@ const styles = {
   container: {
     maxWidth: '900px',
     margin: '0 auto',
-    padding: '0.3rem',
+    padding: '1.5rem',
+    backgroundColor: '#fff',
+    borderRadius: '12px',
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.08)',
   },
   title: {
     fontSize: '1.8rem',
@@ -51,6 +54,7 @@ const styles = {
     cursor: 'pointer',
     transition: 'box-shadow 0.3s ease',
     position: 'relative',
+    backgroundColor: '#fff',
   },
   quizCardHeader: {
     display: 'flex',
@@ -76,6 +80,7 @@ const styles = {
     justifyContent: 'space-between',
     borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
     paddingBottom: '1.5rem',
+    backgroundColor: '#fff',
   },
   backButton: {
     backgroundColor: '#f5f5f5',

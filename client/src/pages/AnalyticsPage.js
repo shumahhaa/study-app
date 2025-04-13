@@ -213,7 +213,7 @@ const AnalyticsPage = ({ formatTime }) => {
 
   return (
     <Layout>
-      <div style={styles.container}>
+      <div style={{...styles.container, marginBottom: "30px"}}>
         <DelayedLoader loading={loading}>
           <div style={styles.loadingContainer}>
             <div style={styles.loading}>データを読み込み中...</div>
@@ -230,7 +230,7 @@ const AnalyticsPage = ({ formatTime }) => {
           </div>
         ) : !loading && (
           <>
-            {/* ヘッダー部分を修正 */}
+            {/* ヘッダー部分 */}
             <div style={styles.header}>
               <h1 style={styles.title}>学習分析</h1>
               <PeriodSelector 

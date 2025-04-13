@@ -19,7 +19,12 @@ const QuizDetail = ({ quiz, onBackToList, onMarkCompleted }) => {
   
   return (
     <div style={styles.container}>
-      <div style={styles.quizDetailHeader}>
+      <div style={{
+        ...styles.quizDetailHeader,
+        backgroundColor: '#fff',
+        borderRadius: '8px',
+        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)'
+      }}>
         <button 
           style={styles.backButton}
           onClick={onBackToList}
