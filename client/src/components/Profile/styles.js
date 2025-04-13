@@ -228,9 +228,10 @@ styles.btnPrimaryDisabled = { ...styles.buttonDisabled };
 
 styles.btnSecondary = { ...styles.buttonBase, ...styles.btnSecondary };
 styles.btnSecondaryHover = { ...styles.buttonHover };
+styles.btnSecondaryDisabled = { ...styles.buttonDisabled, backgroundColor: '#a0aec0' };
 
 styles.btnDanger = { ...styles.buttonBase, ...styles.btnDanger };
 styles.btnDangerHover = { ...styles.buttonHover };
-styles.btnDangerDisabled = { ...styles.buttonDisabled };
+styles.btnDangerDisabled = { ...styles.buttonDisabled, backgroundColor: '#f87171' };
 
 export default styles; 
