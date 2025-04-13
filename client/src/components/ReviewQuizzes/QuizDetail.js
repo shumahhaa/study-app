@@ -18,7 +18,7 @@ const QuizDetail = ({ quiz, onBackToList, onMarkCompleted }) => {
   const isQuizDueToday = isDueToday(quiz);
   
   return (
-    <div style={styles.container}>
+    <div>
       <div style={{
         ...styles.quizDetailHeader,
         backgroundColor: '#fff',

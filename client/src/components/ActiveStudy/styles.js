@@ -142,8 +142,8 @@ const styles = {
     backgroundColor: "white",
     borderRadius: "16px",
     padding: "30px",
-    width: "90%",
-    maxWidth: "400px",
+    width: "calc(90% + 20px)",
+    maxWidth: "420px",
     boxShadow: "0 15px 35px rgba(0,0,0,0.2)",
   },
   dialogTitle: {
