@@ -17,7 +17,8 @@ const styles = {
   title: {
     margin: 0,
     color: "rgb(25, 118, 210)",
-    fontSize: "24px"
+    fontSize: "24px",
+    paddingLeft: "10px"
   },
   filterContainer: {
     display: "flex",

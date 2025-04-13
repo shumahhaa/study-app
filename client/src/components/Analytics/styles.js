@@ -18,6 +18,7 @@ const styles = {
     color: "rgb(25, 118, 210)",
     margin: 0,
     fontSize: "28px",
+    paddingLeft: "20px",
   },
   periodSelector: {
     display: "flex",

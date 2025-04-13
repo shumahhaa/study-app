@@ -8,10 +8,11 @@ const styles = {
     boxShadow: '0 4px 10px rgba(0, 0, 0, 0.08)',
   },
   title: {
-    fontSize: '1.8rem',
+    fontSize: '1.5rem',
     marginBottom: '1.5rem',
     textAlign: 'center',
     color: 'rgb(25, 118, 210)',
+    paddingLeft: '10px',
   },
   loading: {
     textAlign: 'center',
