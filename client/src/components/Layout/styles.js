@@ -118,9 +118,6 @@ const styles = {
     backgroundColor: "#f9f9f9",
     width: "100%",
     marginTop: "60px",
-    "@media (maxWidth: 768px)": {
-      padding: "20px",
-    }
   },
   footer: {
     padding: "15px 20px",
@@ -140,8 +137,8 @@ const styles = {
   },
   // レスポンシブ対応のメディアクエリ
   mediaQueries: {
-    mobile: "@media (maxWidth: 768px)",
-    tablet: "@media (maxWidth: 1024px)",
+    mobile: "@media (max-width: 768px)",
+    tablet: "@media (max-width: 1024px)",
   }
 };
 

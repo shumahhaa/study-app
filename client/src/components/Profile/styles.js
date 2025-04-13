@@ -13,7 +13,7 @@ const styles = {
     borderRadius: '12px',
     boxShadow: '0 8px 30px rgba(0, 0, 0, 0.06)',
     padding: '35px',
-    marginTop: '20px',
+    marginTop: '0',
     border: '1px solid rgba(226, 232, 240, 0.8)',
   },
   profileForm: {
