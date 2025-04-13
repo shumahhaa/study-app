@@ -28,11 +28,15 @@ const styles = {
     maxWidth: "1200px",
     margin: "0 auto",
     width: "100%",
-    padding: "0 20px",
+    padding: "0",
     height: "100%",
+    position: "relative",
   },
   logoContainer: {
-    paddingLeft: "10px",
+    display: "flex",
+    alignItems: "center",
+    height: "100%",
+    paddingLeft: "0",
   },
   logoLink: {
     textDecoration: "none",
@@ -66,12 +70,57 @@ const styles = {
     display: "flex",
     gap: "18px",
   },
+  navMobile: {
+    flexDirection: "column",
+    width: "100%",
+    padding: "10px 0",
+  },
+  hamburger: {
+    display: "none",
+    cursor: "pointer",
+    position: "absolute",
+    right: "20px",
+    top: "50%",
+    transform: "translateY(-50%)",
+    width: "30px",
+    height: "24px",
+    zIndex: 1000,
+    flexDirection: "column",
+    justifyContent: "space-between",
+  },
+  hamburgerLine: {
+    width: "100%",
+    height: "3px",
+    backgroundColor: "#333",
+    margin: "3px 0",
+    transition: "all 0.3s ease",
+    borderRadius: "2px",
+  },
+  mobileMenu: {
+    display: "none",
+    position: "fixed",
+    top: "60px",
+    left: 0,
+    right: 0,
+    backgroundColor: "#fff",
+    padding: "20px",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+    zIndex: 99,
+  },
+  mobileNav: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "15px",
+  },
   main: {
     flex: 1,
     padding: "40px",
     backgroundColor: "#f9f9f9",
     width: "100%",
     marginTop: "60px",
+    "@media (maxWidth: 768px)": {
+      padding: "20px",
+    }
   },
   footer: {
     padding: "15px 20px",
@@ -88,6 +137,11 @@ const styles = {
     margin: 0,
     color: "#666",
     fontSize: "14px"
+  },
+  // レスポンシブ対応のメディアクエリ
+  mediaQueries: {
+    mobile: "@media (maxWidth: 768px)",
+    tablet: "@media (maxWidth: 1024px)",
   }
 };
 
