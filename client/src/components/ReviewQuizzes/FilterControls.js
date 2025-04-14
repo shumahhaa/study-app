@@ -7,7 +7,7 @@ const FilterControls = ({
   setFilterMode 
 }) => {
   return (
-    <div style={styles.filterContainer}>
+    <div style={styles.filterContainer} className="filter-controls">
       <button 
         className={`green-nav-link ${filterMode === 'due_today' ? 'green-active-link' : ''}`}
         onClick={() => setFilterMode('due_today')}

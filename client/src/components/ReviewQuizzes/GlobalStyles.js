@@ -89,6 +89,10 @@ const GlobalStyles = () => {
       
       .back-button {
         transition: all 0.3s ease !important;
+        padding: 0.6rem 1.2rem !important;
+        font-size: 0.9rem !important;
+        border-radius: 8px !important;
+        display: inline-flex !important;
       }
       
       .back-button:hover {
@@ -335,6 +339,61 @@ const GlobalStyles = () => {
       .back-button:hover {
         background-color: #e0e0e0;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+      
+      /* レスポンシブスタイル - モバイル対応 */
+      @media screen and (max-width: 768px) {
+        .header-container {
+          flex-direction: column !important;
+          align-items: flex-start !important;
+          gap: 16px;
+        }
+        
+        .header-container h1 {
+          margin-bottom: 10px !important;
+          text-align: center !important;
+          width: 100% !important;
+        }
+        
+        .filter-controls {
+          width: 100% !important;
+          justify-content: center !important;
+          gap: 10px !important;
+          margin-bottom: 10px !important;
+        }
+        
+        .green-nav-link {
+          padding: 8px 10px;
+          min-width: 70px;
+          font-size: 13px;
+        }
+        
+        /* QuizDetail スマホ対応 */
+        .quiz-detail-header {
+          flex-direction: column !important;
+          align-items: flex-start !important;
+          padding: 1rem !important;
+          gap: 1rem;
+        }
+        
+        .quiz-title {
+          font-size: calc(1.3rem + 2px) !important;
+          text-align: left !important;
+          padding: 0 !important;
+          width: 100% !important;
+          order: 1;
+        }
+        
+        .back-button {
+          width: auto !important;
+          order: 0;
+        }
+        
+        .quiz-meta {
+          width: 100% !important;
+          justify-content: flex-start !important;
+          order: 2;
+        }
       }
     `;
     document.head.appendChild(style);

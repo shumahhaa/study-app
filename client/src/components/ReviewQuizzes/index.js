@@ -162,7 +162,7 @@ const ReviewQuizzesPage = () => {
               justifyContent: 'space-between',
               alignItems: 'center',
               marginBottom: '2rem'
-            }}>
+            }} className="header-container">
               <h1 style={{
                 ...styles.title,
                 margin: 0,

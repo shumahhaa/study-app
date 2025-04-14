@@ -24,7 +24,7 @@ const QuizDetail = ({ quiz, onBackToList, onMarkCompleted }) => {
         backgroundColor: '#fff',
         borderRadius: '8px',
         boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)'
-      }}>
+      }} className="quiz-detail-header">
         <button 
           style={styles.backButton}
           onClick={onBackToList}
@@ -34,9 +34,9 @@ const QuizDetail = ({ quiz, onBackToList, onMarkCompleted }) => {
           一覧に戻る
         </button>
         
-        <h2 style={styles.quizTitle}>{quiz.studyTopic}</h2>
+        <h2 style={styles.quizTitle} className="quiz-title">{quiz.studyTopic}</h2>
         
-        <div style={styles.quizMeta}>
+        <div style={styles.quizMeta} className="quiz-meta">
           <p style={styles.quizDate}>
             作成日: {formatDateSafe(quiz.createdAt)}
           </p>
