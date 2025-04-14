@@ -22,7 +22,10 @@ const styles = {
   },
   periodSelector: {
     display: "flex",
-    gap: "10px",
+    gap: "4px",
+    flexWrap: "nowrap",
+    justifyContent: "center",
+    margin: "10px 0",
   },
   periodButton: {
     padding: "8px 16px",
@@ -90,7 +93,7 @@ const styles = {
   },
   chartSection: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(500px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
     gap: "20px",
     marginBottom: "30px",
   },
@@ -99,6 +102,9 @@ const styles = {
     borderRadius: "12px",
     padding: "20px",
     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+    width: "100%",
+    maxWidth: "100%",
+    overflow: "hidden",
   },
   chartTitle: {
     color: "#333",
@@ -112,6 +118,8 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    width: "100%",
+    overflow: "hidden",
   },
   chartFooter: {
     marginTop: "15px",

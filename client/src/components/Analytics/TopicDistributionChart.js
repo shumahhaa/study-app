@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import PieChart from "../PieChart";
 import styles from "./styles";
 
@@ -9,6 +9,19 @@ const TopicDistributionChart = ({
   mostStudiedTopic,
   formatTime 
 }) => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   // トピック分布データを円グラフ用に変換
   const getPieChartData = () => {
     return topicDistribution.map(topic => ({
@@ -25,7 +38,7 @@ const TopicDistributionChart = ({
           <PieChart 
             data={getPieChartData()} 
             colors={pieChartColors}
-            legendColumns={4}
+            legendColumns={isMobile ? 2 : 4}
             formatTime={formatTime}
           />
         ) : (

@@ -28,6 +28,20 @@ const AnalyticsPage = ({ formatTime }) => {
   const [topicMotivation, setTopicMotivation] = useState([]);
   const [dayMotivation, setDayMotivation] = useState([]);
 
+  // モバイル表示かどうかを判定
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   // APIから学習履歴を取得
   useEffect(() => {
     const fetchStudyHistory = async () => {
@@ -231,8 +245,18 @@ const AnalyticsPage = ({ formatTime }) => {
         ) : !loading && (
           <>
             {/* ヘッダー部分 */}
-            <div style={styles.header}>
-              <h1 style={styles.title}>学習分析</h1>
+            <div style={{
+              ...styles.header, 
+              flexDirection: isMobile ? "column" : "row",
+              alignItems: isMobile ? "center" : "center",
+              gap: isMobile ? "15px" : "0"
+            }}>
+              <h1 style={{
+                ...styles.title,
+                fontSize: isMobile ? "24px" : "28px",
+                textAlign: isMobile ? "center" : "left",
+                paddingLeft: isMobile ? "0" : "20px"
+              }}>学習分析</h1>
               <PeriodSelector 
                 selectedPeriod={selectedPeriod} 
                 setSelectedPeriod={setSelectedPeriod} 

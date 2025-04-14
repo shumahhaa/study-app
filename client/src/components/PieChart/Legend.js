@@ -1,14 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './styles';
 
 /**
  * 円グラフの凡例コンポーネント
  */
 const Legend = ({ data, colors, percentages, formatTime, legendColumns }) => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  // モバイル表示時は2列、それ以外は指定された列数
+  const columns = isMobile ? 2 : legendColumns;
+
   return (
     <div style={{
       ...styles.legend,
-      gridTemplateColumns: `repeat(${legendColumns}, 1fr)`
+      gridTemplateColumns: `repeat(${columns}, 1fr)`
     }}>
       {data.map((item, index) => (
         <div 

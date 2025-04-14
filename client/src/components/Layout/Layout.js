@@ -29,7 +29,7 @@ const Layout = ({ children, isStudying }) => {
   // モバイル用のメインスタイル
   const mainStyle = {
     ...styles.main,
-    padding: isMobile ? "5px" : "40px"
+    padding: isMobile ? "0px" : "40px"
   };
 
   return (

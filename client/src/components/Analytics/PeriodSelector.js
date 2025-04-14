@@ -57,6 +57,20 @@ const PeriodSelector = ({ selectedPeriod, setSelectedPeriod }) => {
           background-color: rgba(76, 175, 80, 0.12);
           color: #2E7D32;
         }
+        
+        /* モバイル表示の調整 */
+        @media (max-width: 768px) {
+          .period-button {
+            padding: 6px 9px;
+            font-size: 15px;
+            margin: 0 1px;
+            white-space: nowrap;
+          }
+          
+          .period-button-active:after {
+            width: 60%;
+          }
+        }
       `;
       document.head.appendChild(styleElement);
     }
