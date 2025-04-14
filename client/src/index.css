@@ -189,6 +189,42 @@ code {
   font-weight: bold;
 }
 
+/* モバイル向けカレンダースタイル */
+@media (max-width: 768px) {
+  .react-calendar {
+    padding: 5px;
+  }
+  
+  .react-calendar__navigation {
+    height: 40px;
+  }
+  
+  .react-calendar__navigation button {
+    font-size: 14px;
+    padding: 0;
+  }
+  
+  .react-calendar__month-view__weekdays__weekday {
+    padding: 5px;
+    font-size: 0.75em;
+  }
+  
+  .react-calendar__month-view__days__day {
+    height: 40px;
+  }
+  
+  .react-calendar__tile {
+    padding: 8px 4px;
+    font-size: 14px;
+  }
+
+  .react-calendar__tile--active {
+    background-color: #2196f3;
+    color: white;
+    font-weight: bold;
+  }
+}
+
 /* アニメーション */
 @keyframes fadeIn {
   from { opacity: 0; }

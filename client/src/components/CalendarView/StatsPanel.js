@@ -69,21 +69,23 @@ const StatsPanel = ({ selectedDateSessions, topicDistribution, formatTime }) => 
         </div>
       </div>
       
-      {/* 学習内容の分布 */}
-      <div style={{
-        ...styles.summaryCard,
-        marginTop: '20px',
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '20px 15px',
-        boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-      }}>
-        <div style={{...styles.pieChartHeader, fontSize: '18px', color: '#000000', textAlign: 'center'}}>学習内容の分布</div>
-        <PieChart 
-          topicDistribution={topicDistribution} 
-          formatTime={formatTime} 
-        />
-      </div>
+      {/* 学習内容の分布（topicDistributionが空の場合は表示しない） */}
+      {topicDistribution.length > 0 && (
+        <div style={{
+          ...styles.summaryCard,
+          marginTop: '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '20px 15px',
+          boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+        }}>
+          <div style={{...styles.pieChartHeader, fontSize: '18px', color: '#000000', textAlign: 'center'}}>学習内容の分布</div>
+          <PieChart 
+            topicDistribution={topicDistribution} 
+            formatTime={formatTime} 
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -6,6 +6,7 @@ import StatsPanel from './StatsPanel';
 import SessionsList from './SessionsList';
 import NoSessionsMessage from './NoSessionsMessage';
 import { pieChartColors } from './utils';
+import PieChart from './PieChart';
 
 const CalendarView = ({ studyHistory, formatTime, initialDate }) => {
   const [calendarData, setCalendarData] = useState({});
@@ -185,9 +186,20 @@ const CalendarView = ({ studyHistory, formatTime, initialDate }) => {
       paddingTop: '20px',
     }}>
       {/* ヘッダー部分 */}
-      <div style={styles.calendarHeader}>
-        <h2 style={styles.calendarTitle}>学習カレンダー</h2>
-        <div style={styles.calendarDate}>{formatDate(selectedDate)}</div>
+      <div style={{
+        ...styles.calendarHeader,
+        ...(isMobile ? styles.calendarHeaderMobile : {})
+      }}>
+        <h2 style={{
+          ...styles.calendarTitle,
+          ...(isMobile ? styles.calendarTitleMobile : {})
+        }}>学習カレンダー</h2>
+        {!isMobile && (
+          <div style={{
+            ...styles.calendarDate,
+            ...(isMobile ? styles.calendarDateMobile : {})
+          }}>{formatDate(selectedDate)}</div>
+        )}
       </div>
       
       {/* コンテンツレイアウト */}
@@ -197,59 +209,229 @@ const CalendarView = ({ studyHistory, formatTime, initialDate }) => {
         width: '100%',
         gap: '30px',
       }}>
-        {/* 左側カラム（カレンダーとセッション詳細） */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: isMobile ? '100%' : '50%',
-          gap: '20px',
-        }}>
-          {/* カレンダー部分 */}
-          <div style={{
-            ...styles.calendarSection,
-            width: '100%',
-            marginTop: '0',
-          }}>
-            <CalendarComponent 
-              selectedDate={selectedDate}
-              handleDateChange={handleDateChange}
-              calendarData={calendarData}
-            />
-          </div>
-          
-          {/* 学習セッション詳細部分（カレンダーの下） */}
-          {selectedDateSessions.length > 0 && (
+        {isMobile ? (
+          /* モバイル表示時のレイアウト */
+          <div style={{ width: '100%' }}>
+            {/* カレンダー部分 */}
             <div style={{
+              ...styles.calendarSection,
               width: '100%',
-              backgroundColor: '#ffffff',
-              borderRadius: '10px',
-              boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-              marginTop: '10px',
+              marginTop: '0',
             }}>
-              <SessionsList 
-                sessions={selectedDateSessions} 
-                formatTime={formatTime} 
+              <CalendarComponent 
+                selectedDate={selectedDate}
+                handleDateChange={handleDateChange}
+                calendarData={calendarData}
               />
             </div>
-          )}
-        </div>
-        
-        {/* 右側カラム（統計パネル） */}
-        <div style={{
-          ...styles.sessionsContainer,
-          width: isMobile ? '100%' : '50%',
-          marginTop: isMobile ? '20px' : '0',
-        }}>
-          {selectedDateSessions.length === 0 ? (
-            <NoSessionsMessage />
-          ) : (
-            <StatsPanel 
-              selectedDateSessions={selectedDateSessions}
-              topicDistribution={topicDistribution}
-              formatTime={formatTime}
-            />
-          )}
-        </div>
+            
+            {/* 学習内容の分布 */}
+            {selectedDateSessions.length > 0 && (
+              <div style={{
+                width: '100%',
+                backgroundColor: '#ffffff',
+                borderRadius: '10px',
+                boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+                marginTop: '20px',
+                marginBottom: '10px',
+                padding: '15px',
+              }}>
+                <div style={{...styles.pieChartHeader, fontSize: '18px', color: '#000000', textAlign: 'center'}}>学習内容の分布</div>
+                <PieChart 
+                  topicDistribution={topicDistribution} 
+                  formatTime={formatTime} 
+                />
+              </div>
+            )}
+            
+            {/* 分析カード（縦一列表示） */}
+            {selectedDateSessions.length > 0 && (
+              <div style={{
+                width: '100%',
+                marginTop: '20px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '15px',
+              }}>
+                {/* 合計学習時間カード */}
+                <div style={{
+                  ...styles.statsCard,
+                  height: 'auto',
+                  padding: '15px',
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '15px',
+                }}>
+                  <img 
+                    src="/total-study-time.png" 
+                    alt="合計学習時間"
+                    style={{...styles.statsCardIcon, width: '80px', height: '80px'}}
+                  />
+                  <div style={{
+                    ...styles.statsCardContent,
+                    alignItems: 'center',
+                  }}>
+                    <div style={{...styles.statsCardValue, fontSize: '22px'}}>{formatTime(selectedDateSessions.reduce((sum, session) => sum + session.duration, 0))}</div>
+                  </div>
+                </div>
+                
+                {/* 学習セッション数カード */}
+                <div style={{
+                  ...styles.statsCard,
+                  height: 'auto',
+                  padding: '15px',
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '15px',
+                }}>
+                  <img 
+                    src="/study-session.png" 
+                    alt="学習セッション数"
+                    style={{...styles.statsCardIcon, width: '80px', height: '80px'}}
+                  />
+                  <div style={{
+                    ...styles.statsCardContent,
+                    alignItems: 'center',
+                  }}>
+                    <div style={{...styles.statsCardValue, fontSize: '22px'}}>{selectedDateSessions.length}回</div>
+                  </div>
+                </div>
+                
+                {/* 平均モチベーションカード */}
+                <div style={{
+                  ...styles.statsCard,
+                  height: 'auto',
+                  padding: '15px',
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '15px',
+                }}>
+                  <img 
+                    src="/average-motivation.png" 
+                    alt="平均モチベーション"
+                    style={{...styles.statsCardIcon, width: '80px', height: '80px'}}
+                  />
+                  <div style={{
+                    ...styles.statsCardContent,
+                    alignItems: 'center',
+                  }}>
+                    <div style={{...styles.statsCardValue, fontSize: '22px'}}>
+                      {(selectedDateSessions.reduce((sum, session) => sum + session.motivation, 0) / selectedDateSessions.length).toFixed(1)}/5
+                    </div>
+                  </div>
+                </div>
+                
+                {/* 平均学習時間カード */}
+                <div style={{
+                  ...styles.statsCard,
+                  height: 'auto',
+                  padding: '15px',
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '15px',
+                }}>
+                  <img 
+                    src="/average-study-time.png" 
+                    alt="平均学習時間"
+                    style={{...styles.statsCardIcon, width: '80px', height: '80px'}}
+                  />
+                  <div style={{
+                    ...styles.statsCardContent,
+                    alignItems: 'center',
+                  }}>
+                    <div style={{...styles.statsCardValue, fontSize: '22px'}}>
+                      {formatTime(Math.round(selectedDateSessions.reduce((sum, session) => sum + session.duration, 0) / selectedDateSessions.length))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* 学習セッション詳細部分 */}
+            {selectedDateSessions.length > 0 && (
+              <div style={{
+                width: '100%',
+                backgroundColor: '#ffffff',
+                borderRadius: '10px',
+                boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+                marginTop: '20px',
+              }}>
+                <SessionsList 
+                  sessions={selectedDateSessions} 
+                  formatTime={formatTime} 
+                />
+              </div>
+            )}
+            
+            {/* セッションがない場合のメッセージ */}
+            {selectedDateSessions.length === 0 && (
+              <div style={{ marginTop: '20px' }}>
+                <NoSessionsMessage />
+              </div>
+            )}
+          </div>
+        ) : (
+          /* デスクトップ表示時の元のレイアウト */
+          <>
+            {/* 左側カラム（カレンダーとセッション詳細） */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: '50%',
+              gap: '20px',
+            }}>
+              {/* カレンダー部分 */}
+              <div style={{
+                ...styles.calendarSection,
+                width: '100%',
+                marginTop: '0',
+              }}>
+                <CalendarComponent 
+                  selectedDate={selectedDate}
+                  handleDateChange={handleDateChange}
+                  calendarData={calendarData}
+                />
+              </div>
+              
+              {/* 学習セッション詳細部分（カレンダーの下） */}
+              {selectedDateSessions.length > 0 && (
+                <div style={{
+                  width: '100%',
+                  backgroundColor: '#ffffff',
+                  borderRadius: '10px',
+                  boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+                  marginTop: '10px',
+                }}>
+                  <SessionsList 
+                    sessions={selectedDateSessions} 
+                    formatTime={formatTime} 
+                  />
+                </div>
+              )}
+            </div>
+            
+            {/* 右側カラム（統計パネル） */}
+            <div style={{
+              ...styles.sessionsContainer,
+              width: '50%',
+              marginTop: '0',
+            }}>
+              {selectedDateSessions.length === 0 ? (
+                <NoSessionsMessage />
+              ) : (
+                <StatsPanel 
+                  selectedDateSessions={selectedDateSessions}
+                  topicDistribution={topicDistribution}
+                  formatTime={formatTime}
+                />
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

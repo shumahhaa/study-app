@@ -20,10 +20,15 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingBottom: '15px',
-    marginBottom: '0',
+    paddingBottom: '10px',
+    marginBottom: '-10px',
     borderBottom: '1px solid #eaeaea',
     width: '100%',
+  },
+  calendarHeaderMobile: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
   },
   calendarTitle: {
     fontSize: '24px',
@@ -33,12 +38,21 @@ const styles = {
     textAlign: 'left',
     paddingLeft: '20px',
   },
+  calendarTitleMobile: {
+    paddingLeft: 0,
+    textAlign: 'center',
+    marginBottom: '10px',
+  },
   calendarDate: {
     fontSize: '18px',
     fontWeight: '500',
     color: '#000000',
     textAlign: 'right',
     paddingRight: '30px',
+  },
+  calendarDateMobile: {
+    paddingRight: 0,
+    textAlign: 'center',
   },
   calendarSection: {
     display: 'flex',
@@ -334,6 +348,38 @@ const styles = {
     fontWeight: '600',
     color: '#333',
     textAlign: 'center',
+  },
+  // モバイル表示用のセッションカードスタイル
+  sessionCardMobile: {
+    padding: '12px',
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+  },
+  sessionRowMobile: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: '10px',
+  },
+  sessionItemMobile: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: '1',
+    minWidth: '0',
+  },
+  itemLabelMobile: {
+    fontSize: '12px',
+    color: '#666',
+    marginBottom: '2px',
+  },
+  itemValueMobile: {
+    fontSize: '14px',
+    fontWeight: '500',
+    color: '#333',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
 };
 
