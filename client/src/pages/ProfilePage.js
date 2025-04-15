@@ -4,24 +4,17 @@ import { useAuth } from '../contexts/AuthContext';
 import Layout from '../components/Layout';
 import {
   ProfileForm,
-  PasswordChangeForm,
   AccountActions,
   DeleteAccountModal,
   styles
 } from '../components/Profile';
 
 function ProfilePage({ isStudying }) {
-  const { currentUser, logout, updateProfile, changePassword, resendVerificationEmail, deleteAccount } = useAuth();
+  const { currentUser, logout, updateProfile, resendVerificationEmail, deleteAccount } = useAuth();
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordChangeLoading, setPasswordChangeLoading] = useState(false);
-  const [passwordError, setPasswordError] = useState('');
-  const [passwordSuccess, setPasswordSuccess] = useState('');
   const [verificationLoading, setVerificationLoading] = useState(false);
   const [verificationError, setVerificationError] = useState('');
   const [verificationSuccess, setVerificationSuccess] = useState('');
@@ -67,38 +60,6 @@ function ProfilePage({ isStudying }) {
       setError(error.message || 'プロファイルの更新に失敗しました');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleChangePassword = async (e) => {
-    e.preventDefault();
-    setPasswordChangeLoading(true);
-    setPasswordError('');
-    setPasswordSuccess('');
-
-    // パスワード検証
-    if (newPassword.length < 6) {
-      setPasswordError('新しいパスワードは6文字以上である必要があります');
-      setPasswordChangeLoading(false);
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setPasswordError('新しいパスワードと確認用パスワードが一致しません');
-      setPasswordChangeLoading(false);
-      return;
-    }
-
-    try {
-      await changePassword(currentPassword, newPassword);
-      setPasswordSuccess('パスワードが正常に変更されました');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-    } catch (error) {
-      setPasswordError(error.message || 'パスワードの変更に失敗しました');
-    } finally {
-      setPasswordChangeLoading(false);
     }
   };
 
@@ -177,19 +138,6 @@ function ProfilePage({ isStudying }) {
             error={error}
             success={success}
             handleUpdateProfile={handleUpdateProfile}
-          />
-          
-          <PasswordChangeForm
-            currentPassword={currentPassword}
-            setCurrentPassword={setCurrentPassword}
-            newPassword={newPassword}
-            setNewPassword={setNewPassword}
-            confirmPassword={confirmPassword}
-            setConfirmPassword={setConfirmPassword}
-            passwordChangeLoading={passwordChangeLoading}
-            passwordError={passwordError}
-            passwordSuccess={passwordSuccess}
-            handleChangePassword={handleChangePassword}
           />
           
           <AccountActions

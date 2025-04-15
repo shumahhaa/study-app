@@ -1,21 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './styles';
 
 const ProfileForm = ({
   currentUser,
   displayName,
-  setDisplayName,
-  loading,
   error,
-  success,
-  handleUpdateProfile
+  success
 }) => {
-  // ホバー状態を管理
-  const [isHovered, setIsHovered] = React.useState(false);
-  
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  // 画面サイズの変更を監視
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  // スマホサイズ向けのスタイル
+  const headingStyle = {
+    ...styles.heading,
+    ...(isMobile && { textAlign: 'center' })
+  };
+
   return (
-    <form onSubmit={handleUpdateProfile} className="profile-form" style={styles.profileForm}>
-      <h2 style={styles.heading}>プロフィール情報</h2>
+    <div className="profile-form" style={styles.profileForm}>
+      <h2 style={headingStyle}>プロフィール情報</h2>
       <div style={styles.profileInfo}>
         <p><strong>メールアドレス:</strong> {currentUser?.email}</p>
         <p><strong>表示名:</strong> {displayName || '未設定'}</p>
@@ -23,35 +37,7 @@ const ProfileForm = ({
       
       {error && <div style={styles.errorMessage}>{error}</div>}
       {success && <div style={styles.successMessage}>{success}</div>}
-      
-      <div style={styles.formGroup}>
-        <label htmlFor="displayName" style={styles.label}>表示名</label>
-        <input
-          type="text"
-          id="displayName"
-          value={displayName}
-          onChange={(e) => setDisplayName(e.target.value)}
-          placeholder="表示名を入力"
-          style={styles.input}
-        />
-      </div>
-      
-      <div style={styles.profileActions}>
-        <button 
-          type="submit" 
-          style={{
-            ...styles.btnPrimary,
-            ...(loading ? styles.btnPrimaryDisabled : {}),
-            ...(isHovered && !loading ? styles.btnPrimaryHover : {})
-          }}
-          disabled={loading}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          {loading ? '更新中...' : 'プロフィールを更新'}
-        </button>
-      </div>
-    </form>
+    </div>
   );
 };
 

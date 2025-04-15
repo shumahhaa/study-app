@@ -7,7 +7,6 @@ import {
   sendPasswordResetEmail,
   EmailAuthProvider,
   reauthenticateWithCredential as reauthWithCredential,
-  updatePassword,
   sendEmailVerification,
   deleteUser
 } from "firebase/auth";
@@ -138,17 +137,6 @@ export const reauthenticateWithCredential = async (user, currentPassword) => {
     return { success: true };
   } catch (error) {
     console.error("再認証エラー:", error);
-    throw error;
-  }
-};
-
-// ユーザーのパスワードを更新
-export const updateUserPassword = async (user, newPassword) => {
-  try {
-    await updatePassword(user, newPassword);
-    return { success: true };
-  } catch (error) {
-    console.error("パスワード更新エラー:", error);
     throw error;
   }
 };

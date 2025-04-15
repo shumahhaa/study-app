@@ -73,7 +73,10 @@ const StudySessionRow = ({ session, deleteStudySession, isMobile }) => {
       </td>
       <td style={getMobileCellStyle()}>
         <button
-          onClick={() => deleteStudySession(session.id)}
+          onClick={(e) => {
+            e.preventDefault();
+            deleteStudySession(session.id);
+          }}
           className="delete-button"
           title="削除"
           style={{

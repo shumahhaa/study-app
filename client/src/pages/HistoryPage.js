@@ -30,18 +30,28 @@ const HistoryPage = ({ formatTime }) => {
   
   // 学習履歴を削除する関数
   const handleDeleteStudySession = async (id) => {
-    if (window.confirm("この学習履歴を削除しますか？")) {
-      try {
-        await deleteStudySession(id);
-        
-        // 成功した場合は、UIから削除
-        setStudyHistory(prevHistory => 
-          prevHistory.filter(session => session.id !== id)
-        );
-      } catch (err) {
-        console.error("学習履歴の削除エラー:", err);
-        alert("削除に失敗しました。もう一度お試しください。");
+    try {
+      if (window.confirm("この学習履歴を削除しますか？")) {
+        try {
+          const result = await deleteStudySession(id);
+          
+          // 成功した場合は、UIから削除
+          setStudyHistory(prevHistory => 
+            prevHistory.filter(session => session.id !== id)
+          );
+          
+          return true; // 成功を示す
+        } catch (err) {
+          console.error("学習履歴の削除エラー:", err);
+          alert("削除に失敗しました。もう一度お試しください。");
+          return false; // 失敗を示す
+        }
       }
+      return false; // キャンセルされた場合
+    } catch (err) {
+      console.error("削除処理でエラーが発生しました:", err);
+      alert("予期せぬエラーが発生しました。ページをリロードしてください。");
+      return false;
     }
   };
 

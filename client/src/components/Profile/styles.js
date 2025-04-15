@@ -5,7 +5,6 @@ const styles = {
   profileContainer: {
     maxWidth: '800px',
     margin: '0 auto',
-    padding: '20px',
     backgroundColor: '#f9fafb',
   },
   profileCard: {
@@ -26,7 +25,7 @@ const styles = {
     fontWeight: '600',
     marginBottom: '20px',
     paddingBottom: '10px',
-    borderBottom: '1px solid rgba(25, 118, 210, 0.2)',
+    borderBottom: '1px solid rgba(25, 118, 210, 0.2)'
   },
   profileInfo: {
     padding: '18px',
@@ -63,7 +62,7 @@ const styles = {
   },
   input: {
     width: '100%',
-    padding: '12px 14px',
+    padding: '10px 14px',
     border: '1px solid #e2e8f0',
     borderRadius: '6px',
     fontSize: '14px',

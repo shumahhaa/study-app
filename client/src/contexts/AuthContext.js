@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { auth, loginWithEmail, logoutUser, registerWithEmail, sendPasswordReset, reauthenticateWithCredential, updateUserPassword, deleteUserAccount } from '../firebase';
+import { auth, loginWithEmail, logoutUser, registerWithEmail, sendPasswordReset, reauthenticateWithCredential, deleteUserAccount } from '../firebase';
 import { fetchUserProfile, updateUserProfile, deleteUserData } from '../utils/api';
 import { sendEmailVerification, updateProfile as updateAuthProfile } from 'firebase/auth';
 
@@ -138,37 +138,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // パスワード変更
-  const changePassword = async (currentPassword, newPassword) => {
-    setError(null);
-    if (!currentUser) {
-      setError('ユーザーが認証されていません');
-      throw new Error('ユーザーが認証されていません');
-    }
-    
-    try {
-      // 現在のパスワードで再認証
-      await reauthenticateWithCredential(currentUser, currentPassword);
-      
-      // パスワードを更新
-      await updateUserPassword(currentUser, newPassword);
-      
-      return { success: true, message: 'パスワードが正常に変更されました' };
-    } catch (error) {
-      console.error('パスワード変更エラー:', error);
-      
-      if (error.code === 'auth/wrong-password') {
-        setError('現在のパスワードが正しくありません');
-      } else if (error.code === 'auth/weak-password') {
-        setError('新しいパスワードは6文字以上である必要があります');
-      } else {
-        setError('パスワードの変更中にエラーが発生しました');
-      }
-      
-      throw error;
-    }
-  };
-
   // パスワードリセット
   const resetPassword = async (email) => {
     setError(null);
@@ -278,9 +247,8 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    resetPassword,
     updateProfile,
-    changePassword,
+    resetPassword,
     resendVerificationEmail,
     deleteAccount
   };

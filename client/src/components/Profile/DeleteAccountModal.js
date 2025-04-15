@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './styles';
 
 const DeleteAccountModal = ({
@@ -12,6 +12,45 @@ const DeleteAccountModal = ({
   handleCloseDeleteModal,
   handleDeleteAccount
 }) => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isFormValid, setIsFormValid] = useState(false);
+  
+  // 画面サイズの変更を監視
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  
+  // パスワードと確認テキストの入力状態を監視
+  useEffect(() => {
+    setIsFormValid(deletePassword !== '' && deleteConfirm !== '');
+  }, [deletePassword, deleteConfirm]);
+  
+  // モバイル表示時のモーダルボディスタイル
+  const modalBodyStyle = {
+    ...styles.modalBody,
+    padding: isMobile ? '15px' : '25px'
+  };
+  
+  // ボタン間の距離を広げたスタイル
+  const modalActionsStyle = {
+    ...styles.modalActions,
+    justifyContent: 'center',
+    marginTop: '30px'
+  };
+  
+  // 警告テキストのスタイル
+  const warningTextStyle = {
+    ...styles.warningText,
+    padding: isMobile ? '5px 12px' : '12px'
+  };
+  
   if (!showDeleteModal) return null;
   
   return (
@@ -22,8 +61,8 @@ const DeleteAccountModal = ({
           <button style={styles.modalClose} onClick={handleCloseDeleteModal}>&times;</button>
         </div>
         
-        <div style={styles.modalBody}>
-          <p style={styles.warningText}>
+        <div style={modalBodyStyle}>
+          <p style={warningTextStyle}>
             アカウントを削除すると、すべてのデータが完全に削除され、復元できなくなります。
           </p>
           
@@ -54,21 +93,14 @@ const DeleteAccountModal = ({
             
             {deleteError && <div style={styles.errorMessage}>{deleteError}</div>}
             
-            <div style={styles.modalActions}>
-              <button 
-                type="button" 
-                style={styles.btnSecondary} 
-                onClick={handleCloseDeleteModal}
-              >
-                キャンセル
-              </button>
+            <div style={modalActionsStyle}>
               <button 
                 type="submit" 
                 style={{
                   ...styles.btnDanger,
-                  ...(deleteLoading ? styles.btnDangerDisabled : {})
+                  ...(!isFormValid || deleteLoading ? styles.btnDangerDisabled : {})
                 }}
-                disabled={deleteLoading}
+                disabled={!isFormValid || deleteLoading}
               >
                 {deleteLoading ? '処理中...' : 'アカウントを削除'}
               </button>

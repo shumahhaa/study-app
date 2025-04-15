@@ -231,7 +231,8 @@ export const deleteStudySession = async (sessionId) => {
 
     return await response.json();
   } catch (error) {
-    handleApiError(error);
+    console.error('学習セッション削除エラー:', error);
+    throw error; // エラーを上位に伝播させる
   }
 };
 
