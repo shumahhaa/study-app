@@ -7,14 +7,24 @@ const LandingPage = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
   useEffect(() => {
-    setIsVisible(true);
+    // マウント直後に実行される部分
+    let isMounted = true;
+    
+    if (isMounted) {
+      setIsVisible(true);
+    }
     
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
+      if (isMounted) {
+        setIsMobile(window.innerWidth <= 768);
+      }
     };
     
     window.addEventListener('resize', handleResize);
+    
+    // クリーンアップ関数
     return () => {
+      isMounted = false;
       window.removeEventListener('resize', handleResize);
     };
   }, []);

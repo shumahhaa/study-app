@@ -11,10 +11,57 @@ const ChartSVG = ({ percentages, colors, data }) => {
   // 円グラフのセグメントを生成
   const generateSegments = () => {
     let segments = [];
+    
+    // 有効なデータ数をカウント
+    const validDataCount = data.filter((item, index) => 
+      item && item.value > 0 && percentages[index] > 0
+    ).length;
+    
+    // 単一アイテムで100%の場合は完全な円を描画
+    if (validDataCount === 1) {
+      const index = data.findIndex(item => item && item.value > 0);
+      if (index !== -1) {
+        // 完全な円を描画
+        segments.push(
+          <circle
+            key="full-circle"
+            cx={center}
+            cy={center}
+            r={radius}
+            fill={colors[index % colors.length]}
+            stroke="#fff"
+            strokeWidth="1"
+          />
+        );
+        
+        // 中央にパーセンテージラベルを表示
+        segments.push(
+          <text
+            key="center-label"
+            x={center}
+            y={center}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fill="#fff"
+            fontWeight="bold"
+            fontSize="16"
+          >
+            100%
+          </text>
+        );
+        
+        return segments;
+      }
+    }
+    
+    // 複数アイテムの場合は通常の円グラフを描画
     let currentAngle = 0;
     
     percentages.forEach((percentage, index) => {
-      if (data[index].value === 0) return;
+      if (!data[index] || data[index].value === 0) return;
+      
+      // パーセンテージが0の場合はスキップ
+      if (percentage <= 0) return;
       
       const angle = (percentage / 100) * 360;
       const largeArcFlag = angle > 180 ? 1 : 0;
