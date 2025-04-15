@@ -4,16 +4,26 @@ import Layout from '../components/Layout/Layout';
 
 const LandingPage = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
   useEffect(() => {
     setIsVisible(true);
+    
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const styles = {
     container: {
       maxWidth: '1200px',
       margin: '0 auto',
-      padding: '0 20px',
+      padding: '0 0px',
       overflow: 'hidden',
       width: '100%',
     },
@@ -46,7 +56,7 @@ const LandingPage = () => {
       transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
     },
     heroTitle: {
-      fontSize: '4.5rem',
+      fontSize: isMobile ? '3.6rem' : '4.5rem',
       fontWeight: '800',
       marginTop: '0px',
       marginBottom: '30px',
@@ -54,7 +64,7 @@ const LandingPage = () => {
       letterSpacing: '1px',
     },
     heroSubtitle: {
-      fontSize: '1.3rem',
+      fontSize: isMobile ? '1.1rem' : '1.3rem',
       fontWeight: '500',
       opacity: '1',
       maxWidth: '700px',
@@ -68,16 +78,16 @@ const LandingPage = () => {
     ctaButton: {
       backgroundColor: 'white',
       color: '#2196F3',
-      padding: '14px 36px',
+      padding: isMobile ? '12px 25px' : '14px 36px',
       borderRadius: '50px',
-      fontSize: '1.2rem',
+      fontSize: isMobile ? '1rem' : '1.2rem',
       fontWeight: '600',
       textDecoration: 'none',
       display: 'inline-block',
       boxShadow: '0 10px 20px rgba(0,0,0,0.15)',
       border: 'none',
       cursor: 'pointer',
-      margin: '0 12px',
+      margin: isMobile ? '0 6px' : '0 12px',
       transition: 'background-color 0.3s ease, color 0.3s ease',
     },
     featureSection: {
@@ -142,18 +152,21 @@ const LandingPage = () => {
     secondaryButton: {
       backgroundColor: '#00C853',
       color: 'white',
-      padding: '14px 36px',
+      padding: isMobile ? '12px 25px' : '14px 36px',
       borderRadius: '50px',
-      fontSize: '1.2rem',
+      fontSize: isMobile ? '1rem' : '1.2rem',
       fontWeight: '700',
       textDecoration: 'none',
       display: 'inline-block',
       boxShadow: '0 10px 20px rgba(0,0,0,0.15)',
-      margin: '0 12px',
+      margin: isMobile ? '0 6px' : '0 12px',
       transition: 'background-color 0.3s ease',
     },
     buttonContainer: {
       marginTop: '50px',
+      display: 'flex',
+      justifyContent: 'center',
+      flexWrap: 'wrap',
     },
     circleDecoration: {
       position: 'absolute',
