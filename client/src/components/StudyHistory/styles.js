@@ -4,8 +4,7 @@ const styles = {
     backgroundColor: "#fff",
     borderRadius: "8px",
     boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
-    padding: "20px",
-    marginTop: "20px"
+    padding: "20px"
   },
   header: {
     display: "flex",
@@ -139,15 +138,18 @@ const styles = {
     width: "100%",
     minWidth: "0",
     borderRadius: "12px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
     backgroundColor: "#fff",
+    margin: "0 auto",
+    display: "flex",
+    justifyContent: "center"
   },
   table: {
     width: "100%",
     borderCollapse: "collapse",
     borderSpacing: "0",
     border: "1px solid #eaeaea",
-    tableLayout: "auto",
+    tableLayout: "fixed",
     borderRadius: "12px",
     overflow: "hidden",
   },

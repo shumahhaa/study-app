@@ -8,7 +8,31 @@ import StatsPanel from './StatsPanel';
 import EmptyState from './EmptyState';
 import StudyHistoryTable from './StudyHistoryTable';
 
+// 画面サイズを取得するカスタムフック
+const useWindowSize = () => {
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return windowSize;
+};
+
 const StudyHistory = ({ studyHistory, deleteStudySession, formatTime }) => {
+  const { width } = useWindowSize();
+  const isMobile = width <= 768;
   const [sortField, setSortField] = useState("startTime");
   const [sortDirection, setSortDirection] = useState("desc");
   const [filter, setFilter] = useState("");
@@ -148,13 +172,24 @@ const StudyHistory = ({ studyHistory, deleteStudySession, formatTime }) => {
     <div style={styles.container}>
       <GlobalStyles />
       
-      <div style={styles.header}>
-        <h2 style={styles.title}>学習履歴</h2>
+      <div style={{
+        ...styles.header,
+        flexDirection: isMobile ? "column" : "row",
+        justifyContent: isMobile ? "center" : "space-between",
+        alignItems: "center"
+      }}>
+        <h2 style={{
+          ...styles.title,
+          marginBottom: isMobile ? "15px" : 0,
+          textAlign: isMobile ? "center" : "left",
+          width: isMobile ? "100%" : "auto"
+        }}>学習履歴</h2>
         <SearchBar 
           filter={filter}
           setFilter={setFilter}
           advancedSearchOpen={advancedSearchOpen}
           setAdvancedSearchOpen={setAdvancedSearchOpen}
+          isMobile={isMobile}
         />
       </div>
 
@@ -163,6 +198,7 @@ const StudyHistory = ({ studyHistory, deleteStudySession, formatTime }) => {
           advancedFilters={advancedFilters}
           handleAdvancedFilterChange={handleAdvancedFilterChange}
           resetFilters={resetFilters}
+          isMobile={isMobile}
         />
       )}
 
@@ -184,6 +220,7 @@ const StudyHistory = ({ studyHistory, deleteStudySession, formatTime }) => {
           sortField={sortField}
           sortDirection={sortDirection}
           deleteStudySession={deleteStudySession}
+          isMobile={isMobile}
         />
       )}
     </div>

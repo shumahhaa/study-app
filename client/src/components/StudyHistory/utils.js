@@ -39,6 +39,43 @@ export const formatDateTime = (timestamp) => {
 };
 
 /**
+ * 日時の短いフォーマット（スマホ表示用）
+ */
+export const formatDateTimeShort = (timestamp) => {
+  if (!timestamp) return "不明";
+  
+  let date;
+  
+  // タイムスタンプの型に応じた変換処理
+  if (timestamp instanceof Date) {
+    date = timestamp;
+  } else if (typeof timestamp === 'object' && timestamp.toDate) {
+    // Firestoreのタイムスタンプオブジェクトの場合
+    date = timestamp.toDate();
+  } else if (timestamp._seconds !== undefined) {
+    // バックエンドから返されたJSONオブジェクトの場合
+    date = new Date(timestamp._seconds * 1000);
+  } else {
+    // ISO文字列または数値タイムスタンプの場合
+    date = new Date(timestamp);
+  }
+  
+  // 年月日
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  
+  // 時刻
+  const hour = date.getHours().toString().padStart(2, '0');
+  const minute = date.getMinutes().toString().padStart(2, '0');
+  
+  return {
+    date: `${year}/${month}/${day}`,
+    time: `${hour}:${minute}`
+  };
+};
+
+/**
  * 学習時間のフォーマット
  */
 export const formatDuration = (seconds) => {
