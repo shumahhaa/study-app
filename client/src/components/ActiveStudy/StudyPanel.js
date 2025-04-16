@@ -24,12 +24,15 @@ const StudyPanel = ({
           motivation={recordedMotivation} 
         />
         
-        <Timer studyDuration={studyDuration} isMobile={isMobile} />
+        <Timer 
+          studyDuration={studyDuration} 
+          isMobile={isMobile} 
+          isPaused={isPaused}
+          pauseStudy={pauseStudy}
+          resumeStudy={resumeStudy}
+        />
         
         <ControlButtons 
-          isPaused={isPaused}
-          onPause={pauseStudy}
-          onResume={resumeStudy}
           onStop={onStopStudy}
           onAbandon={onAbandonStudy}
         />

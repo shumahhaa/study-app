@@ -66,7 +66,10 @@ export const StudyProvider = ({ children }) => {
   
     let totalPausedTime = pausedTime;
     if (isPaused) {
-      totalPausedTime += Date.now() - pauseStartTime;
+      const lastPauseDuration = Date.now() - pauseStartTime;
+      totalPausedTime += lastPauseDuration;
+      // 最後の一時停止時間もpausedTimeステートに反映する
+      setPausedTime(totalPausedTime);
     }
 
     const endTime = Date.now();

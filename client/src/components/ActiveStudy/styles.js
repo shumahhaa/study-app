@@ -145,6 +145,21 @@ const styles = {
     letterSpacing: "1px",
     marginBottom: "6px",
   },
+  timerPaused: {
+    background: "rgba(255, 165, 0, 0.1)",
+    boxShadow: "0 8px 25px rgba(255, 165, 0, 0.15), inset 0 2px 10px rgba(255, 255, 255, 0.8)",
+    border: "2px solid rgba(255, 165, 0, 0.3)",
+  },
+  pausedIndicator: {
+    fontSize: "14px",
+    fontWeight: "600",
+    color: "#FF8C00",
+    marginTop: "5px",
+    padding: "3px 8px",
+    borderRadius: "4px",
+    background: "rgba(255, 165, 0, 0.1)",
+    display: "inline-block",
+  },
   timerValueMobile: {
     fontSize: "30px",
     fontWeight: "700",
