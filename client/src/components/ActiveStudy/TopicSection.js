@@ -1,8 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './styles';
 
 // 学習トピックを表示するコンポーネント
 const TopicSection = ({ topic, motivation }) => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  // 画面サイズの変更を監視
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   return (
     <div style={styles.topicSection}>
       <div style={{
@@ -16,8 +30,9 @@ const TopicSection = ({ topic, motivation }) => {
       }}></div>
       <h1 style={{
         ...styles.topicTitle,
-        paddingLeft: "8px",
+        paddingLeft: "10px",
         textAlign: "left",
+        margin: isMobile ? "0" : undefined,
       }}>{topic}</h1>
     </div>
   );

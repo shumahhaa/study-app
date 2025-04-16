@@ -35,6 +35,7 @@ const StudyPanel = ({
         <ControlButtons 
           onStop={onStopStudy}
           onAbandon={onAbandonStudy}
+          isMobile={isMobile}
         />
       </div>
     </div>

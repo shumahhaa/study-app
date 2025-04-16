@@ -855,6 +855,21 @@ code {
   box-shadow: 0 2px 5px rgba(244, 67, 54, 0.1);
 }
 
+@media (max-width: 768px) {
+  .abandon-button {
+    margin-top: 0;
+    padding: 8px 0;
+    min-height: 40px;
+    font-size: 14px;
+  }
+  
+  .stop-button {
+    padding: 8px 0;
+    min-height: 40px;
+    font-size: 14px;
+  }
+}
+
 /* キャンセルボタン */
 .cancel-button {
   padding: 12px 24px;
