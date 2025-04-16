@@ -13,17 +13,18 @@ const StudyPanel = ({
   pauseStudy,
   resumeStudy,
   onStopStudy,
-  onAbandonStudy
+  onAbandonStudy,
+  isMobile
 }) => {
   return (
-    <div style={styles.leftPanel}>
+    <div style={isMobile ? styles.leftPanelMobile : styles.leftPanel}>
       <div style={styles.studyInfoCard}>
         <TopicSection 
           topic={recordedStudyTopic} 
           motivation={recordedMotivation} 
         />
         
-        <Timer studyDuration={studyDuration} />
+        <Timer studyDuration={studyDuration} isMobile={isMobile} />
         
         <ControlButtons 
           isPaused={isPaused}

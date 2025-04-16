@@ -4,17 +4,17 @@ import AIChat from '../../components/AIChat';
 import MaintenanceMessage from '../../components/MaintenanceMessage';
 
 // 右側のAIチャットパネル
-const ChatPanel = ({ recordedStudyTopic, isMaintenanceMode }) => {
+const ChatPanel = ({ recordedStudyTopic, isMaintenanceMode, isMobile }) => {
   if (!recordedStudyTopic) {
     return (
-      <div style={styles.rightPanel}>
+      <div style={isMobile ? styles.rightPanelMobile : styles.rightPanel}>
         <div style={styles.loadingChat}>学習トピックが設定されていません</div>
       </div>
     );
   }
 
   return (
-    <div style={styles.rightPanel}>
+    <div style={isMobile ? styles.rightPanelMobile : styles.rightPanel}>
       {isMaintenanceMode ? (
         <MaintenanceMessage 
           customStyles={{

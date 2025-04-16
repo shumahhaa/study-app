@@ -5,6 +5,13 @@ const styles = {
     paddingLeft: "60px",
     paddingRight: "60px",
   },
+  containerMobile: {
+    display: "flex",
+    flexDirection: "column",
+    padding: "15px",
+    paddingLeft: "15px",
+    paddingRight: "15px",
+  },
   // 左側パネル（学習管理）
   leftPanel: {
     width: "280px",
@@ -14,6 +21,17 @@ const styles = {
     height: "auto",
     maxHeight: "calc(100vh - 180px)",
     overflowY: "hidden",
+    backgroundColor: "#fff",
+    borderRadius: "20px",
+    boxShadow: "0 5px 15px rgba(0,0,0,0.03)",
+    border: "1px solid rgba(0, 0, 0, 0.04)",
+  },
+  leftPanelMobile: {
+    position: "static",
+    width: "100%",
+    maxHeight: "none",
+    marginBottom: "20px",
+    left: "auto",
     backgroundColor: "#fff",
     borderRadius: "20px",
     boxShadow: "0 5px 15px rgba(0,0,0,0.03)",
@@ -83,6 +101,15 @@ const styles = {
     justifyContent: "center",
     flexShrink: 0,
   },
+  timerContainerMobile: {
+    textAlign: "center",
+    marginTop: "10px",
+    marginBottom: "20px",
+    padding: "0",
+    display: "flex",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
   timerCircle: {
     width: "180px",
     height: "180px",
@@ -97,6 +124,17 @@ const styles = {
     position: "relative",
     transition: "all 0.3s ease",
   },
+  timerDigital: {
+    padding: "15px 25px",
+    borderRadius: "10px",
+    background: "#f8fcff",
+    border: "1px solid rgba(33, 150, 243, 0.15)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    boxShadow: "0 5px 15px rgba(0, 0, 0, 0.05)",
+    transition: "all 0.3s ease",
+  },
   timerValue: {
     fontSize: "28px",
     fontWeight: "600",
@@ -106,6 +144,15 @@ const styles = {
     fontFamily: "'Roboto Mono', monospace",
     letterSpacing: "1px",
     marginBottom: "6px",
+  },
+  timerValueMobile: {
+    fontSize: "30px",
+    fontWeight: "700",
+    background: "linear-gradient(135deg, #2196F3 10%, #4CAF50 90%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    fontFamily: "'Roboto Mono', monospace",
+    letterSpacing: "1px",
   },
   controlsContainer: {
     display: "flex",
@@ -122,6 +169,12 @@ const styles = {
     marginLeft: "300px",
     minHeight: "calc(100vh - 180px)",
     marginTop: "-65px",
+  },
+  rightPanelMobile: {
+    flex: 1,
+    marginLeft: "0",
+    minHeight: "auto",
+    marginTop: "0",
   },
   
   // モーダルダイアログ

@@ -22,10 +22,24 @@ const ActiveStudyPage = ({
   const navigate = useNavigate();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationType, setConfirmationType] = useState("stop");
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
   // 環境変数からメンテナンスモードの設定を取得
   const isMaintenanceMode = process.env.REACT_APP_AI_CHAT_MAINTENANCE_MODE === "true";
 
+  // ウィンドウサイズの変更を監視
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  
   // ページロード時の処理
   useEffect(() => {
     // 学習中でない場合、ホームページに戻る
@@ -105,7 +119,7 @@ const ActiveStudyPage = ({
 
   return (
     <Layout isStudying={isStudying}>
-      <div style={styles.container}>
+      <div style={isMobile ? styles.containerMobile : styles.container}>
         {/* 左側：学習管理パネル */}
         <StudyPanel
           isPaused={isPaused}
@@ -116,12 +130,14 @@ const ActiveStudyPage = ({
           resumeStudy={resumeStudy}
           onStopStudy={handleStopStudy}
           onAbandonStudy={handleAbandonStudy}
+          isMobile={isMobile}
         />
         
         {/* 右側：AIチャットまたはメンテナンス画面 */}
         <ChatPanel 
           recordedStudyTopic={recordedStudyTopic}
           isMaintenanceMode={isMaintenanceMode}
+          isMobile={isMobile}
         />
         
         {/* 確認ダイアログ */}
