@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import MarkdownContent from './MarkdownContent';
 import { styles } from './styles';
 
@@ -6,6 +6,27 @@ import { styles } from './styles';
 const ChatMessage = ({ message }) => {
   const isUser = message.role === "user";
   const isError = message.isError || false;
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  
+  // 画面サイズの変更を監視
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  // バブルのスタイルを定義
+  const bubbleStyle = {
+    ...styles.bubble,
+    ...(isUser ? { backgroundColor: "rgba(76, 175, 80, 0.1)" } : {}), // ユーザーメッセージの背景色を薄緑に
+    maxWidth: isMobile ? "calc(100% - 16px)" : "calc(100% - 60px)", // モバイル時にバブルを広げる
+    margin: isMobile ? "0 4px" : "0 12px", // モバイル時にマージンを小さく
+  };
 
   return (
     <div
@@ -15,14 +36,17 @@ const ChatMessage = ({ message }) => {
         ...(isError ? styles.errorMessage : {})
       }}
     >
-      <div style={styles.avatarContainer}>
-        <div
-          style={isUser ? styles.userAvatar : styles.avatar}
-        >
-          {isUser ? "U" : "AI"}
+      {/* アイコンを非表示にする */}
+      {!isMobile && (
+        <div style={styles.avatarContainer}>
+          <div
+            style={isUser ? styles.userAvatar : styles.avatar}
+          >
+            {isUser ? "U" : "AI"}
+          </div>
         </div>
-      </div>
-      <div style={styles.bubble}>
+      )}
+      <div style={bubbleStyle}>
         {isUser ? (
           <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{message.content}</p>
         ) : (

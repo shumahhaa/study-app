@@ -1,5 +1,30 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { styles } from './styles';
+
+// ウィンドウサイズを監視するカスタムフック
+const useWindowSize = () => {
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    // リサイズイベントのリスナーを追加
+    window.addEventListener('resize', handleResize);
+    
+    // クリーンアップ関数
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return windowSize;
+};
 
 const ChatInput = ({ 
   input, 
@@ -13,6 +38,7 @@ const ChatInput = ({
   dailyLimitExceeded 
 }) => {
   const textAreaRef = useRef(null);
+  const { width } = useWindowSize(); // ウィンドウサイズを取得
   
   // テキストエリアの高さを自動調整する関数
   const adjustTextAreaHeight = () => {
@@ -31,8 +57,21 @@ const ChatInput = ({
     adjustTextAreaHeight();
   }, [input]);
   
+  // ウィンドウサイズに応じてスタイルを調整
+  const containerStyle = {
+    ...styles.inputContainer,
+    padding: width <= 768 ? "12px 12px" : "16px 70px", // スマホサイズでは左右のパディングを小さく
+  };
+  
+  // テキストエリアのスタイルも調整
+  const textAreaStyle = {
+    ...styles.textArea,
+    // スマホサイズでは横幅を最大化
+    width: width <= 768 ? "calc(100% - 50px)" : "auto", // 送信ボタンのスペースを確保
+  };
+  
   return (
-    <div style={styles.inputContainer}>
+    <div style={containerStyle}>
       <form onSubmit={sendMessage} style={styles.inputForm}>
         {/* 使用回数カウンターを表示 */}
         <div style={styles.usageCounter}>
@@ -45,7 +84,7 @@ const ChatInput = ({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="質問を入力してください..."
-          style={styles.textArea}
+          style={textAreaStyle}
           disabled={isLoading || usageCount >= MAX_USAGE_COUNT || dailyLimitExceeded}
           rows="1"
           spellCheck="false"
