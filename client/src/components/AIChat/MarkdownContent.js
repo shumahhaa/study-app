@@ -32,11 +32,11 @@ const MarkdownContent = ({ content }) => {
             </code>
           );
         },
-        // 数式用のカスタムレンダリング
+        // 数式用のカスタムレンダリング - <p>タグ内に<div>が入らないように修正
         math: ({ value }) => (
-          <div className="katex-display-wrapper">
-            <div className="katex-display">{value}</div>
-          </div>
+          <span className="katex-display-wrapper">
+            <span className="katex-display">{value}</span>
+          </span>
         ),
         inlineMath: ({ value }) => (
           <span className="katex-inline">{value}</span>
