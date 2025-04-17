@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from './styles';
 import Logo from './Logo';
 import Navigation from './Navigation';
@@ -7,6 +7,8 @@ const Header = ({ currentUser, pathname, logoLinkPath, setScrolled }) => {
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const menuRef = useRef(null);
+  const hamburgerRef = useRef(null);
   
   // スクロール検出のためのイベントリスナー
   useEffect(() => {
@@ -36,6 +38,28 @@ const Header = ({ currentUser, pathname, logoLinkPath, setScrolled }) => {
       window.removeEventListener('resize', handleResize);
     };
   }, [headerScrolled, setScrolled]);
+
+  // メニュー外クリックを検出するイベントリスナー
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuOpen && 
+          menuRef.current && 
+          !menuRef.current.contains(event.target) && 
+          hamburgerRef.current && 
+          !hamburgerRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    };
+
+    // タッチイベントとマウスクリックイベントを監視
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [menuOpen]);
 
   // スクロール状態に基づいたヘッダーのスタイル
   const headerStyle = {
@@ -133,6 +157,7 @@ const Header = ({ currentUser, pathname, logoLinkPath, setScrolled }) => {
         )}
         
         <div 
+          ref={hamburgerRef}
           style={hamburgerStyle} 
           onClick={() => setMenuOpen(!menuOpen)}
         >
@@ -141,7 +166,7 @@ const Header = ({ currentUser, pathname, logoLinkPath, setScrolled }) => {
           <div style={line3Style}></div>
         </div>
         
-        <div style={mobileNavStyle}>
+        <div ref={menuRef} style={mobileNavStyle}>
           <Navigation 
             pathname={pathname} 
             currentUser={currentUser} 
