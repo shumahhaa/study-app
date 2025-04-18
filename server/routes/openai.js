@@ -8,44 +8,60 @@ const admin = require('firebase-admin');
 // 1日のチャット使用上限
 const DAILY_CHAT_LIMIT = 100;
 
+// ユーザーのチャット使用状況をチェックし、必要に応じてリセットする共通関数
+const checkAndResetChatCount = async (userId) => {
+  // ユーザー参照を取得
+  const userRef = db.collection('users').doc(userId);
+  const userDoc = await userRef.get();
+  
+  if (!userDoc.exists) {
+    throw new Error('ユーザーが見つかりません');
+  }
+  
+  // ユーザードキュメントからデータを取得
+  const userData = userDoc.data();
+  const chatCount = userData.chatCount || 0;
+  
+  // 現在の日付（日本時間）
+  const now = admin.firestore.Timestamp.now();
+  const today = new Date(now.toDate());
+  today.setHours(0, 0, 0, 0);
+  
+  // 最終リセット日時を取得
+  const lastResetDate = userData.lastChatCountReset 
+    ? new Date(userData.lastChatCountReset.toDate()) 
+    : new Date(0);
+  lastResetDate.setHours(0, 0, 0, 0);
+  
+  // 日付が変わっていれば、カウンターをリセット
+  let currentCount = chatCount;
+  if (today.getTime() > lastResetDate.getTime()) {
+    // データベースを更新
+    await userRef.update({
+      chatCount: 0,
+      lastChatCountReset: admin.firestore.Timestamp.fromDate(today)
+    });
+    currentCount = 0;
+  }
+  
+  return {
+    userRef,
+    currentCount,
+    limit: DAILY_CHAT_LIMIT
+  };
+};
+
 // チャット応答を生成するエンドポイント
 router.post('/chat', verifyToken, async (req, res) => {
   try {
     const { messages, studyTopic, model = 'gpt-3.5-turbo' } = req.body;
     const userId = req.user.uid; // 認証されたユーザーID
     
-    // ユーザーのチャット使用回数を取得・更新
-    const userRef = db.collection('users').doc(userId);
-    const userDoc = await userRef.get();
-    
-    if (!userDoc.exists) {
-      return res.status(404).json({ error: 'ユーザーが見つかりません' });
-    }
-    
-    // ユーザードキュメントからchatCountを取得
-    const userData = userDoc.data();
-    // chatCountフィールドが存在しない場合は0とする
-    const currentChatCount = userData.chatCount || 0;
-    
-    // 現在の日付（日本時間）
-    const now = admin.firestore.Timestamp.now();
-    const today = new Date(now.toDate());
-    today.setHours(0, 0, 0, 0);
-    
-    // 最終リセット日時を取得（存在しない場合は過去の日付）
-    const lastResetDate = userData.lastChatCountReset 
-      ? new Date(userData.lastChatCountReset.toDate()) 
-      : new Date(0);
-    lastResetDate.setHours(0, 0, 0, 0);
-    
-    // 日付が変わっていれば、カウンターをリセット
-    let chatCount = currentChatCount;
-    if (today.getTime() > lastResetDate.getTime()) {
-      chatCount = 0;
-    }
+    // ユーザーのチャット使用回数を取得・更新（共通関数を使用）
+    const { userRef, currentCount, limit } = await checkAndResetChatCount(userId);
     
     // 1日の上限をチェック
-    if (chatCount >= DAILY_CHAT_LIMIT) {
+    if (currentCount >= DAILY_CHAT_LIMIT) {
       return res.status(429).json({ 
         error: `1日のAIチャット使用回数上限（${DAILY_CHAT_LIMIT}回）に達しました。明日になるとリセットされます。`
       });
@@ -84,8 +100,7 @@ router.post('/chat', verifyToken, async (req, res) => {
 
     // チャットカウントを更新
     await userRef.update({
-      chatCount: chatCount + 1,
-      lastChatCountReset: today
+      chatCount: currentCount + 1
     });
     
     // 応答を返す
@@ -93,7 +108,7 @@ router.post('/chat', verifyToken, async (req, res) => {
       message: completion.choices[0].message.content,
       model: model,
       dailyUsage: {
-        current: chatCount + 1,
+        current: currentCount + 1,
         limit: DAILY_CHAT_LIMIT
       }
     });
@@ -116,42 +131,14 @@ router.post('/chat', verifyToken, async (req, res) => {
 router.get('/chat-usage', verifyToken, async (req, res) => {
   try {
     const userId = req.user.uid;
-    const userRef = db.collection('users').doc(userId);
-    const userDoc = await userRef.get();
     
-    if (!userDoc.exists) {
-      return res.status(404).json({ error: 'ユーザーが見つかりません' });
-    }
-    
-    const userData = userDoc.data();
-    const chatCount = userData.chatCount || 0;
-    
-    // 現在の日付（日本時間）
-    const now = admin.firestore.Timestamp.now();
-    const today = new Date(now.toDate());
-    today.setHours(0, 0, 0, 0);
-    
-    // 最終リセット日時を取得
-    const lastResetDate = userData.lastChatCountReset 
-      ? new Date(userData.lastChatCountReset.toDate()) 
-      : new Date(0);
-    lastResetDate.setHours(0, 0, 0, 0);
-    
-    // 日付が変わっていれば、カウンターをリセット
-    let currentCount = chatCount;
-    if (today.getTime() > lastResetDate.getTime()) {
-      currentCount = 0;
-      // 実際にデータベースを更新
-      await userRef.update({
-        chatCount: 0,
-        lastChatCountReset: today
-      });
-    }
+    // 共通関数を使用してチャット使用状況を取得・更新
+    const { currentCount, limit } = await checkAndResetChatCount(userId);
     
     res.json({
       dailyUsage: {
         current: currentCount,
-        limit: DAILY_CHAT_LIMIT
+        limit: limit
       }
     });
   } catch (error) {

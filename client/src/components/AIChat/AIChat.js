@@ -37,8 +37,10 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
   const fetchDailyUsage = useCallback(async () => {
     try {
       const response = await fetchChatUsage();
-      setDailyUsage(response.dailyUsage);
-      setDailyLimitExceeded(response.dailyUsage.current >= response.dailyUsage.limit);
+      if (response && response.dailyUsage) {
+        setDailyUsage(response.dailyUsage);
+        setDailyLimitExceeded(response.dailyUsage.current >= response.dailyUsage.limit);
+      }
     } catch (error) {
       console.error('1日のチャット使用回数取得エラー:', error);
     }
@@ -46,8 +48,10 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
 
   // コンポーネントのマウント時にチャット使用回数を取得
   useEffect(() => {
-    fetchDailyUsage();
-  }, [fetchDailyUsage]);
+    if (studyTopic) {
+      fetchDailyUsage();
+    }
+  }, [fetchDailyUsage, studyTopic]);
 
   // 初期ウェルカムメッセージを設定する関数
   const setInitialWelcomeMessage = useCallback(() => {
@@ -113,7 +117,7 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
     e.preventDefault();
     if (input.trim() === "") return;
     
-    // 使用回数が上限に達している場合は送信しない
+    // この学習セッションでの使用回数が上限に達している場合は送信しない
     if (usageCount >= MAX_USAGE_COUNT) {
       const limitMessage = {
         role: "assistant",
@@ -124,15 +128,21 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
       return;
     }
 
-    // 1日の使用制限チェック
-    if (dailyLimitExceeded) {
-      const limitMessage = {
-        role: "assistant",
-        content: `申し訳ありませんが、1日のAIチャット使用回数上限（${dailyUsage.limit}回）に達しました。明日になるとリセットされます。`,
-        isError: true,
-      };
-      setMessages((prevMessages) => [...prevMessages, limitMessage]);
-      return;
+    // 1日の使用制限チェック - 最新の状態を取得してから判断
+    try {
+      await fetchDailyUsage();
+      
+      if (dailyLimitExceeded) {
+        const limitMessage = {
+          role: "assistant",
+          content: `申し訳ありませんが、1日のAIチャット使用回数上限（${dailyUsage.limit}回）に達しました。明日になるとリセットされます。`,
+          isError: true,
+        };
+        setMessages((prevMessages) => [...prevMessages, limitMessage]);
+        return;
+      }
+    } catch (error) {
+      console.error("使用回数取得エラー:", error);
     }
 
     const userMessage = {
@@ -166,6 +176,7 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
       };
 
       setMessages((prevMessages) => [...prevMessages, botResponse]);
+      
       // 使用回数をインクリメント
       setUsageCount(prevCount => prevCount + 1);
       
@@ -173,6 +184,9 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
       if (response.dailyUsage) {
         setDailyUsage(response.dailyUsage);
         setDailyLimitExceeded(response.dailyUsage.current >= response.dailyUsage.limit);
+      } else {
+        // レスポンスに含まれていない場合は最新の状態を取得
+        fetchDailyUsage();
       }
     } catch (error) {
       console.error("API呼び出しエラー:", error);

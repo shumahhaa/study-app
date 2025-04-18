@@ -35,13 +35,22 @@ const getAuthHeaders = async () => {
 
 // OpenAI APIのチャット機能を呼び出す関数
 export const fetchChatResponse = async (messages, studyTopic, model = 'gpt-3.5-turbo') => {
+  let response;
   try {
     const headers = await getAuthHeaders();
-    const response = await fetch(`${API_BASE_URL}/openai/chat`, {
+    
+    // リクエストのタイムアウト処理
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒タイムアウト
+    
+    response = await fetch(`${API_BASE_URL}/openai/chat`, {
       method: 'POST',
       headers,
       body: JSON.stringify({ messages, studyTopic, model }),
+      signal: controller.signal
     });
+    
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -50,17 +59,49 @@ export const fetchChatResponse = async (messages, studyTopic, model = 'gpt-3.5-t
 
     return await response.json();
   } catch (error) {
-    handleApiError(error);
+    console.error('チャットAPI呼び出しエラー:', error);
+    
+    // AbortControllerによるタイムアウトの場合
+    if (error.name === 'AbortError') {
+      throw new Error('リクエストがタイムアウトしました。ネットワーク接続を確認してください。');
+    }
+    
+    // ネットワークエラーの場合
+    if (!navigator.onLine) {
+      throw new Error('インターネット接続がありません。接続状態を確認してください。');
+    }
+    
+    // レスポンスはあるがJSONとして解析できない場合
+    if (response && !response.ok) {
+      try {
+        const text = await response.text();
+        throw new Error(`サーバーエラー (${response.status}): ${text}`);
+      } catch (textError) {
+        throw new Error(`サーバーエラー (${response.status})`);
+      }
+    }
+    
+    // その他のエラー
+    throw error.message ? error : new Error('チャットリクエスト中に予期せぬエラーが発生しました');
   }
 };
 
 // チャット使用回数を取得する関数
 export const fetchChatUsage = async () => {
+  let response;
   try {
     const headers = await getAuthHeaders();
-    const response = await fetch(`${API_BASE_URL}/openai/chat-usage`, {
-      headers
+    
+    // リクエストのタイムアウト処理
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒タイムアウト
+    
+    response = await fetch(`${API_BASE_URL}/openai/chat-usage`, {
+      headers,
+      signal: controller.signal
     });
+    
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -69,7 +110,30 @@ export const fetchChatUsage = async () => {
 
     return await response.json();
   } catch (error) {
-    handleApiError(error);
+    console.error('チャット使用回数取得エラー:', error);
+    
+    // AbortControllerによるタイムアウトの場合
+    if (error.name === 'AbortError') {
+      throw new Error('リクエストがタイムアウトしました。ネットワーク接続を確認してください。');
+    }
+    
+    // ネットワークエラーの場合
+    if (!navigator.onLine) {
+      throw new Error('インターネット接続がありません。接続状態を確認してください。');
+    }
+    
+    // レスポンスはあるがJSONとして解析できない場合
+    if (response && !response.ok) {
+      try {
+        const text = await response.text();
+        throw new Error(`サーバーエラー (${response.status}): ${text}`);
+      } catch (textError) {
+        throw new Error(`サーバーエラー (${response.status})`);
+      }
+    }
+    
+    // その他のエラー
+    return { dailyUsage: { current: 0, limit: 100 } };
   }
 };
 
