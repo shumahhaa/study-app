@@ -54,8 +54,11 @@ const checkAndResetChatCount = async (userId) => {
 // チャット応答を生成するエンドポイント
 router.post('/chat', verifyToken, async (req, res) => {
   try {
-    const { messages, studyTopic, model = 'gpt-3.5-turbo' } = req.body;
+    const { messages, studyTopic, model = 'gpt-3.5-turbo', sessionUsageCount = 0 } = req.body;
     const userId = req.user.uid; // 認証されたユーザーID
+    
+    // セッション毎の使用制限（クライアントから受け取った使用回数をログに記録）
+    console.log(`User ${userId} - Study Topic: ${studyTopic} - Session Usage: ${sessionUsageCount}`);
     
     // ユーザーのチャット使用回数を取得・更新（共通関数を使用）
     const { userRef, currentCount, limit } = await checkAndResetChatCount(userId);

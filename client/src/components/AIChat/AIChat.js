@@ -4,9 +4,6 @@ import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
 import { styles, injectGlobalStyles } from "./styles";
 
-// 開発環境か本番環境かを確認
-const isDevelopment = process.env.NODE_ENV === 'development';
-
 const AIChat = ({ studyTopic, customStyles = {} }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -16,8 +13,6 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
   // 1日のチャット使用回数を追跡するstate
   const [dailyUsage, setDailyUsage] = useState({ current: 0, limit: 100 });
   const [dailyLimitExceeded, setDailyLimitExceeded] = useState(false);
-  // API接続エラーを追跡
-  const [apiError, setApiError] = useState(false);
   const messagesEndRef = useRef(null);
   const chatStorageKey = `aiChat_${studyTopic}`; // 学習トピックごとに固有のストレージキー
   const usageCountKey = `aiChatUsage_${studyTopic}`; // 使用回数保存用のキー
@@ -26,14 +21,16 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
   const selectedModel = process.env.REACT_APP_SELECTED_MODEL || "gpt-3.5-turbo";
   
   // 最大使用回数の制限（環境変数またはデフォルト値を使用）
-  const MAX_USAGE_COUNT = parseInt(process.env.REACT_APP_MAX_USAGE_COUNT || "20", 10);
-
-  // デバッグ用ロギング（開発環境のみ）
-  const logDebug = (message, data) => {
-    if (isDevelopment) {
-      console.log(`[AIChat] ${message}`, data);
-    }
+  // 環境変数の値が無効な場合にデフォルト値を使用するように改善
+  const getMaxUsageCount = () => {
+    const envValue = process.env.REACT_APP_MAX_USAGE_COUNT;
+    if (!envValue) return 20; // 環境変数が未設定の場合
+    
+    const parsed = parseInt(envValue, 10);
+    return isNaN(parsed) ? 20 : parsed; // NaNの場合はデフォルト値を返す
   };
+  
+  const MAX_USAGE_COUNT = getMaxUsageCount();
 
   // グローバルスタイルの適用
   useEffect(() => {
@@ -47,32 +44,21 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
 
   // 1日の使用回数を取得
   const fetchDailyUsage = useCallback(async () => {
-    if (!studyTopic) return;
-    
     try {
-      setApiError(false);
       const response = await fetchChatUsage();
-      
       if (response && response.dailyUsage) {
-        logDebug('Daily usage fetched:', response.dailyUsage);
         setDailyUsage(response.dailyUsage);
         setDailyLimitExceeded(response.dailyUsage.current >= response.dailyUsage.limit);
       }
     } catch (error) {
       console.error('1日のチャット使用回数取得エラー:', error);
-      setApiError(true);
     }
-  }, [studyTopic]);
+  }, []);
 
   // コンポーネントのマウント時にチャット使用回数を取得
   useEffect(() => {
     if (studyTopic) {
       fetchDailyUsage();
-      
-      // 定期的に使用回数を更新（5分ごと）
-      const intervalId = setInterval(fetchDailyUsage, 300000);
-      
-      return () => clearInterval(intervalId);
     }
   }, [fetchDailyUsage, studyTopic]);
 
@@ -85,11 +71,7 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
     setMessages([welcomeMessage]);
     
     // セッションストレージに新しいウェルカムメッセージを保存
-    try {
-      sessionStorage.setItem(chatStorageKey, JSON.stringify([welcomeMessage]));
-    } catch (error) {
-      console.error("ウェルカムメッセージ保存エラー:", error);
-    }
+    sessionStorage.setItem(chatStorageKey, JSON.stringify([welcomeMessage]));
   }, [studyTopic, chatStorageKey]);
 
   // セッションストレージからチャット履歴と使用回数を読み込む
@@ -97,38 +79,30 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
     // studyTopicが空の場合は何もしない
     if (!studyTopic) return;
     
-    try {
-      const savedMessages = sessionStorage.getItem(chatStorageKey);
-      const savedUsageCount = sessionStorage.getItem(usageCountKey);
-      
-      if (savedMessages) {
-        try {
-          const parsedMessages = JSON.parse(savedMessages);
-          setMessages(parsedMessages);
-          logDebug('Loaded messages from storage', parsedMessages.length);
-        } catch (error) {
-          console.error("チャット履歴の読み込みエラー:", error);
-          setInitialWelcomeMessage();
-        }
-      } else {
+    const savedMessages = sessionStorage.getItem(chatStorageKey);
+    const savedUsageCount = sessionStorage.getItem(usageCountKey);
+    
+    if (savedMessages) {
+      try {
+        const parsedMessages = JSON.parse(savedMessages);
+        setMessages(parsedMessages);
+      } catch (error) {
+        console.error("チャット履歴の読み込みエラー:", error);
         setInitialWelcomeMessage();
       }
-      
-      if (savedUsageCount) {
-        try {
-          const parsedUsageCount = parseInt(savedUsageCount, 10);
-          setUsageCount(parsedUsageCount);
-          logDebug('Loaded usage count from storage', parsedUsageCount);
-        } catch (error) {
-          console.error("使用回数の読み込みエラー:", error);
-          setUsageCount(0);
-        }
-      } else {
+    } else {
+      setInitialWelcomeMessage();
+    }
+    
+    if (savedUsageCount) {
+      try {
+        const parsedUsageCount = parseInt(savedUsageCount, 10);
+        setUsageCount(parsedUsageCount);
+      } catch (error) {
+        console.error("使用回数の読み込みエラー:", error);
         setUsageCount(0);
       }
-    } catch (error) {
-      console.error("セッションストレージ読み込みエラー:", error);
-      setInitialWelcomeMessage();
+    } else {
       setUsageCount(0);
     }
   }, [studyTopic, chatStorageKey, usageCountKey, setInitialWelcomeMessage]);
@@ -136,22 +110,14 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
   // チャット履歴が更新されたらセッションストレージに保存
   useEffect(() => {
     if (messages.length > 0 && studyTopic) {
-      try {
-        sessionStorage.setItem(chatStorageKey, JSON.stringify(messages));
-      } catch (error) {
-        console.error("チャット履歴の保存エラー:", error);
-      }
+      sessionStorage.setItem(chatStorageKey, JSON.stringify(messages));
     }
   }, [messages, chatStorageKey, studyTopic]);
   
   // 使用回数が更新されたらセッションストレージに保存
   useEffect(() => {
     if (studyTopic) {
-      try {
-        sessionStorage.setItem(usageCountKey, usageCount.toString());
-      } catch (error) {
-        console.error("使用回数の保存エラー:", error);
-      }
+      sessionStorage.setItem(usageCountKey, usageCount.toString());
     }
   }, [usageCount, usageCountKey, studyTopic]);
 
@@ -159,21 +125,6 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
   const sendMessage = async (e) => {
     e.preventDefault();
     if (input.trim() === "") return;
-    
-    // APIエラーが発生している場合は再接続を試みる
-    if (apiError) {
-      try {
-        await fetchDailyUsage();
-      } catch (error) {
-        const errorMessage = {
-          role: "assistant",
-          content: "サーバーとの通信に問題があります。ネットワーク接続を確認してください。",
-          isError: true,
-        };
-        setMessages((prevMessages) => [...prevMessages, errorMessage]);
-        return;
-      }
-    }
     
     // この学習セッションでの使用回数が上限に達している場合は送信しない
     if (usageCount >= MAX_USAGE_COUNT) {
@@ -201,7 +152,6 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
       }
     } catch (error) {
       console.error("使用回数取得エラー:", error);
-      // 使用回数の取得に失敗した場合でも、ユーザー体験を優先してメッセージ送信を続行
     }
 
     const userMessage = {
@@ -226,17 +176,13 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
         content: input
       });
 
-      logDebug('Sending message to API', {
-        messageCount: conversationHistory.length,
-        studyTopic
-      });
-
-      // バックエンドAPIを呼び出し
-      const response = await fetchChatResponse(conversationHistory, studyTopic, selectedModel);
-
-      if (!response || !response.message) {
-        throw new Error("サーバーからの応答が不正です");
-      }
+      // バックエンドAPIを呼び出し（現在の使用回数も送信）
+      const response = await fetchChatResponse(
+        conversationHistory, 
+        studyTopic, 
+        selectedModel,
+        usageCount // 現在のセッション使用回数を送信
+      );
 
       const botResponse = {
         role: "assistant",
@@ -248,9 +194,6 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
       // 使用回数をインクリメント
       setUsageCount(prevCount => prevCount + 1);
       
-      // APIエラー状態をリセット
-      setApiError(false);
-      
       // 1日の使用回数を更新
       if (response.dailyUsage) {
         setDailyUsage(response.dailyUsage);
@@ -261,9 +204,6 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
       }
     } catch (error) {
       console.error("API呼び出しエラー:", error);
-      
-      // API接続エラーフラグを設定
-      setApiError(true);
       
       // レート制限エラーの場合
       if (error.message && error.message.includes('1日のAIチャット使用回数上限')) {
@@ -308,11 +248,6 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
       {/* AIアシスタントのヘッダーバーを追加 */}
       <div style={styles.header}>
         <h3 style={styles.title}>AIアシスタント</h3>
-        {apiError && (
-          <div style={styles.apiErrorIndicator}>
-            接続エラー
-          </div>
-        )}
       </div>
       
       <div style={styles.chatContent}>
@@ -343,7 +278,6 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
         dailyUsage={dailyUsage}
         MAX_USAGE_COUNT={MAX_USAGE_COUNT}
         dailyLimitExceeded={dailyLimitExceeded}
-        hasApiError={apiError}
       />
     </div>
   );

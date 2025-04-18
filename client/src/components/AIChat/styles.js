@@ -279,20 +279,6 @@ export const styles = {
     display: "flex",
     gap: "12px",
   },
-  // API接続エラー表示用のスタイルを追加
-  apiErrorIndicator: {
-    backgroundColor: "#ff4d4d",
-    color: "white",
-    padding: "2px 8px",
-    borderRadius: "4px",
-    fontSize: "12px",
-    fontWeight: "bold",
-  },
-  apiErrorMessage: {
-    color: "#ff4d4d",
-    fontWeight: "bold",
-    marginLeft: "10px",
-  }
 };
 
 // グローバルCSSスタイル（CSSインジェクション用）
