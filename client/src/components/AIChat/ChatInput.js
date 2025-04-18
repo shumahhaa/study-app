@@ -35,7 +35,8 @@ const ChatInput = ({
   usageCount, 
   dailyUsage,
   MAX_USAGE_COUNT,
-  dailyLimitExceeded 
+  dailyLimitExceeded,
+  hasApiError = false
 }) => {
   const textAreaRef = useRef(null);
   const { width } = useWindowSize(); // ウィンドウサイズを取得
@@ -70,21 +71,35 @@ const ChatInput = ({
     width: width <= 768 ? "calc(100% - 50px)" : "auto", // 送信ボタンのスペースを確保
   };
   
+  // 使用回数カウンターのスタイル（APIエラー時は警告色に）
+  const usageCounterStyle = {
+    ...styles.usageCounter,
+    ...(hasApiError ? { color: '#ff4d4d' } : {})
+  };
+  
   return (
     <div style={containerStyle}>
       <form onSubmit={sendMessage} style={styles.inputForm}>
         {/* 使用回数カウンターを表示 */}
-        <div style={styles.usageCounter}>
+        <div style={usageCounterStyle}>
           <div>１セッション：{usageCount}/{MAX_USAGE_COUNT}</div>
           <div>１日：{dailyUsage.current}/{dailyUsage.limit}</div>
+          {hasApiError && (
+            <div style={styles.apiErrorMessage}>
+              サーバー接続エラー
+            </div>
+          )}
         </div>
         <textarea
           ref={textAreaRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="質問を入力してください..."
-          style={textAreaStyle}
+          placeholder={hasApiError ? "接続に問題があります。もう一度試してください..." : "質問を入力してください..."}
+          style={{
+            ...textAreaStyle,
+            ...(hasApiError ? { borderColor: '#ff4d4d' } : {})
+          }}
           disabled={isLoading || usageCount >= MAX_USAGE_COUNT || dailyLimitExceeded}
           rows="1"
           spellCheck="false"
@@ -96,9 +111,11 @@ const ChatInput = ({
           className="send-button"
           style={{
             ...styles.sendButton,
-            ...(isLoading || input.trim() === "" || usageCount >= MAX_USAGE_COUNT || dailyLimitExceeded ? styles.disabledButton : {})
+            ...(isLoading || input.trim() === "" || usageCount >= MAX_USAGE_COUNT || dailyLimitExceeded ? styles.disabledButton : {}),
+            ...(hasApiError ? { color: '#ff4d4d' } : {})
           }}
           disabled={isLoading || input.trim() === "" || usageCount >= MAX_USAGE_COUNT || dailyLimitExceeded}
+          title={hasApiError ? "接続を再試行" : "送信"}
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/>

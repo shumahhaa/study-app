@@ -5,9 +5,22 @@ import { getAuth } from 'firebase/auth';
 // APIのベースURL（開発環境と本番環境で切り替え可能）
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 
+// 開発環境か本番環境かを確認
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+// エラーログ関数（本番環境ではコンソールログを制限）
+const logError = (message, error) => {
+  if (isDevelopment) {
+    console.error(message, error);
+  } else {
+    // 本番環境では最小限のエラー情報のみ出力
+    console.error(message);
+  }
+};
+
 // APIエラーを処理する関数
 const handleApiError = (error) => {
-  console.error('API Error:', error);
+  logError('API Error:', error);
   if (error.response) {
     // サーバーからのエラーレスポンス
     throw new Error(error.response.data.error || 'サーバーエラーが発生しました');
@@ -22,15 +35,20 @@ const handleApiError = (error) => {
 
 // 認証済みリクエストヘッダーを取得する関数
 const getAuthHeaders = async () => {
-  const token = await getAuthToken();
-  if (!token) {
-    throw new Error('認証が必要です。ログインしてください。');
+  try {
+    const token = await getAuthToken();
+    if (!token) {
+      throw new Error('認証が必要です。ログインしてください。');
+    }
+    
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+  } catch (error) {
+    logError('認証ヘッダー取得エラー:', error);
+    throw new Error('認証情報の取得に失敗しました。再ログインしてください。');
   }
-  
-  return {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
-  };
 };
 
 // OpenAI APIのチャット機能を呼び出す関数
@@ -39,9 +57,12 @@ export const fetchChatResponse = async (messages, studyTopic, model = 'gpt-3.5-t
   try {
     const headers = await getAuthHeaders();
     
+    // タイムアウト設定（本番環境では長めに設定）
+    const timeoutDuration = isDevelopment ? 30000 : 60000; // 開発:30秒, 本番:60秒
+    
     // リクエストのタイムアウト処理
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒タイムアウト
+    const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
     
     response = await fetch(`${API_BASE_URL}/openai/chat`, {
       method: 'POST',
@@ -53,13 +74,14 @@ export const fetchChatResponse = async (messages, studyTopic, model = 'gpt-3.5-t
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({ error: `サーバーエラー (${response.status})` }));
       throw new Error(errorData.error || 'チャットレスポンスの取得に失敗しました');
     }
 
-    return await response.json();
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error('チャットAPI呼び出しエラー:', error);
+    logError('チャットAPI呼び出しエラー:', error);
     
     // AbortControllerによるタイムアウトの場合
     if (error.name === 'AbortError') {
@@ -92,9 +114,12 @@ export const fetchChatUsage = async () => {
   try {
     const headers = await getAuthHeaders();
     
+    // タイムアウト設定（本番環境では長めに設定）
+    const timeoutDuration = isDevelopment ? 10000 : 20000; // 開発:10秒, 本番:20秒
+    
     // リクエストのタイムアウト処理
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒タイムアウト
+    const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
     
     response = await fetch(`${API_BASE_URL}/openai/chat-usage`, {
       headers,
@@ -104,13 +129,14 @@ export const fetchChatUsage = async () => {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({ error: `サーバーエラー (${response.status})` }));
       throw new Error(errorData.error || 'チャット使用回数の取得に失敗しました');
     }
 
-    return await response.json();
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error('チャット使用回数取得エラー:', error);
+    logError('チャット使用回数取得エラー:', error);
     
     // AbortControllerによるタイムアウトの場合
     if (error.name === 'AbortError') {
@@ -126,13 +152,13 @@ export const fetchChatUsage = async () => {
     if (response && !response.ok) {
       try {
         const text = await response.text();
-        throw new Error(`サーバーエラー (${response.status}): ${text}`);
+        logError(`サーバーエラー (${response.status}): ${text}`);
       } catch (textError) {
-        throw new Error(`サーバーエラー (${response.status})`);
+        logError(`サーバーエラー (${response.status})`);
       }
     }
     
-    // その他のエラー
+    // エラー時はデフォルト値を返す（アプリの動作を継続させるため）
     return { dailyUsage: { current: 0, limit: 100 } };
   }
 };
