@@ -24,16 +24,13 @@ const AIChat = ({ studyTopic, customStyles = {} }) => {
   // 環境変数の値が無効な場合にデフォルト値を使用するように改善
   const getMaxUsageCount = () => {
     const envValue = process.env.REACT_APP_MAX_USAGE_COUNT;
-    console.log('環境変数REACT_APP_MAX_USAGE_COUNT:', envValue);
     if (!envValue) return 20; // 環境変数が未設定の場合
     
     const parsed = parseInt(envValue, 10);
-    console.log('パース後の値:', parsed);
     return isNaN(parsed) ? 20 : parsed; // NaNの場合はデフォルト値を返す
   };
   
   const MAX_USAGE_COUNT = getMaxUsageCount();
-  console.log('最終的なMAX_USAGE_COUNT:', MAX_USAGE_COUNT);
 
   // グローバルスタイルの適用
   useEffect(() => {
