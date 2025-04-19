@@ -2,7 +2,12 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { saveStudySession } from "../utils/api";
 import { formatTime } from "../components/Utils/TimeFormatter";
 import { getStudyStatus } from "../components/Utils/StatusIndicator";
-import { resetChatHistory as resetChat, clearSessionChats, resetReloadFlag } from "../components/Utils/SessionStorageManager";
+import { 
+  resetChatHistory as resetChat, 
+  clearSessionChats, 
+  resetReloadFlag,
+  resetChatUsageCount 
+} from "../components/Utils/SessionStorageManager";
 
 const StudyContext = createContext();
 
@@ -36,6 +41,11 @@ export const StudyProvider = ({ children }) => {
   const startStudy = () => {
     // 新しい学習セッション開始時にチャット履歴をクリア
     clearSessionChats(recordedStudyTopic, studyTopic);
+    
+    // 明示的にチャット使用回数もリセット
+    if (studyTopic) {
+      resetChatUsageCount(studyTopic);
+    }
     
     setStudyStartTime(Date.now());
     setStudyDuration(null);
