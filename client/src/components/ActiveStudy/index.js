@@ -42,8 +42,11 @@ const ActiveStudyPage = ({
   
   // ページロード時の処理
   useEffect(() => {
-    // 学習中でない場合、ホームページに戻る
-    if (!isStudying) {
+    // 学習完了中の場合は何もしない
+    const isCompletingStudy = sessionStorage.getItem('completingStudy') === 'true';
+    
+    // 学習中でない場合かつ学習完了処理中でない場合、ホームページに戻る
+    if (!isStudying && !isCompletingStudy) {
       navigate('/');
       return;
     }
@@ -95,13 +98,21 @@ const ActiveStudyPage = ({
     
     if (confirmationType === "stop") {
       try {
+        // isStudyingの変更による自動リダイレクトを防ぐために一時的なフラグを設定
+        sessionStorage.setItem('completingStudy', 'true');
+        
         // 学習終了処理を実行
         await stopStudy();
+        
         // 完了ページへ遷移（チャット履歴のリセットは完了ページで行う）
         navigate("/completed");
+        
+        // フラグをクリア
+        sessionStorage.removeItem('completingStudy');
       } catch (error) {
         console.error("学習終了エラー:", error);
         alert("学習の終了処理中にエラーが発生しました。もう一度お試しください。");
+        sessionStorage.removeItem('completingStudy');
       }
     } else {
       // 学習放棄時にチャット履歴をリセット

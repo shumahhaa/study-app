@@ -29,9 +29,13 @@ const CompletedStudyPage = ({
 
   // ページロード時の処理
   useEffect(() => {
+    // 学習完了フラグをクリア（既に存在する場合）
+    sessionStorage.removeItem('completingStudy');
+    
     // 学習内容がなければホームページにリダイレクト
     if (!recordedStudyTopic) {
       navigate("/");
+      return;
     }
     
     // アニメーションスタイルを追加
