@@ -47,6 +47,8 @@ const StudyHistory = ({ studyHistory, deleteStudySession, formatTime }) => {
     endDate: "",
   });
   const [filteredHistory, setFilteredHistory] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 10;
 
   // フィルタリングされたデータを取得
   useEffect(() => {
@@ -114,6 +116,7 @@ const StudyHistory = ({ studyHistory, deleteStudySession, formatTime }) => {
     }
     
     setFilteredHistory(filtered);
+    setCurrentPage(1); // フィルタが変更されたら1ページ目に戻る
   }, [studyHistory, filter, advancedFilters, advancedSearchOpen]);
 
   // ソートされたデータを取得
@@ -135,6 +138,17 @@ const StudyHistory = ({ studyHistory, deleteStudySession, formatTime }) => {
     
     return sortDirection === "asc" ? comparison : -comparison;
   });
+
+  // 現在のページのデータを取得
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = sortedHistory.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(sortedHistory.length / recordsPerPage);
+
+  // ページ変更ハンドラ
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   // ソート機能
   const handleSort = (field) => {
@@ -166,6 +180,41 @@ const StudyHistory = ({ studyHistory, deleteStudySession, formatTime }) => {
       startDate: "",
       endDate: "",
     });
+  };
+
+  // ページネーションコンポーネント
+  const Pagination = () => {
+    return (
+      <div style={styles.pagination}>
+        <button 
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          style={{
+            ...styles.pageButton,
+            opacity: currentPage === 1 ? 0.5 : 1,
+            cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
+          }}
+        >
+          前へ
+        </button>
+        
+        <div style={styles.pageInfo}>
+          {totalPages > 0 ? `${currentPage} / ${totalPages}` : '0 / 0'}
+        </div>
+        
+        <button 
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages || totalPages === 0}
+          style={{
+            ...styles.pageButton,
+            opacity: (currentPage === totalPages || totalPages === 0) ? 0.5 : 1,
+            cursor: (currentPage === totalPages || totalPages === 0) ? 'not-allowed' : 'pointer'
+          }}
+        >
+          次へ
+        </button>
+      </div>
+    );
   };
 
   return (
@@ -214,14 +263,17 @@ const StudyHistory = ({ studyHistory, deleteStudySession, formatTime }) => {
           resetFilters={resetFilters}
         />
       ) : (
-        <StudyHistoryTable 
-          sortedHistory={sortedHistory}
-          handleSort={handleSort}
-          sortField={sortField}
-          sortDirection={sortDirection}
-          deleteStudySession={deleteStudySession}
-          isMobile={isMobile}
-        />
+        <>
+          <StudyHistoryTable 
+            sortedHistory={currentRecords}
+            handleSort={handleSort}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            deleteStudySession={deleteStudySession}
+            isMobile={isMobile}
+          />
+          <Pagination />
+        </>
       )}
     </div>
   );

@@ -289,7 +289,32 @@ const styles = {
     fontSize: "24px",
     fontWeight: "600",
     color: "#333"
-  }
+  },
+  // ページネーションのスタイル
+  pagination: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    margin: "30px 0 10px",
+    gap: "20px",
+  },
+  pageButton: {
+    padding: "8px 16px",
+    backgroundColor: "#4CAF50",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontSize: "14px",
+    fontWeight: "500",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+    transition: "all 0.2s",
+  },
+  pageInfo: {
+    fontSize: "16px",
+    fontWeight: "500",
+    color: "#333",
+  },
 };
 
 export default styles; 
