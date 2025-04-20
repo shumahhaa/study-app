@@ -5,16 +5,17 @@ import styles from './styles';
 const ActionButtons = ({
   quizGenerated,
   isGeneratingQuiz,
-  handleGenerateQuiz
+  handleGenerateQuiz,
+  isMobile
 }) => {
   return (
     <div style={styles.actionsSection}>
       {quizGenerated ? (
         <>
-          <Link to="/review-quizzes" style={styles.quizButton}>
+          <Link to="/review-quizzes" style={isMobile ? {...styles.quizButton, ...styles.mobileButton} : styles.quizButton}>
             復習問題を確認する
           </Link>
-          <Link to="/" style={styles.homeButton}>
+          <Link to="/" style={isMobile ? {...styles.homeButton, ...styles.mobileButton} : styles.homeButton}>
             ホームに戻る
           </Link>
         </>
@@ -25,7 +26,8 @@ const ActionButtons = ({
             disabled={isGeneratingQuiz}
             style={{
               ...styles.quizButton,
-              ...(isGeneratingQuiz ? styles.disabledButton : {})
+              ...(isGeneratingQuiz ? styles.disabledButton : {}),
+              ...(isMobile ? styles.mobileButton : {})
             }}
           >
             {isGeneratingQuiz ? (
@@ -34,10 +36,10 @@ const ActionButtons = ({
                 復習問題を作成中...
               </>
             ) : (
-              'チャットから復習問題を作成'
+              isMobile ? '復習問題作成' : 'チャットから復習問題を作成'
             )}
           </button>
-          <Link to="/" style={styles.homeButton}>
+          <Link to="/" style={isMobile ? {...styles.homeButton, ...styles.mobileButton} : styles.homeButton}>
             ホームに戻る
           </Link>
         </>

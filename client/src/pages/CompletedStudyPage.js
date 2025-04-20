@@ -26,6 +26,9 @@ const CompletedStudyPage = ({
   const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
   const [quizGenerated, setQuizGenerated] = useState(false);
   const [quizError, setQuizError] = useState(null);
+  
+  // モバイル画面かどうかを判定する状態
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
 
   // ページロード時の処理
   useEffect(() => {
@@ -40,6 +43,16 @@ const CompletedStudyPage = ({
     
     // アニメーションスタイルを追加
     addAnimationStyles();
+    
+    // 画面サイズの変更を監視
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 480);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, [recordedStudyTopic, navigate]);
 
   // 復習問題を生成する処理
@@ -67,10 +80,15 @@ const CompletedStudyPage = ({
     }
   };
 
+  const responsiveCardStyle = {
+    ...styles.completionCard,
+    ...(isMobile && { padding: "15px" })
+  };
+
   return (
     <Layout>
       <div style={styles.container}>
-        <div style={styles.completionCard}>
+        <div style={responsiveCardStyle}>
           <CompletionHeader />
           
           <StudySummary 
@@ -85,6 +103,7 @@ const CompletedStudyPage = ({
             quizGenerated={quizGenerated}
             isGeneratingQuiz={isGeneratingQuiz}
             handleGenerateQuiz={handleGenerateQuiz}
+            isMobile={isMobile}
           />
           
           <ErrorMessage quizError={quizError} />

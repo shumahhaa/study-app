@@ -90,6 +90,7 @@ const styles = {
     justifyContent: "center",
     gap: "15px",
     marginTop: "25px",  // マージンを追加
+    flexWrap: "wrap", // スマホ表示時に折り返せるように
   },
   quizButton: {
     backgroundColor: '#4CAF50',
@@ -161,6 +162,14 @@ const styles = {
   buttonIcon: {
     marginRight: "8px",
     fontSize: "16px",
+  },
+  // モバイル用のボタンスタイル
+  mobileButton: {
+    padding: "10px 15px",
+    fontSize: "14px",
+    minWidth: '130px',
+    flex: "1 0 auto",
+    margin: "5px 0",
   }
 };
 
