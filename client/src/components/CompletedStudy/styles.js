@@ -1,16 +1,16 @@
 const styles = {
   container: {
-    maxWidth: "700px",
+    maxWidth: "800px",
     margin: "0 auto",
-    padding: "15px",
+    width: "100%",
   },
   completionCard: {
     backgroundColor: "white",
     borderRadius: "12px",
     boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
     padding: "25px",
-    marginTop: "20px",
     width: "100%",
+    boxSizing: "border-box",
   },
   completionHeader: {
     textAlign: "center",
@@ -61,11 +61,12 @@ const styles = {
     fontSize: "14px",
     color: "#666",
     fontWeight: "500",
-    width: "120px",
+    width: "140px",
     textAlign: "left",
     borderTopLeftRadius: "8px",
     borderBottomLeftRadius: "8px",
     verticalAlign: "top",
+    whiteSpace: "nowrap",
   },
   tableValue: {
     padding: "12px 15px",

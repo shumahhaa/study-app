@@ -23,7 +23,7 @@ const StudySummary = ({
           <tr style={styles.tableRow}>
             <td style={styles.tableLabel}>モチベーション:</td>
             <td style={styles.tableValue}>
-              <strong>{recordedMotivation}/5</strong>
+              <span>{recordedMotivation}/5</span>
             </td>
           </tr>
           
